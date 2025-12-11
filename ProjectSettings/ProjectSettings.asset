@@ -4,7 +4,11 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 28
+<<<<<<< HEAD
   productGUID: f61f9b6bb2695364090f1bac9b5ec623
+=======
+  productGUID: 503feb035e6325c489cdee8036d3b624
+>>>>>>> 95b9fbbe8125d45fb0ebb57dd055a5e46e4e56d7
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -717,10 +721,17 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
+<<<<<<< HEAD
   cloudProjectId: 9919c881-1e66-4adb-9cf2-753eae83615d
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: The Shimmer 2025-12-11_15-57-09
+=======
+  cloudProjectId: fd2601ec-6e98-480c-93ef-2ec109f5d612
+  framebufferDepthMemorylessMode: 0
+  qualitySettingsNames: []
+  projectName: The Shimmer 2025-12-11_14-49-50
+>>>>>>> 95b9fbbe8125d45fb0ebb57dd055a5e46e4e56d7
   organizationId: hbt-whisperworks
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
