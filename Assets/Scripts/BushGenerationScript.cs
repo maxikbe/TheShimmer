@@ -33,7 +33,7 @@ public class BushGenerationScript : MonoBehaviour
 
     [Header("Leaf Spawning")]
     [Range(0f, 1f)]
-    public float leafSpawnChance = 0.5f;
+    public float leafSpawnChance = 1f;
 
     void Start()
     {
