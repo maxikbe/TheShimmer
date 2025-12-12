@@ -590,6 +590,7 @@ GameObject:
   - component: {fileID: 324822916}
   - component: {fileID: 324822915}
   - component: {fileID: 324822917}
+  - component: {fileID: 324822918}
   m_Layer: 15
   m_Name: Mainchar
   m_TagString: Player
@@ -771,6 +772,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   animator: {fileID: 324822912}
+--- !u!114 &324822918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 324822911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fa9519f5b01aea41b2997abae9b6b09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseMenuCursor
+  pauseMenuUI: {fileID: 150009420}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
