@@ -70,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
         moveSouthEast = vertical < 0 && horizontal > 0;
         moveNorthWest = vertical > 0 && horizontal < 0;
         moveNorthEast = vertical > 0 && horizontal > 0;
-        Debug.Log(moveSouth + " " + moveNorth + " " + moveEast + " " + moveWest + " " + moveSouthEast + " " + moveSouthWest + " " + moveNorthEast + " " + moveNorthWest);
+        //Debug.Log(moveSouth + " " + moveNorth + " " + moveEast + " " + moveWest + " " + moveSouthEast + " " + moveSouthWest + " " + moveNorthEast + " " + moveNorthWest);
     }
 
     void ResetDirectionBools()
