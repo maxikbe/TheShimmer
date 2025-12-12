@@ -4,6 +4,13 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float runSpeed = 8f;
+
+    [SerializeField] private KeyCode keyUp = KeyCode.W;
+    [SerializeField] private KeyCode keyDown = KeyCode.S;
+    [SerializeField] private KeyCode keyLeft = KeyCode.A;
+    [SerializeField] private KeyCode keyRight = KeyCode.D;
+    [SerializeField] private KeyCode keyRun = KeyCode.LeftShift;
+
     [SerializeField] private Animator animator;
 
     private Rigidbody2D rb;
@@ -22,10 +29,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        float horizontal = 0f;
+        float vertical = 0f;
 
-        bool isRunning = Input.GetKey(KeyCode.LeftShift);
+        if (Input.GetKey(keyLeft))  horizontal -= 1f;
+        if (Input.GetKey(keyRight)) horizontal += 1f;
+        if (Input.GetKey(keyDown))  vertical  -= 1f;
+        if (Input.GetKey(keyUp))    vertical  += 1f;
+
+        bool isRunning = Input.GetKey(keyRun);
         currentSpeed = isRunning ? runSpeed : walkSpeed;
 
         movement = new Vector2(horizontal, vertical);
@@ -44,11 +56,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (animator == null) return;
 
-        // Zapamatuj poslední směr pohybu (pro idle animaci)
         if (movement.sqrMagnitude > 0.01f)
             lastMoveDir = movement.normalized;
 
-        // Speed:  0 = idle, 1 = walk, 2 = run
         float animSpeed = 0f;
         if (movement.sqrMagnitude > 0.01f)
             animSpeed = isRunning ? 2f : 1f;
