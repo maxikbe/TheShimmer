@@ -48,40 +48,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-       
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
-      
-        
+        rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
     }
 
-    void UpdateDirectionBools(float horizontal, float vertical)
-    {
-        
-        ResetDirectionBools();
-        moveSouth = vertical < 0 && horizontal == 0;
-        moveNorth = vertical > 0 && horizontal == 0;
-        moveWest = horizontal < 0 && vertical == 0;
-        moveEast = horizontal > 0 && vertical == 0;
-        moveSouthWest = vertical < 0 && horizontal < 0;
-        moveSouthEast = vertical < 0 && horizontal > 0;
-        moveNorthWest = vertical > 0 && horizontal < 0;
-        moveNorthEast = vertical > 0 && horizontal > 0;
-        Debug.Log(moveSouth + " " + moveNorth + " " + moveEast + " " + moveWest + " " + moveSouthEast + " " + moveSouthWest + " " + moveNorthEast + " " + moveNorthWest);
-    }
-
-    void ResetDirectionBools()
-    {
-        moveSouth = false;
-        moveNorth = false;
-        moveWest = false;
-        moveEast = false;
-        moveSouthWest = false;
-        moveSouthEast = false;
-        moveNorthWest = false;
-        moveNorthEast = false;
-    }
-
-    void UpdateAnimator()
+    private void UpdateAnimator(bool isRunning)
     {
         if (animator == null) return;
 
