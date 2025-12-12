@@ -2,114 +2,59 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private float moveSpeed = 5f;
-    private KeyCode moveUpKey = KeyCode.W;
-    private KeyCode moveDownKey = KeyCode.S; 
-    private KeyCode moveLeftKey = KeyCode.A;
-    private KeyCode moveRightKey = KeyCode.D;
-    private KeyCode runKey = KeyCode.LeftShift;
-    private Rigidbody2D rb;
-    private Vector2 movement;
-
-    private Matrix4x4 isoMatrix;
-
-    private bool moveSouth = false;
-    private bool moveSouthWest = false;
-    private bool moveSouthEast = false;
-    private bool moveNorth = false;
-    private bool moveNorthWest = false;
-    private bool moveNorthEast = false;
-    private bool moveWest = false;
-    private bool moveEast = false;
-    public bool isMoving = false;
-    private bool isRunning = false;
+    [SerializeField] private float walkSpeed = 5f;
+    [SerializeField] private float runSpeed = 8f;
     [SerializeField] private Animator animator;
 
+    private Rigidbody2D rb;
+    private Vector2 movement;
+    private Vector2 lastMoveDir = Vector2.down;
+    private float currentSpeed;
 
+    private static readonly int AnimMoveX = Animator.StringToHash("MoveX");
+    private static readonly int AnimMoveY = Animator.StringToHash("MoveY");
+    private static readonly int AnimSpeed = Animator.StringToHash("Speed");
 
-    void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        isoMatrix = Matrix4x4.Rotate(Quaternion.Euler(0, 0, -45));
     }
 
-
-    void Update()
+    private void Update()
     {
-        float horizontal = 0f;
-        float vertical = 0f;
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
 
-        if (Input.GetKey(moveUpKey))vertical += 1f;
-        if (Input.GetKey(moveDownKey))vertical -= 1f;
-        if (Input.GetKey(moveLeftKey))horizontal -= 1f;
-        if (Input.GetKey(moveRightKey))horizontal += 1f;
-        isRunning = Input.GetKey(runKey);
-        UpdateDirectionBools(horizontal, vertical);
-        if(isRunning)
-        {
-            moveSpeed = 8f;          
-        }
-        else
-        {
-            moveSpeed = 5f;
-        }
-        UpdateAnimator();
-        Debug.Log("isRunning: " + isRunning);
-        movement = new Vector2(horizontal, vertical).normalized;
-        Vector2 input = new Vector2(horizontal, vertical).normalized;
-        Vector3 isoMovement = isoMatrix.MultiplyVector(new Vector3(input.x, input.y, 0));
+        bool isRunning = Input.GetKey(KeyCode.LeftShift);
+        currentSpeed = isRunning ? runSpeed : walkSpeed;
+
+        movement = new Vector2(horizontal, vertical);
+        if (movement.sqrMagnitude > 1f)
+            movement.Normalize();
+
+        UpdateAnimator(isRunning);
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-       
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
-      
-        
+        rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
     }
 
-    void UpdateDirectionBools(float horizontal, float vertical)
-    {
-        ResetDirectionBools();
-        moveSouth = vertical < 0 && horizontal == 0;
-        moveNorth = vertical > 0 && horizontal == 0;
-        moveWest = horizontal < 0 && vertical == 0;
-        moveEast = horizontal > 0 && vertical == 0;
-        moveSouthWest = vertical < 0 && horizontal < 0;
-        moveSouthEast = vertical < 0 && horizontal > 0;
-        moveNorthWest = vertical > 0 && horizontal < 0;
-        moveNorthEast = vertical > 0 && horizontal > 0;
-    }
-
-    void ResetDirectionBools()
-    {
-        moveSouth = false;
-        moveNorth = false;
-        moveWest = false;
-        moveEast = false;
-        moveSouthWest = false;
-        moveSouthEast = false;
-        moveNorthWest = false;
-        moveNorthEast = false;
-    }
-
-
-    void UpdateAnimator()
+    private void UpdateAnimator(bool isRunning)
     {
         if (animator == null) return;
-        animator.SetBool("isRunning", isRunning);
-        animator.SetBool("South", moveSouth);
-        animator.SetBool("North", moveNorth);
-        animator.SetBool("West", moveWest);
-        animator.SetBool("East", moveEast);
-        animator.SetBool("SouthWest", moveSouthWest);
-        animator.SetBool("SouthEast", moveSouthEast);
-        animator.SetBool("NorthWest", moveNorthWest);
-        animator.SetBool("NorthEast", moveNorthEast);
-        
-        
-     
 
-     
+        // Zapamatuj poslední směr pohybu (pro idle animaci)
+        if (movement.sqrMagnitude > 0.01f)
+            lastMoveDir = movement.normalized;
+
+        // Speed:  0 = idle, 1 = walk, 2 = run
+        float animSpeed = 0f;
+        if (movement.sqrMagnitude > 0.01f)
+            animSpeed = isRunning ? 2f : 1f;
+
+        animator.SetFloat(AnimMoveX, lastMoveDir.x);
+        animator.SetFloat(AnimMoveY, lastMoveDir.y);
+        animator.SetFloat(AnimSpeed, animSpeed);
     }
 }
