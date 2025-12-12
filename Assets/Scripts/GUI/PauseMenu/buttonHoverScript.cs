@@ -3,7 +3,6 @@ using UnityEngine. EventSystems;
 
 public class ButtonHoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("Nastavení zvětšení")]
     [SerializeField] private float hoverScale = 1.2f;        
     [SerializeField] private float animationSpeed = 10f;     
 
