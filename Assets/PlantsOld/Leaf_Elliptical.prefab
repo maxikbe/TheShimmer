@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7971325068333980004}
   - component: {fileID: -3303501648705590978}
   m_Layer: 0
-  m_Name: Leaf
+  m_Name: Leaf_Elliptical
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
