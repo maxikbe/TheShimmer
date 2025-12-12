@@ -16,7 +16,6 @@ public class CursorChanger : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        // Použij MenuCursor pro nastavení výchozího kurzoru
         if (MenuCursor.Instance != null)
         {
             MenuCursor.Instance.SetDefaultCursor();
