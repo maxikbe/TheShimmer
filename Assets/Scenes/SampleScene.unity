@@ -223,8 +223,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1049085749
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 2324236343598682440, guid: 9007c4dcceb98c1448d192e8e7d13677, type: 3}
@@ -417,7 +417,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2070140370}
   - component: {fileID: 2070140369}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PathTest_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -469,8 +469,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1748805237
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 397926824735423530, guid: 835beddd7b5bfb34ab912e1ea9c866a3, type: 3}
