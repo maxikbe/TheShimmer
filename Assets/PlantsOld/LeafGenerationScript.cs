@@ -20,9 +20,9 @@ public class LeafGenerationScript : MonoBehaviour
     public float noiseScale = 10f;
     public float colorVariationStrength = 0.2f;
     public Color leafColor = new Color(100/255f, 160/255f, 60/255f, 1.0f);
-    private float greenValue = 220f;
+    // private float greenValue = 160f;
 
-    private float leafChangeTimer = 0;
+    // private float leafChangeTimer = 0;
     private SpriteRenderer sr;
     private Vector2 noiseOffset;
 
@@ -33,9 +33,9 @@ public class LeafGenerationScript : MonoBehaviour
         //Leaf Setting
         textureSize = 256;
         widthOfLeaf = 0.45f;
-        leafChangeTimer = UnityEngine.Random.Range(1f,3f);
-        Array values = Enum.GetValues(typeof(LeafShapeType));
-        leafShape = (LeafShapeType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+        // leafChangeTimer = UnityEngine.Random.Range(1f,3f);
+        // Array values = Enum.GetValues(typeof(LeafShapeType));
+        // leafShape = (LeafShapeType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
         
         noiseOffset = new Vector2(UnityEngine.Random.Range(0f, 100f), UnityEngine.Random.Range(0f, 100f));
         
@@ -45,13 +45,13 @@ public class LeafGenerationScript : MonoBehaviour
 
     void Update()
     {
-        leafChangeTimer -= Time.deltaTime;
-        if(leafChangeTimer <= 0)
-        {
-            leafChangeTimer = UnityEngine.Random.Range(1f,3f);
-            //Debug.Log("Updated");
-            GenerateLeafSprite();
-        }
+        // leafChangeTimer -= Time.deltaTime;
+        // if(leafChangeTimer <= 0)
+        // {
+        //     leafChangeTimer = UnityEngine.Random.Range(1f,3f);
+        //     //Debug.Log("Updated");
+        //     GenerateLeafSprite();
+        // }
     }
 
     private float CalculateMaxLeafWidth(float v_norm)
@@ -85,11 +85,11 @@ public class LeafGenerationScript : MonoBehaviour
 
     void GenerateLeafSprite()
     {
-        if(greenValue > 80)
-        {
-            greenValue -= 2;
-            leafColor = new Color(100/255f, greenValue/255f, 60/255f, 1.0f);
-        }
+        // if(greenValue > 80)
+        // {
+        //     greenValue -= 2;
+        //     leafColor = new Color(100/255f, greenValue/255f, 60/255f, 1.0f);
+        // }
         
         Texture2D texture = new Texture2D(textureSize, textureSize, TextureFormat.RGBA32, false);
         Color[] clearPixels = new Color[textureSize * textureSize];
@@ -137,7 +137,7 @@ public class LeafGenerationScript : MonoBehaviour
         Rect rect = new Rect(0, 0, textureSize, textureSize);
         Vector2 pivot = new Vector2(0.5f, 0f); 
         
-        Sprite newSprite = Sprite.Create(texture, rect, pivot, 400f);
+        Sprite newSprite = Sprite.Create(texture, rect, pivot, 300f);
         sr.sprite = newSprite;
     }
 }

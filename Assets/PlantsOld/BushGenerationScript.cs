@@ -1,11 +1,9 @@
 using UnityEngine;
-
 using System;
-
-
+using System.Collections.Generic;
+using System.Linq;
 
 [RequireComponent(typeof(SpriteRenderer))]
-
 public class BushGenerationScript : MonoBehaviour
 {
     [Header("Deterministic Seed")]
@@ -13,7 +11,7 @@ public class BushGenerationScript : MonoBehaviour
     private System.Random randomGenerator;
 
     [Header("Generation Parameters")]
-    public int maxDepth = 5;
+    public int maxDepth = 7;
     public float baseLength = 2.5f;
     public float baseWidth = 0.2f;
     public int branchCount = 2;
@@ -34,6 +32,7 @@ public class BushGenerationScript : MonoBehaviour
     [Header("Leaf Spawning")]
     [Range(0f, 1f)]
     public float leafSpawnChance = 1f;
+    public int leavesPerBranch = 25;
 
     void Start()
     {
@@ -94,7 +93,13 @@ public class BushGenerationScript : MonoBehaviour
 
         if (leafPrefab != null && UnityEngine.Random.value < leafSpawnChance)
         {
-            SpawnLeaf(stickObject.transform); 
+            for (int j = 0; j < leavesPerBranch; j++)
+            {
+                if (depth >= 1) 
+                {
+                    SpawnLeaf(stickObject.transform); 
+                }
+            }
         }
 
         float newLength = length * lengthScaleFactor;
@@ -107,7 +112,9 @@ public class BushGenerationScript : MonoBehaviour
 
             GameObject branchHolder = new GameObject($"Holder_D{depth+1}_{i}");
             branchHolder.transform.SetParent(stickObject.transform); 
-            branchHolder.transform.localPosition = Vector3.zero; 
+            
+            branchHolder.transform.localPosition = Vector3.up * length; 
+            
             branchHolder.transform.localRotation = branchRotation;
 
             GenerateBranch(branchHolder.transform, newLength, newWidth, depth + 1);
@@ -144,11 +151,33 @@ public class BushGenerationScript : MonoBehaviour
         
         if (stickLr == null) return;
         
-        Vector3 spawnPosition = stickLr.GetPosition(1);
+        float branchWidth = stickLr.startWidth; 
+        float leafScale = Mathf.Max(0.5f, branchWidth * 4f); 
+        
         
         GameObject leafInstance = Instantiate(leafPrefab, stickTransform);
-        
         leafInstance.name = "Leaf";
-        leafInstance.transform.localPosition = spawnPosition;
+
+        leafInstance.transform.localScale = new Vector3(leafScale, leafScale, 1f);
+
+        float stickLength = Vector3.Distance(stickLr.GetPosition(0), stickLr.GetPosition(1));
+
+        float positionAlongStick = RandomRange(0.05f, 0.95f);
+        
+        float sideOffset = RandomRange(-0.1f, 0.1f) * stickLength; 
+        
+        Vector3 localPosition = Vector3.up * stickLength * positionAlongStick;
+        
+        localPosition += Vector3.right * sideOffset; 
+        
+        leafInstance.transform.localPosition = localPosition;
+        
+        float rotationZ = RandomRange(-150f, -30f);
+        if (UnityEngine.Random.value > 0.5f)
+        {
+            rotationZ = RandomRange(30f, 150f);
+        }
+
+        leafInstance.transform.localRotation = Quaternion.Euler(0, 0, rotationZ);
     }
 }

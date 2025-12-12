@@ -46,17 +46,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BushGenerationScript
   seed: 12345
-  maxDepth: 5
-  baseLength: 2.5
+  maxDepth: 6
+  baseLength: 0.69
   baseWidth: 0.2
   branchCount: 2
-  lengthScaleFactor: 0.8
+  lengthScaleFactor: 0.99
   widthScaleFactor: 0.8
   minAngle: 15
   maxAngle: 45
-  lineMaterial: {fileID: 0}
+  lineMaterial: {fileID: 2100000, guid: 72c4e77c8d391924494ce698628ae31f, type: 2}
   baseColor: {r: 0.5, g: 0.3, b: 0.1, a: 1}
-  leafPrefab: {fileID: 0}
+  leafPrefab: {fileID: 2332947298183141887, guid: 04141318fa234c14a82fc3e66eadc890, type: 3}
+  leafSpawnChance: 1
+  leavesPerBranch: 10
 --- !u!212 &5084674245250581152
 SpriteRenderer:
   serializedVersion: 2
