@@ -313,7 +313,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75efeed6a22ed1e409ad044627ac673d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  isMoving: 0
+  walkSpeed: 5
+  runSpeed: 8
+  keyUp: 119
+  keyDown: 115
+  keyLeft: 97
+  keyRight: 100
+  keyRun: 304
   animator: {fileID: 324822912}
 --- !u!1 &519420028
 GameObject:
