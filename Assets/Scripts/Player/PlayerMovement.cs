@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
     private KeyCode moveDownKey = KeyCode.S; 
     private KeyCode moveLeftKey = KeyCode.A;
     private KeyCode moveRightKey = KeyCode.D;
+    private KeyCode runKey = KeyCode.LeftShift;
     private Rigidbody2D rb;
     private Vector2 movement;
 
@@ -21,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     private bool moveWest = false;
     private bool moveEast = false;
     public bool isMoving = false;
+    private bool isRunning = false;
     [SerializeField] private Animator animator;
 
 
@@ -41,10 +43,18 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(moveDownKey))vertical -= 1f;
         if (Input.GetKey(moveLeftKey))horizontal -= 1f;
         if (Input.GetKey(moveRightKey))horizontal += 1f;
-
+        isRunning = Input.GetKey(runKey);
         UpdateDirectionBools(horizontal, vertical);
+        if(isRunning)
+        {
+            moveSpeed = 8f;          
+        }
+        else
+        {
+            moveSpeed = 5f;
+        }
         UpdateAnimator();
-
+        Debug.Log("isRunning: " + isRunning);
         movement = new Vector2(horizontal, vertical).normalized;
         Vector2 input = new Vector2(horizontal, vertical).normalized;
         Vector3 isoMovement = isoMatrix.MultiplyVector(new Vector3(input.x, input.y, 0));
@@ -60,7 +70,6 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateDirectionBools(float horizontal, float vertical)
     {
-        
         ResetDirectionBools();
         moveSouth = vertical < 0 && horizontal == 0;
         moveNorth = vertical > 0 && horizontal == 0;
@@ -70,7 +79,6 @@ public class PlayerMovement : MonoBehaviour
         moveSouthEast = vertical < 0 && horizontal > 0;
         moveNorthWest = vertical > 0 && horizontal < 0;
         moveNorthEast = vertical > 0 && horizontal > 0;
-        Debug.Log(moveSouth + " " + moveNorth + " " + moveEast + " " + moveWest + " " + moveSouthEast + " " + moveSouthWest + " " + moveNorthEast + " " + moveNorthWest);
     }
 
     void ResetDirectionBools()
@@ -85,10 +93,11 @@ public class PlayerMovement : MonoBehaviour
         moveNorthEast = false;
     }
 
+
     void UpdateAnimator()
     {
         if (animator == null) return;
-        
+        animator.SetBool("isRunning", isRunning);
         animator.SetBool("South", moveSouth);
         animator.SetBool("North", moveNorth);
         animator.SetBool("West", moveWest);
@@ -97,5 +106,10 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("SouthEast", moveSouthEast);
         animator.SetBool("NorthWest", moveNorthWest);
         animator.SetBool("NorthEast", moveNorthEast);
+        
+        
+     
+
+     
     }
 }
