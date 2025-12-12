@@ -2,14 +2,13 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float walkSpeed = 5f;
-    [SerializeField] private float runSpeed = 8f;
-
-    [SerializeField] private KeyCode keyUp = KeyCode.W;
-    [SerializeField] private KeyCode keyDown = KeyCode.S;
-    [SerializeField] private KeyCode keyLeft = KeyCode.A;
-    [SerializeField] private KeyCode keyRight = KeyCode.D;
-    [SerializeField] private KeyCode keyRun = KeyCode.LeftShift;
+    private float walkSpeed = 5f;
+    private float runSpeed = 8f;
+    private KeyCode keyUp = KeyCode.W;
+    private KeyCode keyDown = KeyCode.S;
+    private KeyCode keyLeft = KeyCode.A;
+    private KeyCode keyRight = KeyCode.D;
+    private KeyCode keyRun = KeyCode.LeftShift;
 
     [SerializeField] private Animator animator;
 
