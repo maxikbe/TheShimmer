@@ -7,10 +7,8 @@ using System;
 [RequireComponent(typeof(SpriteRenderer))]
 
 public class BushGenerationScript : MonoBehaviour
-
 {
-
-   [Header("Deterministic Seed")]
+    [Header("Deterministic Seed")]
     public int seed = 12345;
     private System.Random randomGenerator;
 
@@ -33,11 +31,16 @@ public class BushGenerationScript : MonoBehaviour
     [Header("Leaf Prefab")]
     public GameObject leafPrefab;
 
+    [Header("Leaf Spawning")]
+    [Range(0f, 1f)]
+    public float leafSpawnChance = 0.5f;
+
     void Start()
     {
-        seed = UnityEngine.Random.Range(100000000,999999999);
+        seed = UnityEngine.Random.Range(100000000, 999999999);
         GenerateBush();
     }
+
     private float RandomRange(float min, float max)
     {
         double range = max - min;
@@ -48,6 +51,11 @@ public class BushGenerationScript : MonoBehaviour
     public void GenerateBush()
     {
         randomGenerator = new System.Random(seed); 
+
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(transform.GetChild(i).gameObject);
+        }
         
         if (lineMaterial == null)
         {
@@ -62,14 +70,6 @@ public class BushGenerationScript : MonoBehaviour
     {
         if (depth >= maxDepth)
         {
-            if (leafPrefab != null)
-            {
-                Transform stickTransform = parentTransform.parent; 
-                if (stickTransform != null)
-                {
-                    SpawnLeaf(stickTransform); 
-                }
-            }
             return;
         }
 
@@ -91,6 +91,11 @@ public class BushGenerationScript : MonoBehaviour
         Color stickColor = Color.Lerp(baseColor, Color.black, colorVariation);
 
         DrawStick(stickObject, length, width, stickColor);
+
+        if (leafPrefab != null && UnityEngine.Random.value < leafSpawnChance)
+        {
+            SpawnLeaf(stickObject.transform); 
+        }
 
         float newLength = length * lengthScaleFactor;
         float newWidth = width * widthScaleFactor;
