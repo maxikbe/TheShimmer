@@ -10,7 +10,7 @@ public class BushGeneration : MonoBehaviour
     private Color[] pixels;
 
     private float Timer = 0;
-    private int refreshRateTime = 1;
+    public int refreshRateTime = 1;
 
     void Start()
     {

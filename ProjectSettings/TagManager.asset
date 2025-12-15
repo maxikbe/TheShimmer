@@ -50,6 +50,9 @@ TagManager:
   - name: player
     uniqueID: 3245881547
     locked: 0
+  - name: Tree
+    uniqueID: 634121761
+    locked: 0
   - name: Bush
     uniqueID: 3161430579
     locked: 0
