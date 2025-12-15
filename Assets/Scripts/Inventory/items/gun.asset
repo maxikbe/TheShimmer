@@ -13,8 +13,23 @@ MonoBehaviour:
   m_Name: gun
   m_EditorClassIdentifier: Assembly-CSharp::item
   id: 0
-  itemName: 
+  itemName: Gun
   icon: {fileID: 0}
   prefab: {fileID: 0}
   description: 
   maxStack: 0
+  itemType: 3
+  isDefaultItem: 0
+  AmmoID: 0
+  AmmoAmount: 0
+  HealAmount: 0
+  Damage: 0
+  Armor: 0
+  Speed: 0
+  Range: 0
+  FireRate: 0
+  ReloadTime: 0
+  AmmoCapacity: 0
+  isTwoHanded: 0
+  durability: 0
+  weight: 0
