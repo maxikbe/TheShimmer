@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class TreeGeneration : MonoBehaviour
 {
@@ -10,13 +11,16 @@ public class TreeGeneration : MonoBehaviour
 
     private float Timer = 0;
     public int refreshRateTime = 1;
+    private System.Random localRandom;
 
     void Start()
     {
         if (config != null && config.seed == 0)
         {
-            config.seed = Random.Range(1, 100000); 
+            config.seed = UnityEngine.Random.Range(1, 100000); 
         }
+        localRandom = new System.Random(config.seed);
+        
         GenerateTree();
     }
 
@@ -36,6 +40,8 @@ public class TreeGeneration : MonoBehaviour
 
         float seedOffsetX = config.seed * 10f; 
         float seedOffsetY = config.seed * 15f; 
+
+        localRandom = new System.Random(config.seed);
         
         texture = new Texture2D(config.resolution, config.resolution)
         {
@@ -94,7 +100,7 @@ public class TreeGeneration : MonoBehaviour
                             float shadeMix = Mathf.InverseLerp(config.leafThreshold, 1f, finalNoise);
                             pixelColor = Color.Lerp(config.baseLeafColor, config.highlightColor, shadeMix);
 
-                            if (config.addFruitOrFlowers && Random.value < config.fruitFlowerDensity)
+                            if (config.addFruitOrFlowers && localRandom.NextDouble() < config.fruitFlowerDensity)
                             {
                                 pixelColor = config.fruitFlowerColor; 
                             }

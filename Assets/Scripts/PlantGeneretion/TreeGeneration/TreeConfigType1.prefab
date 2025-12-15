@@ -47,7 +47,7 @@ MonoBehaviour:
   resolution: 64
   scale: 5
   seed: 33205
-  trunkHeight: 0.324
+  trunkHeight: 0.343
   trunkWidth: 0.088
   trunkNoiseThreshold: 0
   trunkColor: {r: 0.40700805, g: 0.24845104, b: 0.0959924, a: 1}
