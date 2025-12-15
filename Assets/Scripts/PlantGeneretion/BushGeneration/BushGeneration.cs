@@ -1,4 +1,4 @@
-using System.Threading;
+using System;
 using UnityEngine;
 
 public class BushGeneration : MonoBehaviour
@@ -11,13 +11,16 @@ public class BushGeneration : MonoBehaviour
 
     private float Timer = 0;
     public int refreshRateTime = 1;
+    private System.Random localRandom;
 
     void Start()
     {
         if (config != null && config.seed == 0)
         {
-            config.seed = Random.Range(1, 100000); 
+            config.seed = UnityEngine.Random.Range(1, 100000); 
         }
+        
+        localRandom = new System.Random(config.seed);
         GenerateBush();
         Timer = refreshRateTime;
     }
@@ -38,8 +41,8 @@ public class BushGeneration : MonoBehaviour
 
         float offsetX = config.seed * 10f; 
         float offsetY = config.seed * 15f; 
-        
-        Random.InitState(config.seed);
+
+        localRandom = new System.Random(config.seed);
 
         texture = new Texture2D(config.resolution, config.resolution)
         {
@@ -88,7 +91,7 @@ public class BushGeneration : MonoBehaviour
                         float shadeMix = Mathf.InverseLerp(config.leafThreshold, 1f, finalNoise);
                         pixelColor = Color.Lerp(config.baseLeafColor, config.highlightColor, shadeMix);
 
-                        if (config.addFlowers && Random.value < config.flowerDensity)
+                        if (config.addFlowers && localRandom.NextDouble() < config.flowerDensity)
                         {
                             pixelColor = config.flowerColor; 
                         }
