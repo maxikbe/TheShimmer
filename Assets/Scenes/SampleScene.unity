@@ -1113,9 +1113,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9892ac27b60a1c14d95cc0b79f280e2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Patroling
-  patrolRadius: 5
-  moveSpeed: 2
+  isFriendly: 1
+  playerPosition: {fileID: 324822913}
   nestPosition: {fileID: 1126297037}
+  moveSpeed: 2
+  runSpeed: 6
+  minRunningDistance: 1
+  maxRunningDistance: 3
+  patrolRadius: 10
+  runningRadius: 15
+  visionRadius: 5
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!212 &771239014
 SpriteRenderer:
   serializedVersion: 2
