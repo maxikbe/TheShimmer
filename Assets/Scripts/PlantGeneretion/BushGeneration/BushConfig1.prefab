@@ -48,6 +48,7 @@ MonoBehaviour:
   scale: 1
   leafThreshold: 0.102
   trunkSize: 0.07
+  trunkWidth: 0.64
   falloffStrength: 5
   baseLeafColor: {r: 0.12549022, g: 0.41960785, b: 0.181274, a: 1}
   highlightColor: {r: 0.15498638, g: 1, b: 0.22088401, a: 1}

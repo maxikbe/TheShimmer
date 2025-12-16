@@ -54,6 +54,10 @@ public class BushGeneration : MonoBehaviour
         float center = config.resolution / 2f;
         float radiusSq = center * center;
 
+        float trunkWidthPixels = config.resolution * config.trunkWidth;
+        float trunkStart = center - (trunkWidthPixels / 2f);
+        float trunkEnd = center + (trunkWidthPixels / 2f);
+
         for (int y = 0; y < config.resolution; y++)
         {
             for (int x = 0; x < config.resolution; x++)
@@ -72,7 +76,7 @@ public class BushGeneration : MonoBehaviour
 
                 Color pixelColor = Color.clear;
 
-                if (y < config.resolution * config.trunkSize && pixelColor == Color.clear)
+                if (y < config.resolution * config.trunkSize && pixelColor == Color.clear && x >= trunkStart && x <= trunkEnd)
                 {
 
                     if (noiseValue > 0.4f) 
