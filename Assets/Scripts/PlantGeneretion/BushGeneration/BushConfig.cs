@@ -12,6 +12,8 @@ public class BushConfig : MonoBehaviour
     [Tooltip("Other Settings")]
     [Range(0.0f, 1.0f)]
     public float trunkSize = 0.1f;
+    [Range(0.0f, 1.0f)]
+    public float trunkWidth = 0.5f;
     public float falloffStrength = 1.0f; 
 
     [Header("Colors")]
