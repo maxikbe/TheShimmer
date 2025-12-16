@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::item
   id: 0
   itemName: Gun
-  icon: {fileID: 0}
-  prefab: {fileID: 0}
-  description: 
+  icon: {fileID: -251271911926977222, guid: a334acfdab4804b209fbfcde60b290bf, type: 3}
+  prefab: {fileID: 5495661421501331160, guid: 49fbf090e5bed4519835383f99cb9524, type: 3}
+  description: Zbran
   maxStack: 0
   itemType: 3
-  isDefaultItem: 0
+  isDefaultItem: 1
   AmmoID: 0
   AmmoAmount: 0
   HealAmount: 0
