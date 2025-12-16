@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &459495001073465858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8386078157331482350}
+  - component: {fileID: 421837175442833921}
+  m_Layer: 0
+  m_Name: TreeConfigType2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8386078157331482350
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459495001073465858}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.234, y: 4.13248, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &421837175442833921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459495001073465858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69327167c0cfc1d4fb0d8ca82b9d0280, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TreeConfig
+  resolution: 64
+  scale: 3.14
+  seed: 33184
+  trunkHeight: 0.33
+  trunkWidth: 0.092
+  trunkNoiseThreshold: 0
+  trunkColor: {r: 0.40700805, g: 0.24845104, b: 0.0959924, a: 1}
+  crownRatio: 1.21
+  falloffStrength: 2.2
+  leafThreshold: 0.17
+  baseLeafColor: {r: 0.07740058, g: 0.40161723, b: 0.15773748, a: 1}
+  highlightColor: {r: 0, g: 0.9083557, b: 0.23642132, a: 1}
+  addFruitOrFlowers: 0
+  fruitFlowerColor: {r: 1, g: 0, b: 0.9816718, a: 1}
+  fruitFlowerDensity: 0.031
