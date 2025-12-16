@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "item", menuName = "Scriptable Objects/item")]
-public class item : ScriptableObject
+[CreateAssetMenu(fileName = "Item", menuName = "Scriptable Objects/Item")]
+public class Item : ScriptableObject
 {
     public int id;
     public string itemName;
@@ -29,7 +29,7 @@ public class item : ScriptableObject
 public enum ItemType 
 {
     Consumable, 
-    armor, 
+    Armor, 
     Resource,
-    gun
+    Gun
 }

@@ -1,28 +1,41 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class Inventory : MonoBehaviour
 {
-    [SerializeField] private List<item> items = new List<item>();
+    public InventoryUI inventoryUI; 
 
+    [SerializeField] public List<Item> items = new List<Item>();
+    
     public int maxWeight = 20;
-    public void AddItem(item newItem)
+
+    public void AddItem(Item newItem)
     {
-        if(GetCurrentWeight() < maxWeight)
+        if(GetCurrentWeight() + newItem.weight <= maxWeight) 
         {
             items.Add(newItem);
-        } else
+            if (inventoryUI != null)
+            {
+                inventoryUI.UpdateInventoryUI();
+            }
+            Debug.Log("Předmět " + newItem.itemName + " přidán.Aktuální váha: " + GetCurrentWeight() + "/" + maxWeight);
+        } 
+        else
         {
-            Debug.Log("Inventory is full!");
+            Debug.Log("Inventory is full! (Weight limit reached: " + maxWeight + ")");
         }
     }
 
-    public void RemoveItem(item itemToRemove)
+    public void RemoveItem(Item itemToRemove)
     {
         if (items.Contains(itemToRemove))
         {
             items.Remove(itemToRemove);
+
+            if (inventoryUI != null)
+            {
+                inventoryUI.UpdateInventoryUI();
+            }
         }
         else
         {
@@ -30,13 +43,10 @@ public class Inventory : MonoBehaviour
         }
     }
 
-
-
-    public void UseItem(item itemToUse)
+    public void UseItem(Item itemToUse)
     {
         if (items.Contains(itemToUse))
         {
-            // logika toho co se stane kdyz item pouzijes
             Debug.Log("Used item: " + itemToUse.itemName);
             RemoveItem(itemToUse);
         }
@@ -49,7 +59,7 @@ public class Inventory : MonoBehaviour
     public int GetCurrentWeight()
     {
         int currentWeight = 0;
-        foreach (item itm in items)
+        foreach (Item itm in items)
         {
             currentWeight += itm.weight;
         }

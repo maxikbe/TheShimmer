@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 39bc8ee89873b4ed2a9f34833b2f9b71
+guid: a334acfdab4804b209fbfcde60b290bf
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7896587377300784523
-    second: inventory-outline_0
+      213: -251271911926977222
+    second: pixellab-2D-image-of-a-pistol--1765805314350_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: inventory-outline_0
+      name: pixellab-2D-image-of-a-pistol--1765805314350_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 64
+        x: 7
+        y: 8
+        width: 51
+        height: 49
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 57a37264e9fa96290800000000000000
-      internalID: -7896587377300784523
+      spriteID: a3d2f83078d438cf0800000000000000
+      internalID: -251271911926977222
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      inventory-outline_0: -7896587377300784523
+      pixellab-2D-image-of-a-pistol--1765805314350_0: -251271911926977222
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
