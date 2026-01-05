@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8386078157331482350}
   - component: {fileID: 421837175442833921}
   m_Layer: 0
-  m_Name: TreeConfigType2
+  m_Name: TreeConfigPine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,17 +45,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TreeConfig
   resolution: 64
-  scale: 3.14
-  seed: 33184
-  trunkHeight: 0.33
-  trunkWidth: 0.092
+  scale: 2.51
+  seed: 33318
+  type: 1
+  trunkHeight: 0.37
+  trunkWidth: 0.088
   trunkNoiseThreshold: 0
   trunkColor: {r: 0.40700805, g: 0.24845104, b: 0.0959924, a: 1}
-  crownRatio: 1.21
-  falloffStrength: 2.2
-  leafThreshold: 0.17
-  baseLeafColor: {r: 0.07740058, g: 0.40161723, b: 0.15773748, a: 1}
-  highlightColor: {r: 0, g: 0.9083557, b: 0.23642132, a: 1}
-  addFruitOrFlowers: 0
-  fruitFlowerColor: {r: 1, g: 0, b: 0.9816718, a: 1}
+  crownRatio: 1.15
+  falloffStrength: 1.71
+  leafThreshold: 0.08
+  baseLeafColor: {r: 0.038364224, g: 0.48247975, b: 0.14768496, a: 1}
+  highlightColor: {r: 0.036562476, g: 0.1482479, b: 0.06531979, a: 1}
+  addFruitOrFlowers: 1
+  fruitFlowerColor: {r: 0.3207546, g: 0.20387702, b: 0.035879523, a: 1}
   fruitFlowerDensity: 0.031
