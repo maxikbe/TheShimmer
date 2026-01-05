@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; 
+using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
-    public Inventory inventory; 
-    public GameObject inventorySlotPrefab; 
-    public Transform slotsParent; 
+    public Inventory inventory;
+    public GameObject inventorySlotPrefab;      // prefab slotu s InventorySlot na rootu
+    public GameObject inventoryLabelNullPrefab; // prefab pro prázdný/NULL slot
+    public Transform slotsParent;
 
-    private List<GameObject> uiSlots = new List<GameObject>(); 
+    private readonly List<GameObject> uiSlots = new List<GameObject>();
 
     void Start()
     {
@@ -17,56 +18,62 @@ public class InventoryUI : MonoBehaviour
 
     public void UpdateInventoryUI()
     {
-        // Smazání starých slotů
+        // Smazat staré sloty
         foreach (GameObject slot in uiSlots)
-        {
             Destroy(slot);
-        }
         uiSlots.Clear();
-        
-        // Počítání předmětů podle ID
-        Dictionary<int, (Item itemData, int count)> itemCounts = new Dictionary<int, (Item, int)>();
-        
-        foreach (Item currentItem in inventory.items)
-        {
-            if (itemCounts.ContainsKey(currentItem.id))
-            {
-                var existing = itemCounts[currentItem.id];
-                itemCounts[currentItem.id] = (existing.itemData, existing.count + 1);
-            }
-            else
-            {
-                itemCounts.Add(currentItem.id, (currentItem, 1));
-            }
-        }
 
-        // Vytvoření UI slotů
-        foreach (var pair in itemCounts.Values)
+        // Jeden slot na každý prvek v inventory.items (zachová pořadí)
+        for (int i = 0; i < inventory.items.Count; i++)
         {
-            Item itemData = pair.itemData; 
-            int count = pair.count;   
+            Item currentItem = inventory.items[i];
 
+            // NULL / chybějící ikona -> null prefab
+            if (currentItem == null || currentItem.icon == null)
+            {
+                if (inventoryLabelNullPrefab != null)
+                {
+                    GameObject nullLabel = Instantiate(inventoryLabelNullPrefab, slotsParent);
+                    uiSlots.Add(nullLabel);
+
+                    var nullSlot = nullLabel.GetComponent<InventorySlot>();
+                    if (nullSlot != null)
+                    {
+                        nullSlot.slotIndex = i;
+                        nullSlot.inventory = inventory;
+                    }
+                }
+                continue;
+            }
+
+            // Normální slot
             GameObject uiSlot = Instantiate(inventorySlotPrefab, slotsParent);
             uiSlots.Add(uiSlot);
-            
-            // Nastavení ikony
-            Image itemIcon = uiSlot.transform.Find("ItemIcon").GetComponent<Image>();
-            if (itemIcon != null && itemData.icon != null)
+
+            var slotComp = uiSlot.GetComponent<InventorySlot>();
+            if (slotComp != null)
             {
-                itemIcon.sprite = itemData.icon;
-                itemIcon.enabled = true;
-            }
-            else if (itemIcon != null)
-            {
-                itemIcon.enabled = false;
+                slotComp.slotIndex = i;
+                slotComp.inventory = inventory;
             }
 
-            // Nastavení počtu předmětů
-            /*Text countText = uiSlot.transform.Find("CountText").GetComponent<Text>();
-            if (countText != null)
+            Image itemIcon = uiSlot.transform.Find("ItemIcon")?.GetComponent<Image>();
+            if (itemIcon != null)
             {
-                countText.text = count > 1 ? count.ToString() : "";
-            }*/
+                itemIcon.sprite = currentItem.icon;
+                itemIcon.enabled = true;
+            }
+
+            var drag = uiSlot.transform.Find("ItemIcon")?.GetComponent<DraggableItem>();
+            if (drag != null)
+            {
+                drag.slot = slotComp;
+                drag.canvas = uiSlot.GetComponentInParent<Canvas>();
+            }
+
+            // Pokud chcete zobrazovat count, doplňte podle vaší datové struktury
+            // Text countText = uiSlot.transform.Find("CountText")?.GetComponent<Text>();
+            // if (countText != null) countText.text = "";
         }
     }
 }

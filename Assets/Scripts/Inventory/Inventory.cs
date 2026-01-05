@@ -3,39 +3,31 @@ using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
-    public InventoryUI inventoryUI; 
+    public InventoryUI inventoryUI;
 
     [SerializeField] public List<Item> items = new List<Item>();
-    
     public int maxWeight = 20;
 
     public void AddItem(Item newItem)
     {
-        if(GetCurrentWeight() + newItem.weight <= maxWeight) 
+        if (newItem == null) return;
+        if (GetCurrentWeight() + newItem.weight <= maxWeight)
         {
             items.Add(newItem);
-            if (inventoryUI != null)
-            {
-                inventoryUI.UpdateInventoryUI();
-            }
-            Debug.Log("Předmět " + newItem.itemName + " přidán.Aktuální váha: " + GetCurrentWeight() + "/" + maxWeight);
-        } 
+            inventoryUI?.UpdateInventoryUI();
+            Debug.Log($"Předmět {newItem.itemName} přidán. Aktuální váha: {GetCurrentWeight()}/{maxWeight}");
+        }
         else
         {
-            Debug.Log("Inventory is full! (Weight limit reached: " + maxWeight + ")");
+            Debug.Log($"Inventory is full! (Weight limit reached: {maxWeight})");
         }
     }
 
     public void RemoveItem(Item itemToRemove)
     {
-        if (items.Contains(itemToRemove))
+        if (items.Remove(itemToRemove))
         {
-            items.Remove(itemToRemove);
-
-            if (inventoryUI != null)
-            {
-                inventoryUI.UpdateInventoryUI();
-            }
+            inventoryUI?.UpdateInventoryUI();
         }
         else
         {
@@ -56,12 +48,25 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    public bool SwapItems(int fromIndex, int toIndex)
+    {
+        if (fromIndex == toIndex) return false;
+        if (fromIndex < 0 || fromIndex >= items.Count) return false;
+        if (toIndex < 0 || toIndex >= items.Count) return false;
+
+        Item tmp = items[fromIndex];
+        items[fromIndex] = items[toIndex];
+        items[toIndex] = tmp;
+        return true;
+    }
+
     public int GetCurrentWeight()
     {
         int currentWeight = 0;
         foreach (Item itm in items)
         {
-            currentWeight += itm.weight;
+            if (itm != null)
+                currentWeight += itm.weight;
         }
         return currentWeight;
     }
