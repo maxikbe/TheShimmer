@@ -1,35 +1,44 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Item", menuName = "Scriptable Objects/Item")]
+[CreateAssetMenu(fileName = "New Item", menuName = "Scriptable Objects/Item")]
 public class Item : ScriptableObject
 {
-    public int id;
+    // Vždy viditelné
+    public int id = -1;
     public string itemName;
     public Sprite icon;
     public GameObject prefab;   
     public string description;
     public int maxStack;
-    public ItemType itemType;
     public bool isDefaultItem;
-    public int AmmoID;
-    public int AmmoAmount;
-    public int HealAmount;
+    public ItemType itemType;
+
+    // Zbraně
+    public WeaponType weaponType;
+    public bool isMagical; 
     public float Damage;
-    public float Armor;
-    public float Speed;
-    public float Range;
     public float FireRate;
+    public float Range;
     public float ReloadTime;
     public int AmmoCapacity;
-    public bool isTwoHanded;
+    public int AmmoID;
+    public int AmmoAmount;
+    public float Speed;
+    public MagicalElement magicalElement;
+
+    // Léčení a Konzumace
+    public int HealAmount;
+    public int consumeAmount;
+    public int waterAmount;
+    
+    // Brnění
     public int durability;
+    public ArmorType armorType;
+    public float Armor;
     public int weight;
 }
 
-public enum ItemType 
-{
-    Consumable, 
-    Armor, 
-    Resource,
-    Gun
-}
+public enum ItemType { Consumable, Healing, Armor, Resource, Weapon }
+public enum ArmorType { Head, Chest, Legs, Feet, Hands, Shield }
+public enum WeaponType { Melee, Ranged, Magic }
+public enum MagicalElement { Fire, Water, Earth, Air, Light, Dark, Alien, Star }

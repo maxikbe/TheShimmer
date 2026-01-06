@@ -3,71 +3,16 @@ using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
-    public InventoryUI inventoryUI;
+   public Item[] allItems; 
 
-    [SerializeField] public List<Item> items = new List<Item>();
-    public int maxWeight = 20;
-
-    public void AddItem(Item newItem)
+    void Start()
     {
-        if (newItem == null) return;
-        if (GetCurrentWeight() + newItem.weight <= maxWeight)
-        {
-            items.Add(newItem);
-            inventoryUI?.UpdateInventoryUI();
-            Debug.Log($"Předmět {newItem.itemName} přidán. Aktuální váha: {GetCurrentWeight()}/{maxWeight}");
-        }
-        else
-        {
-            Debug.Log($"Inventory is full! (Weight limit reached: {maxWeight})");
-        }
-    }
+        Debug.Log("Načítání všech položek inventáře...");
+        allItems = Resources.LoadAll<Item>("AllItems");
 
-    public void RemoveItem(Item itemToRemove)
-    {
-        if (items.Remove(itemToRemove))
+        foreach (var item in allItems)
         {
-            inventoryUI?.UpdateInventoryUI();
+            Debug.Log("Načteno: " + item.name);
         }
-        else
-        {
-            Debug.Log("Item not found in inventory!");
-        }
-    }
-
-    public void UseItem(Item itemToUse)
-    {
-        if (items.Contains(itemToUse))
-        {
-            Debug.Log("Used item: " + itemToUse.itemName);
-            RemoveItem(itemToUse);
-        }
-        else
-        {
-            Debug.Log("Item not found in inventory!");
-        }
-    }
-
-    public bool SwapItems(int fromIndex, int toIndex)
-    {
-        if (fromIndex == toIndex) return false;
-        if (fromIndex < 0 || fromIndex >= items.Count) return false;
-        if (toIndex < 0 || toIndex >= items.Count) return false;
-
-        Item tmp = items[fromIndex];
-        items[fromIndex] = items[toIndex];
-        items[toIndex] = tmp;
-        return true;
-    }
-
-    public int GetCurrentWeight()
-    {
-        int currentWeight = 0;
-        foreach (Item itm in items)
-        {
-            if (itm != null)
-                currentWeight += itm.weight;
-        }
-        return currentWeight;
     }
 }
