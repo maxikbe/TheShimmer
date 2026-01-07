@@ -10,6 +10,10 @@ public class ItemEditor : Editor
 
         EditorGUILayout.LabelField("ZÁKLADNÍ NASTAVENÍ", EditorStyles.boldLabel);
         item.itemName = EditorGUILayout.TextField("Název", item.itemName);
+        item.description = EditorGUILayout.TextField("Popis", item.description);
+        item.isOwned = EditorGUILayout.Toggle("Je vlastněný?", item.isOwned);
+        item.isResearched = EditorGUILayout.Toggle("Je výzkoumaný?", item.isResearched);
+        item.isUsable = EditorGUILayout.Toggle("Je použitelný?", item.isUsable);
         item.itemType = (ItemType)EditorGUILayout.EnumPopup("Typ předmětu", item.itemType);
         
         EditorGUILayout.Space();

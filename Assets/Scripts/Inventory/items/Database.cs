@@ -45,4 +45,8 @@ public class Database : ScriptableObject
     {
         return _itemDatabase.Find(item => item.id == id);
     }
+    public List<Item> GetAllItems()
+    {
+        return _itemDatabase;
+    }
 }

@@ -9,6 +9,9 @@ public class Item : ScriptableObject
     public Sprite icon;
     public GameObject prefab;   
     public string description;
+    public bool isOwned;
+    public bool isResearched;
+    public bool isUsable;
     public int maxStack;
     public bool isDefaultItem;
     public ItemType itemType;
