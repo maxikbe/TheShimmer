@@ -104,17 +104,21 @@ public class Patroling : MonoBehaviour
     private bool CheckForPlayer()
     {
         if (playerPosition == null) return false;
+        
+        // Tady 'playerPosition' odkazuje na ten Empty Object u nohou!
+        // transform.position si sám zjistí globální souřadnice těch nohou.
         float distanceToPlayer = Vector3.Distance(transform.position, playerPosition.position);
         
         if (distanceToPlayer > visionRadius) return false;
         
         Vector3 directionToPlayer = (playerPosition.position - transform.position).normalized;
         
+        // Raycast střílíme na nohy
         RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, visionRadius, wallLayer | (1 << playerPosition.gameObject.layer));
 
         if (hit.collider != null)
         {
-            if (hit.transform == playerPosition)
+            if (hit.transform.CompareTag("Player"))
             {
                 return true;
             }

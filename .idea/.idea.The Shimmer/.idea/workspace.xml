@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d50bba62-decd-43dc-a703-8f8fa9515bad" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Animal/Patroling.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Animal/Patroling.cs" afterDir="false" />
-    </list>
+    <list default="true" id="d50bba62-decd-43dc-a703-8f8fa9515bad" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
