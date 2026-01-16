@@ -85,14 +85,38 @@ public class Inventory : MonoBehaviour
     public void ShowStats(Item item)
     {
         statsTitle.text = item.itemName;
-        statsDescription.text = "Damage: " + item.Damage; 
+        string enumTypeName = item.itemType.ToString();
+        Debug.Log($"Zobrazuji statistiky pro položku: {item.itemName} typu {enumTypeName}");
+        switch (item.itemType)
+        {
+            case ItemType.Consumable:
+                statsDescription.text = $"Type: {enumTypeName}\nConsume Amount: {item.consumeAmount}\nWater Amount: {item.waterAmount}";
+                break;
+            case ItemType.Healing:
+                statsDescription.text = $"Type: {enumTypeName}\nHeal Amount: {item.HealAmount}";
+                break;
+            case ItemType.Armor:
+                statsDescription.text = $"Type: {enumTypeName}\nArmor Type: {item.armorType}\nArmor: {item.Armor}\nDurability: {item.durability}\nWeight: {item.weight}";
+                break;
+            case ItemType.Resource:
+                statsDescription.text = $"Type: {enumTypeName}\nDescription: {item.description}";
+                break;
+            case ItemType.Weapon:
+                if(item.weaponType == WeaponType.Ranged) statsDescription.text = $"Weapon Type: {item.weaponType}\nDamage: {item.Damage}\nFire Rate: {item.FireRate}\nRange: {item.Range}\nReload Time: {item.ReloadTime}\nAmmo Capacity: {item.AmmoCapacity}";
+                if(item.weaponType == WeaponType.Melee) statsDescription.text = $"Weapon Type: {item.weaponType}\nDamage: {item.Damage}";
+                if(item.weaponType == WeaponType.Magic) statsDescription.text = $"Weapon Type: {item.weaponType}\nDamage: {item.Damage}\nFire Rate: {item.FireRate}\nRange: {item.Range}\nReload Time: {item.ReloadTime}\nAmmo Capacity: {item.AmmoCapacity}\nMagical Element: {item.magicalElement}";
+                      
+                break;
+            default:
+                statsDescription.text = "No stats available.";
+                break;
+        }
         statsIcon.sprite = item.icon;
     }
 
     public void SetFilter(string typeName)
     {
-        Debug.Log("Pokouším se filtrovat podle: " + typeName);
-
+    
         if (System.Enum.TryParse(typeName, out ItemType newFilter))
         {
             RefreshInventory(newFilter);
