@@ -12,8 +12,8 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private Animator animator;
     [SerializeField] private Transform cameraTransform;
-    private float cameraSmoothing = 0.001f;
-    private Vector3 cameraOffset = new Vector3(0f, 0f, -10f);
+    private float cameraSmoothing = 1f;
+    private Vector3 cameraOffset = new Vector3(0f, 1f, -10f);
     private float lookAheadDistance = 0.8f;
 
     private Rigidbody2D rb;
@@ -68,19 +68,28 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void UpdateCamera()
+{
+    if (cameraTransform == null) return;
+
+    // 1. Základní bod je pozice hráče + tvůj povinný posun nahoru (0.4f)
+    Vector3 baseTargetPosition = transform.position + cameraOffset;
+
+    // 2. K tomu přičteme "předvídání" směru, pokud se hráč hýbe
+    Vector3 lookAheadOffset = Vector3.zero;
+    if (movement.sqrMagnitude > 0.01f)
     {
-        if (cameraTransform == null) return;
-
-        Vector3 lookAheadOffset = Vector3.zero;
-        if (movement.sqrMagnitude > 0.01f)
-        {
-            lookAheadOffset = new Vector3(movement.x, movement.y, 0f) * lookAheadDistance;
-        }
-
-        Vector3 targetPosition = transform.position + cameraOffset + lookAheadOffset;
-        Vector3 smoothedPosition = Vector3.Lerp(cameraTransform.position, targetPosition, cameraSmoothing);
-        cameraTransform.position = smoothedPosition;
+        lookAheadOffset = new Vector3(movement.x, movement.y, 0f) * lookAheadDistance;
     }
+
+    Vector3 finalTarget = baseTargetPosition + lookAheadOffset;
+
+    // 3. Plynulý posun (Lerp potřebuje rozumné číslo a Time.deltaTime)
+    cameraTransform.position = Vector3.Lerp(
+        cameraTransform.position, 
+        finalTarget, 
+        cameraSmoothing * Time.deltaTime
+    );
+}
 
     private void UpdateAnimator(bool isRunning)
     {
