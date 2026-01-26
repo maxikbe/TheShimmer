@@ -11,6 +11,10 @@ public class PlayerMovement : MonoBehaviour
     private KeyCode keyRun = KeyCode.LeftShift;
 
     [SerializeField] private Animator animator;
+    [SerializeField] private Transform cameraTransform;
+    private float cameraSmoothing = 0.001f;
+    private Vector3 cameraOffset = new Vector3(0f, 0f, -10f);
+    private float lookAheadDistance = 0.8f;
 
     private Rigidbody2D rb;
     private Vector2 movement;
@@ -24,6 +28,13 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        
+        if (cameraTransform == null)
+        {
+            Camera mainCamera = Camera.main;
+            if (mainCamera != null)
+                cameraTransform = mainCamera.transform;
+        }
     }
 
     private void Update()
@@ -49,6 +60,26 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
+    }
+
+    private void LateUpdate()
+    {
+        UpdateCamera();
+    }
+
+    private void UpdateCamera()
+    {
+        if (cameraTransform == null) return;
+
+        Vector3 lookAheadOffset = Vector3.zero;
+        if (movement.sqrMagnitude > 0.01f)
+        {
+            lookAheadOffset = new Vector3(movement.x, movement.y, 0f) * lookAheadDistance;
+        }
+
+        Vector3 targetPosition = transform.position + cameraOffset + lookAheadOffset;
+        Vector3 smoothedPosition = Vector3.Lerp(cameraTransform.position, targetPosition, cameraSmoothing);
+        cameraTransform.position = smoothedPosition;
     }
 
     private void UpdateAnimator(bool isRunning)
