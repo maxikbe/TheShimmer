@@ -9,9 +9,9 @@ Shader "Custom/Sprites-SeeThrough"
     {
         Tags { "Queue"="Transparent" "RenderType"="Transparent" "PreviewType"="Plane" }
         
-        Cull Off 
-        ZWrite Off 
-        Blend One OneMinusSrcAlpha // Correct for SpriteRenderer premultiplied alpha
+        Cull Off
+        ZWrite Off
+        Blend One OneMinusSrcAlpha 
 
         Pass
         {
@@ -31,6 +31,7 @@ Shader "Custom/Sprites-SeeThrough"
             {
                 float4 positionCS : SV_POSITION;
                 float3 positionWS : TEXCOORD1;
+                float objectYWS : TEXCOORD3; // We store the object pivot Y here
                 float2 uv : TEXCOORD0;
                 float4 color : COLOR;
             };
@@ -38,7 +39,6 @@ Shader "Custom/Sprites-SeeThrough"
             sampler2D _MainTex;
             float4 _Color;
 
-            // Global variables from C#
             float4 _GlobalPlayerPos;
             float _GlobalRadius;
             float _GlobalSoftness;
@@ -47,6 +47,10 @@ Shader "Custom/Sprites-SeeThrough"
             {
                 Varyings output;
                 output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                
+                // Get the World Y of the object pivot (bottom center)
+                output.objectYWS = TransformObjectToWorld(float3(0,0,0)).y;
+                
                 output.positionCS = TransformWorldToHClip(output.positionWS);
                 output.uv = input.uv;
                 output.color = input.color * _Color;
@@ -57,26 +61,23 @@ Shader "Custom/Sprites-SeeThrough"
             {
                 half4 col = tex2D(_MainTex, input.uv) * input.color;
                 
-                // Calculate 2D distance
-                float d = distance(input.positionWS.xy, _GlobalPlayerPos.xy);
+                // 1. Calculate the distance for the circle
+                // We use World XYZ for a true "bubble"
+                float d = distance(input.positionWS.xyz, _GlobalPlayerPos.xyz);
+                float mask = smoothstep(_GlobalRadius - _GlobalSoftness, _GlobalRadius, d);
 
-                // --- SAFETY CHECK ---
-                // If radius is near zero, keep the sprite fully visible
-                if (_GlobalRadius < 0.01) 
+                // 2. THE FRONT/BACK CHECK
+                // If Player Y is less than Object Pivot Y, the player is in front.
+                // We use a small threshold (0.1) to prevent flickering.
+                if (_GlobalPlayerPos.y < input.objectYWS - 0.1)
                 {
-                    col.rgb *= col.a;
-                    return col;
+                    mask = 1.0; // Force opaque
                 }
 
-                // Create the transparency mask
-                // d > Radius = 1 (Visible)
-                // d < Radius - Softness = 0 (Transparent)
-                float mask = smoothstep(_GlobalRadius - _GlobalSoftness, _GlobalRadius, d);
-                
                 col.a *= mask;
-                col.rgb *= col.a; // Apply alpha to RGB for the Blend mode
+                col.rgb *= col.a; 
                 
-                return col; 
+                return col;
             }
             ENDHLSL
         }
