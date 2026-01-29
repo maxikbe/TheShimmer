@@ -31,7 +31,7 @@ Shader "Custom/Sprites-SeeThrough"
             {
                 float4 positionCS : SV_POSITION;
                 float3 positionWS : TEXCOORD1;
-                float objectYWS : TEXCOORD3; // We store the object pivot Y here
+                float objectYWS : TEXCOORD3;
                 float2 uv : TEXCOORD0;
                 float4 color : COLOR;
             };
@@ -47,8 +47,7 @@ Shader "Custom/Sprites-SeeThrough"
             {
                 Varyings output;
                 output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
-                
-                // Get the World Y of the object pivot (bottom center)
+
                 output.objectYWS = TransformObjectToWorld(float3(0,0,0)).y;
                 
                 output.positionCS = TransformWorldToHClip(output.positionWS);
@@ -60,18 +59,13 @@ Shader "Custom/Sprites-SeeThrough"
             half4 frag (Varyings input) : SV_Target
             {
                 half4 col = tex2D(_MainTex, input.uv) * input.color;
-                
-                // 1. Calculate the distance for the circle
-                // We use World XYZ for a true "bubble"
+
                 float d = distance(input.positionWS.xyz, _GlobalPlayerPos.xyz);
                 float mask = smoothstep(_GlobalRadius - _GlobalSoftness, _GlobalRadius, d);
 
-                // 2. THE FRONT/BACK CHECK
-                // If Player Y is less than Object Pivot Y, the player is in front.
-                // We use a small threshold (0.1) to prevent flickering.
                 if (_GlobalPlayerPos.y < input.objectYWS - 0.1)
                 {
-                    mask = 1.0; // Force opaque
+                    mask = 1.0;
                 }
 
                 col.a *= mask;
