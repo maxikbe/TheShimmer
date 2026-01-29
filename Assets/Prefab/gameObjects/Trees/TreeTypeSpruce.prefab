@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4903676511166131099
+--- !u!1 &6840254930597135883
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,11 +8,11 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3850782289319123957}
-  - component: {fileID: 5820547201409200743}
-  - component: {fileID: 7130062663667878255}
-  - component: {fileID: 2591299845478763497}
-  - component: {fileID: 1644270151794136377}
+  - component: {fileID: 3427404546439902821}
+  - component: {fileID: 5343116918226362359}
+  - component: {fileID: 8652327921816675583}
+  - component: {fileID: 4113485388032108153}
+  - component: {fileID: 878679861270886569}
   m_Layer: 0
   m_Name: TreeTypeSpruce
   m_TagString: Untagged
@@ -20,29 +20,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3850782289319123957
+--- !u!4 &3427404546439902821
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4903676511166131099}
+  m_GameObject: {fileID: 6840254930597135883}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.85, y: 4.1000004, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 19.650002, y: 21.939995, z: 0}
   m_LocalScale: {x: 8, y: 8, z: 8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &5820547201409200743
+--- !u!212 &5343116918226362359
 SpriteRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4903676511166131099}
+  m_GameObject: {fileID: 6840254930597135883}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -94,13 +94,13 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 1
---- !u!70 &7130062663667878255
+--- !u!70 &8652327921816675583
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4903676511166131099}
+  m_GameObject: {fileID: 6840254930597135883}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -131,13 +131,13 @@ CapsuleCollider2D:
   m_Offset: {x: 0.0062499046, y: 0.13999999}
   m_Size: {x: 0.27999997, y: 0.55500007}
   m_Direction: 0
---- !u!114 &2591299845478763497
+--- !u!114 &4113485388032108153
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4903676511166131099}
+  m_GameObject: {fileID: 6840254930597135883}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ba8aa1ecf5d0f64dae53a70f2a7e1f9, type: 3}
@@ -147,13 +147,13 @@ MonoBehaviour:
   transparency: 1
   colorToReplace: {r: 0.9960785, g: 0.82745105, b: 0.38823533, a: 1}
   tolerance: 0
---- !u!114 &1644270151794136377
+--- !u!114 &878679861270886569
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4903676511166131099}
+  m_GameObject: {fileID: 6840254930597135883}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
@@ -169,21 +169,21 @@ MonoBehaviour:
   m_AlphaCutoff: 0.1
   m_ApplyToSortingLayers: 2969b79d75a63c68000000005167b174
   m_ShapePath:
-  - {x: -0.8399999, y: 0, z: 0}
-  - {x: -0.8399999, y: 2.5, z: 0}
-  - {x: 0.8399999, y: 2.5, z: 0}
-  - {x: 0.8399999, y: 0, z: 0}
-  m_ShapePathHash: 0
+  - {x: -0.18124992, y: 0.0062499046, z: 0}
+  - {x: -0.09374991, y: 0.1312499, z: 0}
+  - {x: 0.1312501, y: 0.12499952, z: 0}
+  - {x: 0.20000009, y: -0.00000047683716, z: 0}
+  m_ShapePathHash: -1827036091
   m_InstanceId: 0
-  m_ShadowShape2DComponent: {fileID: 5820547201409200743}
+  m_ShadowShape2DComponent: {fileID: 0}
   m_ShadowShape2DProvider:
-    rid: 6200623925298987494
-  m_ShadowCastingSource: 2
+    rid: -2
+  m_ShadowCastingSource: 1
   m_ShadowMesh:
     m_Mesh: {fileID: 0}
     m_LocalBounds:
-      m_Center: {x: 0.12636566, y: 0.89027405, z: 0}
-      m_Extent: {x: 0.11362457, y: 0.29026794, z: 0}
+      m_Center: {x: 0.009375095, y: 0.065624714, z: 0}
+      m_Extent: {x: 0.19062501, y: 0.06562519, z: 0}
     m_EdgeProcessing: 1
     m_TrimEdge: 0.6
     m_FlipX: 0
@@ -192,11 +192,10 @@ MonoBehaviour:
   m_CastingOption: 1
   m_PreviousTrimEdge: 0.6
   m_PreviousEdgeProcessing: 1
-  m_PreviousShadowCastingSource: 2
-  m_PreviousShadowShape2DSource: {fileID: 5820547201409200743}
+  m_PreviousShadowCastingSource: 1
+  m_PreviousShadowShape2DSource: {fileID: 5343116918226362359}
   references:
     version: 2
     RefIds:
-    - rid: 6200623925298987494
-      type: {class: ShadowShape2DProvider_SpriteRenderer, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
-      data: 
+    - rid: -2
+      type: {class: , ns: , asm: }

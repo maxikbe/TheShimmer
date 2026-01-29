@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7482608867148281112
+--- !u!1 &4708936291560151780
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,10 +8,11 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1069954993303700063}
-  - component: {fileID: 2162260606946948413}
-  - component: {fileID: 1984278543369317574}
-  - component: {fileID: 7044020335371714420}
+  - component: {fileID: 2906844727006014883}
+  - component: {fileID: 4075745661877246657}
+  - component: {fileID: 4397627972968366906}
+  - component: {fileID: 5138451772571488392}
+  - component: {fileID: 5646233557039511655}
   m_Layer: 0
   m_Name: TreeTypeNone
   m_TagString: Untagged
@@ -19,29 +20,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1069954993303700063
+--- !u!4 &2906844727006014883
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7482608867148281112}
+  m_GameObject: {fileID: 4708936291560151780}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 21.050001, y: -2.859995, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 60, y: 1.8399925, z: 0}
   m_LocalScale: {x: 8, y: 8, z: 8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &2162260606946948413
+--- !u!212 &4075745661877246657
 SpriteRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7482608867148281112}
+  m_GameObject: {fileID: 4708936291560151780}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -93,13 +94,13 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 1
---- !u!70 &1984278543369317574
+--- !u!70 &4397627972968366906
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7482608867148281112}
+  m_GameObject: {fileID: 4708936291560151780}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -130,13 +131,13 @@ CapsuleCollider2D:
   m_Offset: {x: -0.05312491, y: 0.03374992}
   m_Size: {x: 0.3800016, y: 0.3175018}
   m_Direction: 1
---- !u!114 &7044020335371714420
+--- !u!114 &5138451772571488392
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7482608867148281112}
+  m_GameObject: {fileID: 4708936291560151780}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ba8aa1ecf5d0f64dae53a70f2a7e1f9, type: 3}
@@ -146,3 +147,55 @@ MonoBehaviour:
   transparency: 1
   colorToReplace: {r: 0.1, g: 0.5, b: 0.1, a: 1}
   tolerance: 0
+--- !u!114 &5646233557039511655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4708936291560151780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.ShadowCaster2D
+  m_ShadowGroup: 0
+  m_Priority: 0
+  m_ComponentVersion: 5
+  m_HasRenderer: 1
+  m_UseRendererSilhouette: 1
+  m_CastsShadows: 1
+  m_SelfShadows: 0
+  m_AlphaCutoff: 0.1
+  m_ApplyToSortingLayers: 2969b79d75a63c68000000005167b174
+  m_ShapePath:
+  - {x: -0.40624952, y: 0.037499905, z: 0}
+  - {x: -0.18124962, y: 0.13750005, z: 0}
+  - {x: 0.05000019, y: 0.11249995, z: 0}
+  - {x: 0.2687502, y: 0.037499905, z: 0}
+  m_ShapePathHash: -1527086363
+  m_InstanceId: 0
+  m_ShadowShape2DComponent: {fileID: 0}
+  m_ShadowShape2DProvider:
+    rid: -2
+  m_ShadowCastingSource: 1
+  m_ShadowMesh:
+    m_Mesh: {fileID: 0}
+    m_LocalBounds:
+      m_Center: {x: -0.068749666, y: 0.087499976, z: 0}
+      m_Extent: {x: 0.33749986, y: 0.05000007, z: 0}
+    m_EdgeProcessing: 1
+    m_TrimEdge: 0.8
+    m_FlipX: 0
+    m_FlipY: 0
+    m_InitialTrim: 0
+  m_CastingOption: 1
+  m_PreviousTrimEdge: 0.8
+  m_PreviousEdgeProcessing: 1
+  m_PreviousShadowCastingSource: 1
+  m_PreviousShadowShape2DSource: {fileID: 4075745661877246657}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
