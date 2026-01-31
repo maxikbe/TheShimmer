@@ -6,16 +6,19 @@ using System.Collections.Generic;
 public class CharPicker : MonoBehaviour
 {
     [Header("Propojení")]
-    [SerializeField] private CharpickerStatsHolder statsHolder; // Přetáhni v Inspectoru
+    [SerializeField] private CharpickerStatsHolder statsHolder; 
+    
 
     [Header("Nastavení kontejneru")]
     [SerializeField] private RectTransform container; 
     [SerializeField] private float elementWidth = 200f; 
     [SerializeField] private float slideDuration = 0.3f;
+    
 
     [Header("Stav")]
     public int currentIndex = 0; 
     private bool isAnimating = false;
+
 
     private Vector3 startPosition;
 
@@ -30,6 +33,8 @@ public class CharPicker : MonoBehaviour
         // Zavoláme hned na začátku, aby se načetla první postava
         if (statsHolder != null) statsHolder.UpdateStats(currentIndex);
     }
+
+   
 
     void Update()
     {
@@ -53,6 +58,8 @@ public class CharPicker : MonoBehaviour
                 StartCoroutine(SlideToCharacter(nextIndex));
             }
         }
+
+        
     }
 
     IEnumerator SlideToCharacter(int targetIndex)
