@@ -7,7 +7,6 @@ public class CharPicker : MonoBehaviour
 {
     [Header("Propojení")]
     [SerializeField] private CharpickerStatsHolder statsHolder; 
-    
 
     [Header("Nastavení kontejneru")]
     [SerializeField] private RectTransform container; 
@@ -19,7 +18,6 @@ public class CharPicker : MonoBehaviour
     public int currentIndex = 0; 
     private bool isAnimating = false;
 
-
     private Vector3 startPosition;
 
     void Start()
@@ -28,16 +26,34 @@ public class CharPicker : MonoBehaviour
         {
             startPosition = container.localPosition;
         }
-        UpdatePositionImmediate();
-
+        
         // Zavoláme hned na začátku, aby se načetla první postava
         if (statsHolder != null) statsHolder.UpdateStats(currentIndex);
+        
+        UpdatePositionImmediate();
     }
 
-   
+    // TOTO JE NOVÉ: Když se objekt (UI) zapne, ujistíme se, že je vše na svém místě
+    void OnEnable()
+    {
+        isAnimating = false;
+        UpdatePositionImmediate();
+    }
+
+    // TOTO JE HLAVNÍ OPRAVA: Když se objekt vypne, zastavíme animaci
+    void OnDisable()
+    {
+        StopAllCoroutines();
+        isAnimating = false;
+        // Volitelně: Hned snapneme pozici na aktuální index, aby to nezůstalo "viset" v půlce
+        UpdatePositionImmediate();
+    }
 
     void Update()
     {
+        // Pokud je hra pauznutá, Update stále běží (protože InventoryManager je asi nastaven na ignorování pauzy nebo UI běží), 
+        // ale musíme si dát pozor na vstupy.
+        
         if (isAnimating) return;
 
         int direction = 0;
@@ -45,8 +61,7 @@ public class CharPicker : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.LeftArrow)) direction = -1;
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-        // Zachování tvé funkční logiky scrollu
-        if (scroll > 0f) direction = -1; // Pokud ti to scrollovalo naopak, změň na 1
+        if (scroll > 0f) direction = -1; 
         else if (scroll < 0f) direction = 1;
 
         if (direction != 0)
@@ -58,15 +73,12 @@ public class CharPicker : MonoBehaviour
                 StartCoroutine(SlideToCharacter(nextIndex));
             }
         }
-
-        
     }
 
     IEnumerator SlideToCharacter(int targetIndex)
     {
         isAnimating = true;
 
-        // TADY voláme aktualizaci statistik - posíláme tam targetIndex
         if (statsHolder != null)
         {
             statsHolder.UpdateStats(targetIndex);
@@ -78,7 +90,9 @@ public class CharPicker : MonoBehaviour
         float time = 0;
         while (time < slideDuration)
         {
-            time += Time.deltaTime;
+            // DŮLEŽITÁ ZMĚNA: Používáme unscaledDeltaTime, aby animace běžela i při PAUZE (Time.timeScale = 0)
+            time += Time.unscaledDeltaTime; 
+            
             float t = time / slideDuration;
             t = Mathf.SmoothStep(0, 1, t); 
             
@@ -96,6 +110,7 @@ public class CharPicker : MonoBehaviour
     void UpdatePositionImmediate()
     {
         if (container != null)
-            container.localPosition = startPosition + new Vector3(-currentIndex * elementWidth, 0, 0);
+            // Tady jsem přidal výpočet startPosition, pokud by Start() ještě neproběhl (pro jistotu)
+            container.localPosition = (startPosition == Vector3.zero ? container.localPosition : startPosition) + new Vector3(-currentIndex * elementWidth, 0, 0);
     }
 }
