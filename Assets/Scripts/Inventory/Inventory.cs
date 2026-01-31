@@ -5,7 +5,6 @@ using TMPro;
 
 public class Inventory : MonoBehaviour
 {
-    [SerializeField] private GameObject inventoryMenuUI;
     [SerializeField] private Database database;
     [SerializeField] private Transform container;    
     [SerializeField] private GameObject itemPrefab;  
@@ -14,7 +13,6 @@ public class Inventory : MonoBehaviour
     [SerializeField] private Image statsIcon;
     
 
-    private bool isOpen = false;
     private List<Item> allItems; 
 
     void Start()
@@ -24,29 +22,7 @@ public class Inventory : MonoBehaviour
         ClearStats();
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            if (isOpen)
-                Resume();
-            else
-                Pause();
-        }
-    }
-    public void Resume()
-    {
-        inventoryMenuUI.SetActive(false);
-        Time.timeScale = 1f;
-        isOpen = false;
-    }
-
-    public void Pause()
-    {
-        inventoryMenuUI.SetActive(true);
-        Time.timeScale = 0f;
-        isOpen = true;
-    }
+    
 
     public void RefreshInventory(ItemType filter)
     {
