@@ -20,6 +20,7 @@ public class CharPicker : MonoBehaviour
 
     private Vector3 startPosition;
 
+
     void Start()
     {
         if (container != null)
