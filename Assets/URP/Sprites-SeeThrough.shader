@@ -89,11 +89,10 @@ Shader "Custom/Tree-Individual-Swap-Unity6-Lit"
 
                 col *= input.color;
 
-                // 2. SEE-THROUGH (REVERSED PIVOT CHECK)
+                // 2. SEE-THROUGH
                 float d_dist = distance(input.positionWS.xyz, _GlobalPlayerPos.xyz);
                 float mask = smoothstep(_GlobalRadius - _GlobalSoftness, _GlobalRadius, d_dist);
                 
-                // Changed < to > so transparency only happens when player is "behind" (higher Y)
                 if (_GlobalPlayerPos.y > input.objectYWS + 0.1) {
                     col.a *= mask;
                 }
