@@ -11,7 +11,7 @@ public class Ghost_movement : MonoBehaviour
     private GameObject myBody;
 
     // --- ENUMY (Musí být public, aby je viděl i Animal) ---
-    public enum State { Patrolling, Fleeing, Returning }
+    public enum State { Patrolling, Fleeing, Returning, Chasing}
     private State currentState;
 
     public enum MobBehavior { Friendly, Neutral, Aggressive }
@@ -31,6 +31,12 @@ public class Ghost_movement : MonoBehaviour
     private bool canHaveBreaks;
     private float minBreakTime;
     private float maxBreakTime;
+    
+    // Nová proměnná pro čekání po ztrátě hráče
+    private float waitAfterLostTime;
+    // Interní proměnné pro Chasing logiku
+    private Vector3 lastKnownPlayerPos;
+    private float searchTimer;
 
     // Tohle necháme nastavitelné na Prefabu ducha, je to spíš globální nastavení
     [SerializeField] private LayerMask wallLayer;
@@ -69,6 +75,8 @@ public class Ghost_movement : MonoBehaviour
         this.minBreakTime = stats.minBreakTime;
         this.maxBreakTime = stats.maxBreakTime;
         
+        this.waitAfterLostTime = stats.waitAfterLostTime;
+        
         // Uložíme si odkaz na hmotné tělo
         this.myBody = stats.gameObject; 
         
@@ -87,15 +95,50 @@ public class Ghost_movement : MonoBehaviour
     {
         // Pokud nemáme mozek (data), neděláme nic
         if (!isInitialized) return;
-
+        
+        bool canSeePlayer = CheckForPlayer();
+        // Pokud to není Friendly, řešíme Patrol / Chasing
         if (behavior != MobBehavior.Friendly)
         {
-            PatrolLogic();
-            return;
+            // Kontrola jestli vidíme hráče
+            
+
+            if (canSeePlayer)
+            {
+                // VIDÍM HRÁČE
+                if (behavior == MobBehavior.Aggressive)
+                {
+                    currentState = State.Chasing;
+                    
+                    // Resetujeme timer, protože ho vidíme
+                    searchTimer = 0f; 
+                    
+                    // Uložíme si, kde jsme ho viděli naposledy (aktualizujeme v reálném čase)
+                    lastKnownPlayerPos = playerPosition.position;
+                    
+                    ChasePlayer(); // Běží přímo za ním
+                }
+            }
+            else
+            {
+                // NEVIDÍM HRÁČE (řešíme stavy)
+                switch (currentState)
+                {
+                    case State.Chasing:
+                        // Hráč zmizel za rohem -> Běžíme na poslední známou pozici
+                        ChaseLostLogic();
+                        break;
+
+                    case State.Patrolling:
+                        PatrolLogic();
+                        break;
+                }
+            }
+            return; // Konec Update pro ne-friendly moby
         }
 
-        bool canSeePlayer = CheckForPlayer();
-        
+        // --- FRIENDLY LOGIKA (Fleeing) ---
+        // (Tohle se spustí jen pro Friendly moby)
         if (canSeePlayer)
         {
             currentState = State.Fleeing;
@@ -103,20 +146,17 @@ public class Ghost_movement : MonoBehaviour
         }
         else
         {
-            switch (currentState)
+            if (currentState == State.Fleeing)
             {
-                case State.Fleeing:
-                    // Pokud už jsme utekli a agent stojí, vrátíme se k hlídkování
-                    if (!agent.pathPending && agent.remainingDistance < 0.5f)
-                    {
-                        currentState = State.Patrolling;
-                        PatrolLogic();
-                    }
-                    break;
-
-                case State.Patrolling:
+                if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                {
+                    currentState = State.Patrolling;
                     PatrolLogic();
-                    break;
+                }
+            }
+            else if (currentState == State.Patrolling)
+            {
+                PatrolLogic();
             }
         }
     }
@@ -271,5 +311,37 @@ public class Ghost_movement : MonoBehaviour
         {
             //zase pro dalsi pripadne funkec
         }
+    }
+
+// --- LOGIKA CHASINGU (Když ztratíme vizuál) ---
+    private void ChaseLostLogic()
+    {
+        agent.speed = runSpeed;
+
+        // 1. Nastavíme cíl na poslední známou pozici
+        agent.SetDestination(lastKnownPlayerPos);
+
+        // 2. Kontrola, jestli jsme doběhli na místo, kde jsme ho naposledy viděli
+        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+        {
+            // Jsme tam, ale hráč nikde (protože CheckForPlayer vrátil false)
+            // Začneme odpočítávat čas
+            searchTimer += Time.deltaTime;
+
+            // Debug.Log($"Hledám hráče... {searchTimer}/{waitAfterLostTime}");
+
+            if (searchTimer >= waitAfterLostTime)
+            {
+                // Čas vypršel, vzdáváme to -> Patrol
+                currentState = State.Patrolling;
+                GoToNextPatrolPoint();
+            }
+        }
+    }
+
+    private void ChasePlayer()
+    {
+        agent.speed = runSpeed;
+        agent.SetDestination(playerPosition.position);
     }
 }

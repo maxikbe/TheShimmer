@@ -24,6 +24,9 @@ public class Animal_movement : MonoBehaviour
     [Header("Flee Settings")]
     public float minRunningDistance = 1f;
     public float maxRunningDistance = 3f;
+    
+    [Header("Chase Settings")]
+    public float waitAfterLostTime = 2f;
 
     [Header("References")]
     public Transform playerPosition; // Přetáhni hráče nebo ho najdi v Awake
