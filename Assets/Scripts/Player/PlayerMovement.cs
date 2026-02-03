@@ -71,10 +71,8 @@ public class PlayerMovement : MonoBehaviour
 {
     if (cameraTransform == null) return;
 
-    // 1. Základní bod je pozice hráče + tvůj povinný posun nahoru (0.4f)
     Vector3 baseTargetPosition = transform.position + cameraOffset;
 
-    // 2. K tomu přičteme "předvídání" směru, pokud se hráč hýbe
     Vector3 lookAheadOffset = Vector3.zero;
     if (movement.sqrMagnitude > 0.01f)
     {
@@ -83,7 +81,6 @@ public class PlayerMovement : MonoBehaviour
 
     Vector3 finalTarget = baseTargetPosition + lookAheadOffset;
 
-    // 3. Plynulý posun (Lerp potřebuje rozumné číslo a Time.deltaTime)
     cameraTransform.position = Vector3.Lerp(
         cameraTransform.position, 
         finalTarget, 
