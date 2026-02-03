@@ -166,13 +166,19 @@ public class Ghost_movement : MonoBehaviour
         foreach (RaycastHit2D hit in hits)
         {
             // 1. Jsem to já (moje tělo)? -> IGNOROVAT a pokračovat dál
-            if (hit.collider.gameObject == myBody) 
+            if (hit.collider.gameObject == myBody || hit.collider.gameObject == gameObject) 
             {
                 continue; 
             }
             if (hit.collider.CompareTag("Player"))
             {
                 return true;
+            }
+            // 3. Pokud jsme trefili něco jiného (Zeď, Bednu...) a NENÍ to trigger
+            // Tak nám to brání ve výhledu -> NEVIDÍME HO
+            if (!hit.collider.isTrigger)
+            {
+                return false; // ZASTAVÍME cyklus, protože přes tohle nevidíme
             }
         }
 
