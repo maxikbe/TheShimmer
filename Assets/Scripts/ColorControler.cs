@@ -4,7 +4,7 @@ using UnityEngine;
 public class IndividualTreeLogic : MonoBehaviour
 {
     [Header("Color Settings")]
-    public Color leavesColor = Color.blue; 
+    public Color newColor = Color.blue; 
     [Range(0f, 1f)]
     public float transparency = 1.0f; // 1 is solid, 0 is clear
 
@@ -26,8 +26,8 @@ public class IndividualTreeLogic : MonoBehaviour
 
         spriteRenderer.GetPropertyBlock(propBlock);
 
-        // We pass the leavesColor but override its Alpha with our slider
-        Color finalColor = leavesColor;
+        // We pass the newColor but override its Alpha with our slider
+        Color finalColor = newColor;
         finalColor.a = transparency;
 
         propBlock.SetColor("_NewColor", finalColor);
