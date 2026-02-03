@@ -136,7 +136,20 @@ public class Ghost_movement : MonoBehaviour
     private void GoToNextPatrolPoint()
     {
         agent.speed = moveSpeed; // Ujistíme se, že při hlídce chodíme pomalu
-        agent.SetDestination(PatrolPosition());
+
+        Vector3 randomPoint = PatrolPosition();
+        NavMeshHit hit;
+        
+        //Pokud najde poblíž podlahu
+        if (NavMesh.SamplePosition(randomPoint, out hit, 2.0f, NavMesh.AllAreas))
+        {
+            // kdyz nasel nejaky bod
+            agent.SetDestination(hit.position);
+        }
+        else
+        {
+            //pro pripadne dalsi funkce kdyz nenajde zadne misto
+        }
     }
 
     private void PatrolLogic()
@@ -247,6 +260,16 @@ public class Ghost_movement : MonoBehaviour
         {
             fleeDestionation = GetFleePoint(directionAwayFromPlayer);
         }
-        agent.SetDestination(fleeDestionation);
+        
+        NavMeshHit hit;
+        //větsi radius at to budobí lip
+        if (NavMesh.SamplePosition(transform.position, out hit, 5.0f, NavMesh.AllAreas))
+        {
+            agent.SetDestination(hit.position);
+        }
+        else
+        {
+            //zase pro dalsi pripadne funkec
+        }
     }
 }
