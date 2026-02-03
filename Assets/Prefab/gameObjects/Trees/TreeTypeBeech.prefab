@@ -128,8 +128,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.0031249523, y: 0.124374986}
-  m_Size: {x: 0.53624964, y: 0.58625007}
+  m_Offset: {x: -0.0031249523, y: 0.09937477}
+  m_Size: {x: 0.53624964, y: 0.53624964}
   m_Direction: 0
 --- !u!114 &6297854967626591406
 MonoBehaviour:
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ba8aa1ecf5d0f64dae53a70f2a7e1f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TreeColorControler
-  leavesColor: {r: 0.20337729, g: 0.7767295, b: 0.14533141, a: 1}
+  newColor: {r: 0, g: 0, b: 1, a: 1}
   transparency: 1
   colorToReplace: {r: 0.46274513, g: 0.64705884, b: 0.3019608, a: 1}
   tolerance: 0
