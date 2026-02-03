@@ -41,7 +41,7 @@ public class Animal_movement : MonoBehaviour
     {
         if (ghostPrefab == null)
         {
-            Debug.LogError($"Kokkotte, zapomněl jsi přiřadit Ghost Prefab v {gameObject.name}!");
+            Debug.LogError($"chybí ghost prefab v:  {gameObject.name}!");
             return;
         }
 
