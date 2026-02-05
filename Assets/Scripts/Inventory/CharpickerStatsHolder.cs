@@ -29,21 +29,20 @@ public class CharpickerStatsHolder : MonoBehaviour
     // Tuto metodu zavolá CharPicker a pošle jí index postavy
     public void UpdateStats(int currentId)
     {
-        // Kontrola, jestli jsou data načtená
-        if (loadedData == null) LoadDataIntoMemory();
+        // 1. Znovu načteme soubor z disku, aby tam byly nové změny (třeba po AddHealth)
+        LoadDataIntoMemory();
+
         if (loadedData == null || loadedData.characters == null) return;
 
-        // Kontrola, jestli index není mimo rozsah seznamu
-        if (currentId >= 0 && currentId < loadedData.characters.Count)
-        {
-            Character postava = loadedData.characters[currentId];
+        // 2. Najdeme postavu (lepší je hledat podle ID, ne podle indexu v poli, pokud se pole mění)
+        Character postava = loadedData.characters.Find(c => c.id == currentId + 1);
 
-            // Kontrola, jestli jsou Texty přiřazené v Inspectoru, aby to neházelo NullReference
+        if (postava != null)
+        {
             if (nazevHrace != null) nazevHrace.text = postava.name;
             if (stat1 != null) stat1.text = "HP: " + postava.health;
             if (stat2 != null) stat2.text = "LVL: " + postava.level;
             if (stat3 != null) stat3.text = "Speed: " + postava.speed;
-            // stat4, stat5...
         }
     }
 }
