@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 public class CharDataManager : MonoBehaviour
 {
@@ -31,7 +32,6 @@ public class CharDataManager : MonoBehaviour
             data = LoadData();
         }
 
-        // TADY SE TO PROPOJUJE:
         if (data != null)
         {
             DistributeDataToHolders(data);
@@ -82,9 +82,11 @@ public class CharDataManager : MonoBehaviour
         return null;
     }
 
-     public void AddHealth(int id, int amount)
+     public void Adder(int id, int amount, int whatToAdd)
     {
-        Debug.Log($"Přidávám {amount} zdraví postavě s ID {id}.");
+
+        Debug.Log($"Přidávám {amount} {whatToAdd} postavě s ID {id}.");
+
         if (currentData == null || currentData.characters.Count == 0)
         {
             currentData = LoadData();
@@ -94,8 +96,17 @@ public class CharDataManager : MonoBehaviour
 
         if (targetChar != null)
         {
-            int updatedHealth = targetChar.health + amount;
-            UpdateCharacter(targetChar.id, targetChar.name, updatedHealth, targetChar.level);
+            switch(whatToAdd)
+            {
+                case 0:
+                    targetChar.health += amount;
+                    break;
+                default:
+                    Debug.LogWarning("Neznámý atribut k přidání.");
+                    return;
+            }
+
+            UpdateCharacter(targetChar.id, targetChar.name, targetChar.health, targetChar.level);
             
             UnityEngine.Debug.Log($"Zdraví postavy {targetChar.name} (ID: {id}) zvýšeno o {amount}. Celkem: {targetChar.health}");
         }
@@ -107,7 +118,7 @@ public class CharDataManager : MonoBehaviour
 
     public void TestAddHealth()
     {
-        AddHealth(2, 50);
+        Adder(2, 50, 0);
     }
 
     //FindObjectOfType<CharDataManager>().AddHealth(2, 50);
