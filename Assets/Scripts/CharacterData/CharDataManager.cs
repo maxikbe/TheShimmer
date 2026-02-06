@@ -132,27 +132,22 @@ public class CharDataManager : MonoBehaviour
 
     public void UpdateCharacter(int id, string newName, int newHealth, int newLevel)
     {
-        // 1. Nejdříve zajistíme, že máme aktuální data v paměti (pokud nebyla načtena)
         if (currentData == null || currentData.characters.Count == 0)
         {
             currentData = LoadData();
         }
 
-        // 2. Najdeme postavu podle ID
         Character targetChar = currentData.characters.Find(c => c.id == id);
 
         if (targetChar != null)
         {
-            // 3. Změníme data
             targetChar.name = newName;
             targetChar.health = newHealth;
             targetChar.level = newLevel;
 
-            // 4. Uložíme aktualizovaný seznam zpět do JSONu
             SaveCurrentData();
             UnityEngine.Debug.Log($"Postava ID {id} byla aktualizována a uložena.");
             
-            // 5. Volitelné: Pokud chceš, aby se změna hned projevila ve hře
             DistributeDataToHolders(currentData);
             if (statsUI != null)
             {

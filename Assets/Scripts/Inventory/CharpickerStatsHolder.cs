@@ -13,7 +13,6 @@ public class CharpickerStatsHolder : MonoBehaviour
     void Awake()
     {
         savePath = Path.Combine(Application.persistentDataPath, "CharData.json");
-        // Načteme data z JSONu hned při startu do paměti
         LoadDataIntoMemory();
     }
 
@@ -26,16 +25,13 @@ public class CharpickerStatsHolder : MonoBehaviour
         }
     }
 
-    // Tuto metodu zavolá CharPicker a pošle jí index postavy
     public void UpdateStats(int currentId)
     {
-        // 1. Znovu načteme soubor z disku, aby tam byly nové změny (třeba po AddHealth)
         LoadDataIntoMemory();
 
         if (loadedData == null || loadedData.characters == null) return;
 
-        // 2. Najdeme postavu (lepší je hledat podle ID, ne podle indexu v poli, pokud se pole mění)
-        Character postava = loadedData.characters.Find(c => c.id == currentId + 1);
+      Character postava = loadedData.characters.Find(c => c.id == currentId + 1);
 
         if (postava != null)
         {
