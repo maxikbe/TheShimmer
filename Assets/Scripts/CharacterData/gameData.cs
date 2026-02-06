@@ -3,4 +3,5 @@ using System.Collections.Generic;
 public class GameData
 {
     public List<Character> characters = new List<Character>();
+    public List<Item> OwnedItems = new List<Item>();
 }
