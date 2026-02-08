@@ -14,7 +14,7 @@ public class CharDataManager : MonoBehaviour
 
     void Awake()
     {
-        savePath = Path.Combine(Application.persistentDataPath, "CharData.json");
+        savePath = Path.Combine(Application.persistentDataPath, "Data.json");
     }
 
     void Start()
@@ -23,12 +23,12 @@ public class CharDataManager : MonoBehaviour
 
         if (!File.Exists(savePath))
         {
-            UnityEngine.Debug.Log("První spuštění: Vytvářím základní JSON data.");
-            data = SaveInitialData(); 
+            //UnityEngine.Debug.Log("První spuštění: Vytvářím základní JSON data.");
+            data = InitializeGameJson.SaveInitialData(); 
         }
         else
         {
-            UnityEngine.Debug.Log("Soubor nalezen, načítám postavy...");
+            //UnityEngine.Debug.Log("Soubor nalezen, načítám postavy...");
             data = LoadData();
         }
 
@@ -50,26 +50,12 @@ public class CharDataManager : MonoBehaviour
             }
             else
             {
-                UnityEngine.Debug.LogWarning("Nebyla nalezena postava s ID " + i + "!");
+                //UnityEngine.Debug.LogWarning("Nebyla nalezena postava s ID " + i + "!");
             }
         }
     }
 
-    public GameData SaveInitialData()
-    {
-        GameData data = new GameData();
 
-        data.characters.Add(new Character { id = 1, name = "Hráč 1", health = 150, level = 1, speed = 5.0f });
-        data.characters.Add(new Character { id = 2, name = "Hráč 2", health = 80, level = 1, speed = 4.5f });
-        data.characters.Add(new Character { id = 3, name = "Hráč 3", health = 100, level = 1, speed = 7.0f });
-        data.characters.Add(new Character { id = 4, name = "Hráč 4", health = 90, level = 1, speed = 8.0f });
-        data.characters.Add(new Character { id = 5, name = "Hráč 5", health = 200, level = 1, speed = 3.0f });
-        string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(savePath, json);
-        
-        UnityEngine.Debug.Log("Data uložena a připravena.");
-        return data;
-    }
 
     public GameData LoadData()
     {
@@ -108,11 +94,11 @@ public class CharDataManager : MonoBehaviour
 
             UpdateCharacter(targetChar.id, targetChar.name, targetChar.health, targetChar.level);
             
-            UnityEngine.Debug.Log($"Zdraví postavy {targetChar.name} (ID: {id}) zvýšeno o {amount}. Celkem: {targetChar.health}");
+            //UnityEngine.Debug.Log($"Zdraví postavy {targetChar.name} (ID: {id}) zvýšeno o {amount}. Celkem: {targetChar.health}");
         }
         else
         {
-            UnityEngine.Debug.LogError($"Nelze přidat zdraví. Postava s ID {id} neexistuje.");
+            //UnityEngine.Debug.LogError($"Nelze přidat zdraví. Postava s ID {id} neexistuje.");
         }
     }
 
@@ -146,7 +132,7 @@ public class CharDataManager : MonoBehaviour
             targetChar.level = newLevel;
 
             SaveCurrentData();
-            UnityEngine.Debug.Log($"Postava ID {id} byla aktualizována a uložena.");
+            //UnityEngine.Debug.Log($"Postava ID {id} byla aktualizována a uložena.");
             
             DistributeDataToHolders(currentData);
             if (statsUI != null)
@@ -156,7 +142,7 @@ public class CharDataManager : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.LogError($"Postava s ID {id} nebyla v JSONu nalezena!");
+            //UnityEngine.Debug.LogError($"Postava s ID {id} nebyla v JSONu nalezena!");
         }
     }
 

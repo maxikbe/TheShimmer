@@ -11,7 +11,7 @@ public class CharPickerName : MonoBehaviour
 
     void Awake()
     {
-        savePath = Path.Combine(Application.persistentDataPath, "CharData.json");
+        savePath = Path.Combine(Application.persistentDataPath, "Data.json");
         if (nazevHrace == null) nazevHrace = GetComponent<TMP_Text>();
     }
 

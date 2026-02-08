@@ -17,11 +17,12 @@ MonoBehaviour:
   icon: {fileID: -251271911926977222, guid: a334acfdab4804b209fbfcde60b290bf, type: 3}
   prefab: {fileID: 5495661421501331160, guid: 49fbf090e5bed4519835383f99cb9524, type: 3}
   description: Zbran
-  isOwned: 1
   isResearched: 1
   isUsable: 1
   maxStack: 0
   isDefaultItem: 1
+  defaultAmount: 5
+  defaultLevel: 1
   itemType: 4
   weaponType: 1
   isMagical: 0

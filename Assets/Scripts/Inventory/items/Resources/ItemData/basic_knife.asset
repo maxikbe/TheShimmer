@@ -17,11 +17,12 @@ MonoBehaviour:
   icon: {fileID: -1273024007585565325, guid: 798773904929f59448a702cfbedb193b, type: 3}
   prefab: {fileID: 0}
   description: sadfasdfasdfasdfsad
-  isOwned: 1
   isResearched: 1
   isUsable: 1
   maxStack: 0
   isDefaultItem: 1
+  defaultAmount: 5
+  defaultLevel: 1
   itemType: 4
   weaponType: 0
   isMagical: 0

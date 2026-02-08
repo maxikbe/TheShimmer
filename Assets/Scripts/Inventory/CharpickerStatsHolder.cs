@@ -12,7 +12,7 @@ public class CharpickerStatsHolder : MonoBehaviour
 
     void Awake()
     {
-        savePath = Path.Combine(Application.persistentDataPath, "CharData.json");
+        savePath = Path.Combine(Application.persistentDataPath, "Data.json");
         LoadDataIntoMemory();
     }
 

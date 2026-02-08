@@ -8,7 +8,7 @@ public class itemsData : MonoBehaviour
 
     void Awake()
     {
-        savePath = Path.Combine(Application.persistentDataPath, "ItemsData.json");
+        savePath = Path.Combine(Application.persistentDataPath, "Data.json");
     }
 
     void Start()
@@ -17,29 +17,14 @@ public class itemsData : MonoBehaviour
         if (!File.Exists(savePath))
         {
             UnityEngine.Debug.Log("První spuštění: Vytvářím základní JSON data.");
-            data = SaveInitialData(); 
+            data = InitializeGameJson.SaveInitialData(); 
         }
         else
         {
-            UnityEngine.Debug.Log("Soubor nalezen, načítám postavy...");
+            UnityEngine.Debug.Log("Soubor nalezen, načítám itemy...");
             data = LoadData();
         }
 
-    }
-
-    public GameData SaveInitialData()
-    {
-        GameData data = new GameData();
-
-        data.OwnedItems.Add(new Item { id = 1, isOwned = false });
-        data.OwnedItems.Add(new Item { id = 2, isOwned = false });
-        data.OwnedItems.Add(new Item { id = 3, isOwned = false });
-        string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(savePath, json);
-        
-        UnityEngine.Debug.Log("Data uložena a připravena.");
-        Debug.Log(json);
-        return data;
     }
 
     public GameData LoadData()

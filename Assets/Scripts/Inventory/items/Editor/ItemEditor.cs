@@ -2,63 +2,124 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(Item))]
+[CanEditMultipleObjects]
 public class ItemEditor : Editor
 {
+    // Serializované vlastnosti (pro bezpečný zápis)
+    SerializedProperty isDefaultItem, defaultAmount, defaultLevel;
+    SerializedProperty itemName, description, itemType, icon, prefab;
+    SerializedProperty isResearched, isUsable, maxStack;
+
+    void OnEnable()
+    {
+        // Propojíme proměnné z Item.cs s editorem
+        isDefaultItem = serializedObject.FindProperty("isDefaultItem");
+        defaultAmount = serializedObject.FindProperty("defaultAmount");
+        defaultLevel = serializedObject.FindProperty("defaultLevel");
+        
+        itemName = serializedObject.FindProperty("itemName");
+        description = serializedObject.FindProperty("description");
+        itemType = serializedObject.FindProperty("itemType");
+        icon = serializedObject.FindProperty("icon");
+        prefab = serializedObject.FindProperty("prefab");
+        
+        isResearched = serializedObject.FindProperty("isResearched");
+        isUsable = serializedObject.FindProperty("isUsable");
+        maxStack = serializedObject.FindProperty("maxStack");
+    }
+
     public override void OnInspectorGUI()
     {
+        // Načteme aktuální stav
+        serializedObject.Update();
         Item item = (Item)target;
 
-        EditorGUILayout.LabelField("ZÁKLADNÍ NASTAVENÍ", EditorStyles.boldLabel);
-        item.itemName = EditorGUILayout.TextField("Název", item.itemName);
-        item.description = EditorGUILayout.TextField("Popis", item.description);
-        item.isOwned = EditorGUILayout.Toggle("Je vlastněný?", item.isOwned);
-        item.isResearched = EditorGUILayout.Toggle("Je výzkoumaný?", item.isResearched);
-        item.isUsable = EditorGUILayout.Toggle("Je použitelný?", item.isUsable);
-        item.itemType = (ItemType)EditorGUILayout.EnumPopup("Typ předmětu", item.itemType);
+        // --- SEKCE PRO SAVE DATA ---
+        EditorGUILayout.Space();
+        GUIStyle headerStyle = new GUIStyle(EditorStyles.boldLabel);
+        headerStyle.normal.textColor = new Color(0.2f, 0.7f, 0.2f); // Zelený text
+        
+        EditorGUILayout.LabelField("VÝCHOZÍ STAV PRO SAVE (JSON)", headerStyle);
+        
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.PropertyField(isDefaultItem, new GUIContent("Získat při startu?"));
+        EditorGUILayout.PropertyField(defaultAmount, new GUIContent("Počáteční množství"));
+        EditorGUILayout.PropertyField(defaultLevel, new GUIContent("Počáteční level"));
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+
+        // --- ZÁKLADNÍ NASTAVENÍ ---
+        EditorGUILayout.LabelField("STATICKÁ DATA PŘEDMĚTU", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(itemName, new GUIContent("Název"));
+        EditorGUILayout.PropertyField(description, new GUIContent("Popis"));
+        EditorGUILayout.PropertyField(itemType, new GUIContent("Typ předmětu"));
         
         EditorGUILayout.Space();
+        EditorGUILayout.PropertyField(isResearched, new GUIContent("Je vyzkoumaný?"));
+        EditorGUILayout.PropertyField(isUsable, new GUIContent("Je použitelný?"));
+        EditorGUILayout.PropertyField(maxStack, new GUIContent("Max Stack"));
 
-        switch (item.itemType)
+        EditorGUILayout.Space();
+
+        // --- SPECIFICKÉ NASTAVENÍ PODLE TYPU ---
+        // Tady používáme přímo item.itemType pro větvení, ale vykreslujeme vlastnosti
+        switch ((ItemType)itemType.enumValueIndex)
         {
             case ItemType.Weapon:
-                EditorGUILayout.LabelField("NASTAVENÍ ZBRANĚ", EditorStyles.boldLabel);
-                
-                item.weaponType = (WeaponType)EditorGUILayout.EnumPopup("Základní typ", item.weaponType);
-                
-                item.isMagical = EditorGUILayout.Toggle("Je Magická?", item.isMagical);
-                if (item.isMagical)
-                {
-                    item.magicalElement = (MagicalElement)EditorGUILayout.EnumPopup("Element Magie", item.magicalElement);
-                }
-
-                EditorGUILayout.Space();
-                item.Damage = EditorGUILayout.FloatField("Poškození", item.Damage);
-
-                if (item.weaponType == WeaponType.Ranged)
-                {
-                    item.Range = EditorGUILayout.FloatField("Dosah (Range)", item.Range);
-                    item.FireRate = EditorGUILayout.FloatField("Rychlost střelby", item.FireRate);
-                    item.AmmoCapacity = EditorGUILayout.IntField("Kapacita munice", item.AmmoCapacity);
-                }
+                DrawWeaponSettings(item);
                 break;
-
             case ItemType.Armor:
-                item.armorType = (ArmorType)EditorGUILayout.EnumPopup("Slot brnění", item.armorType);
-                item.Armor = EditorGUILayout.FloatField("Obrana", item.Armor);
-                item.durability = EditorGUILayout.IntField("Odolnost", item.durability);
+                DrawArmorSettings(item);
                 break;
-
             case ItemType.Healing:
             case ItemType.Consumable:
-                item.HealAmount = EditorGUILayout.IntField("Léčení / Obnova", item.HealAmount);
+                DrawConsumableSettings(item);
                 break;
         }
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("VIZUÁL A DATA", EditorStyles.boldLabel);
-        item.icon = (Sprite)EditorGUILayout.ObjectField("Ikona", item.icon, typeof(Sprite), false);
-        item.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", item.prefab, typeof(GameObject), false);
 
-        if (GUI.changed) EditorUtility.SetDirty(item);
+        // --- VIZUÁL ---
+        EditorGUILayout.LabelField("VIZUÁL A DATA", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(icon, new GUIContent("Ikona"));
+        EditorGUILayout.PropertyField(prefab, new GUIContent("Prefab"));
+
+        // Propagujeme změny do objektu
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    // Pomocné metody pro přehlednost
+    private void DrawWeaponSettings(Item item)
+    {
+        EditorGUILayout.LabelField("NASTAVENÍ ZBRANĚ", EditorStyles.boldLabel);
+        item.weaponType = (WeaponType)EditorGUILayout.EnumPopup("Základní typ", item.weaponType);
+        item.Damage = EditorGUILayout.FloatField("Poškození", item.Damage);
+        
+        item.isMagical = EditorGUILayout.Toggle("Je Magická?", item.isMagical);
+        if (item.isMagical)
+            item.magicalElement = (MagicalElement)EditorGUILayout.EnumPopup("Element", item.magicalElement);
+
+        if (item.weaponType == WeaponType.Ranged)
+        {
+            item.Range = EditorGUILayout.FloatField("Dosah", item.Range);
+            item.FireRate = EditorGUILayout.FloatField("Rychlost střelby", item.FireRate);
+            item.AmmoCapacity = EditorGUILayout.IntField("Kapacita munice", item.AmmoCapacity);
+        }
+    }
+
+    private void DrawArmorSettings(Item item)
+    {
+        EditorGUILayout.LabelField("NASTAVENÍ BRNĚNÍ", EditorStyles.boldLabel);
+        item.armorType = (ArmorType)EditorGUILayout.EnumPopup("Slot brnění", item.armorType);
+        item.Armor = EditorGUILayout.FloatField("Obrana", item.Armor);
+        item.durability = EditorGUILayout.IntField("Odolnost", item.durability);
+    }
+
+    private void DrawConsumableSettings(Item item)
+    {
+        EditorGUILayout.LabelField("NASTAVENÍ KONZUMACE", EditorStyles.boldLabel);
+        item.HealAmount = EditorGUILayout.IntField("Léčení / Obnova", item.HealAmount);
     }
 }
