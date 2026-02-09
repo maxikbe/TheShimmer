@@ -40,7 +40,7 @@ public class Ghost_movement : MonoBehaviour
     private float searchTimer;
     
     //Proměnné pro přestávky
-    private bool isHavingBreak;
+    public bool isHavingBreak;
     private float currentBreakTimer;
     
 
@@ -380,7 +380,7 @@ public class Ghost_movement : MonoBehaviour
         // Odečítáme čas
         currentBreakTimer -= Time.deltaTime;
 
-        Debug.Log($"<color=cyan>Odpočívám... {currentBreakTimer:F1}</color>");
+        //Debug.Log($"<color=cyan>Odpočívám... {currentBreakTimer:F1}</color>");
 
         // Konec pauzy
         if (currentBreakTimer <= 0)

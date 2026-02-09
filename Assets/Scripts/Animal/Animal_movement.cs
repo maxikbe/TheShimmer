@@ -34,6 +34,13 @@ public class Animal_movement : MonoBehaviour
     public Transform playerPosition; // Přetáhni hráče nebo ho najdi v Awake
     public Transform nestPosition;   // Přetáhni hnízdo
 
+    
+    
+    
+    //Lokální proměnné!!!!!!
+    //pro animace při breaku
+    private bool isFacingRight = true;
+    
     // Reference na vytvořeného ducha, abychom ho mohli sledovat
     private Ghost_movement myGhost;
     
@@ -67,6 +74,21 @@ public class Animal_movement : MonoBehaviour
 
     void Update()
     {
+        //-------------PRo animaci při breaku
+        /*
+        if (myGhost.isHavingBreak)
+        {
+            if (isFacingRight)
+            {
+                Debug.Log("Ghost is having break on right");
+            }
+            else
+            {
+                Debug.Log("Ghost is having break on left");
+            }
+        }
+        */
+        
         if (myGhost != null)
         {
             Vector3 previousPos = transform.position;
@@ -88,6 +110,17 @@ public class Animal_movement : MonoBehaviour
             return;
         }
 
+        // --- pro breaky  ---
+        if (movementVector.x > 0) 
+        {
+            isFacingRight = true; // Jde doprava
+        }
+        else if (movementVector.x < 0) 
+        {
+            isFacingRight = false; // Jde doleva
+        }
+        // ---
+        
         // Normalizujeme vektor (chceme jen směr, ne délku)
         Vector3 dir = movementVector.normalized;
 
