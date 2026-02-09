@@ -16,6 +16,8 @@ public class Animal_movement : MonoBehaviour
     public bool canHaveBreaks = false;
     public float minBreakTime = 0.5f;
     public float maxBreakTime = 3f;
+    [SerializeField, Range(0f, 100f)] 
+    public float breakChancePercent = 25f;
 
     [Header("Patrol Settings")]
     public float patrolRadius = 5f;

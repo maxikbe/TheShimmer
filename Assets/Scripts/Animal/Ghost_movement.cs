@@ -31,12 +31,18 @@ public class Ghost_movement : MonoBehaviour
     private bool canHaveBreaks;
     private float minBreakTime;
     private float maxBreakTime;
+    private float breakChancePercent;
     
     // Nová proměnná pro čekání po ztrátě hráče
     private float waitAfterLostTime;
     // Interní proměnné pro Chasing logiku
     private Vector3 lastKnownPlayerPos;
     private float searchTimer;
+    
+    //Proměnné pro přestávky
+    private bool isHavingBreak;
+    private float currentBreakTimer;
+    
 
     // Tohle necháme nastavitelné na Prefabu ducha, je to spíš globální nastavení
     [SerializeField] private LayerMask wallLayer;
@@ -74,6 +80,7 @@ public class Ghost_movement : MonoBehaviour
         this.canHaveBreaks = stats.canHaveBreaks;
         this.minBreakTime = stats.minBreakTime;
         this.maxBreakTime = stats.maxBreakTime;
+        this.breakChancePercent = stats.breakChancePercent;
         
         this.waitAfterLostTime = stats.waitAfterLostTime;
         
@@ -93,39 +100,35 @@ public class Ghost_movement : MonoBehaviour
 
     void Update()
     {
-        // Pokud nemáme mozek (data), neděláme nic
         if (!isInitialized) return;
-        
+
         bool canSeePlayer = CheckForPlayer();
-        // Pokud to není Friendly, řešíme Patrol / Chasing
+
+        // --- DŮLEŽITÁ POJISTKA ---
+        // Pokud uvidíme hráče, okamžitě rušíme pauzu!
+        if (canSeePlayer)
+        {
+            isHavingBreak = false;
+        }
+
+        // --- NE-FRIENDLY LOGIKA ---
         if (behavior != MobBehavior.Friendly)
         {
-            // Kontrola jestli vidíme hráče
-            
-
             if (canSeePlayer)
             {
-                // VIDÍM HRÁČE
                 if (behavior == MobBehavior.Aggressive)
                 {
                     currentState = State.Chasing;
-                    
-                    // Resetujeme timer, protože ho vidíme
-                    searchTimer = 0f; 
-                    
-                    // Uložíme si, kde jsme ho viděli naposledy (aktualizujeme v reálném čase)
+                    searchTimer = 0f;
                     lastKnownPlayerPos = playerPosition.position;
-                    
-                    ChasePlayer(); // Běží přímo za ním
+                    ChasePlayer();
                 }
             }
             else
             {
-                // NEVIDÍM HRÁČE (řešíme stavy)
                 switch (currentState)
                 {
                     case State.Chasing:
-                        // Hráč zmizel za rohem -> Běžíme na poslední známou pozici
                         ChaseLostLogic();
                         break;
 
@@ -134,11 +137,10 @@ public class Ghost_movement : MonoBehaviour
                         break;
                 }
             }
-            return; // Konec Update pro ne-friendly moby
+            return;
         }
 
-        // --- FRIENDLY LOGIKA (Fleeing) ---
-        // (Tohle se spustí jen pro Friendly moby)
+        // --- FRIENDLY LOGIKA ---
         if (canSeePlayer)
         {
             currentState = State.Fleeing;
@@ -194,10 +196,17 @@ public class Ghost_movement : MonoBehaviour
 
     private void PatrolLogic()
     {
-        // Pokud jsme došli do cíle, najdeme nový
+        // 1. Pokud zrovna máme pauzu, řešíme jen čekání
+        if (isHavingBreak)
+        {
+            breakActivites();
+            return; // Nepokračujeme dál, dokud pauza neskončí
+        }
+
+        // 2. Pokud nemáme pauzu a došli jsme do cíle, zkusíme si ji hodit
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
-            GoToNextPatrolPoint();
+            breakLogic();
         }
     }
 
@@ -343,5 +352,41 @@ public class Ghost_movement : MonoBehaviour
     {
         agent.speed = runSpeed;
         agent.SetDestination(playerPosition.position);
+    }
+
+    private void breakLogic()
+    {
+        // Nejdřív zjistíme, jestli jsou pauzy vůbec povolené
+        if (canHaveBreaks)
+        {
+            float roll = Random.Range(0f, 100f);
+            
+            // Pokud hodíme méně než je šance (WIN)
+            if (roll < breakChancePercent)
+            {
+                isHavingBreak = true;
+                currentBreakTimer = Random.Range(minBreakTime, maxBreakTime);
+                // Debug.Log($"<color=green>Pauza na {currentBreakTimer}s (Roll: {roll})</color>");
+                return; // Ukončíme metodu, nejdeme na další bod
+            }
+        }
+
+        // Pokud pauzy nejsou povolené NEBO jsme prohráli hod -> Jdeme dál
+        GoToNextPatrolPoint();
+    }
+
+    private void breakActivites()
+    {
+        // Odečítáme čas
+        currentBreakTimer -= Time.deltaTime;
+
+        Debug.Log($"<color=cyan>Odpočívám... {currentBreakTimer:F1}</color>");
+
+        // Konec pauzy
+        if (currentBreakTimer <= 0)
+        {
+            isHavingBreak = false;
+            GoToNextPatrolPoint();
+        }
     }
 }
