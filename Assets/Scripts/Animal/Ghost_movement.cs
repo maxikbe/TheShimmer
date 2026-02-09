@@ -43,6 +43,9 @@ public class Ghost_movement : MonoBehaviour
     public bool isHavingBreak;
     private float currentBreakTimer;
     
+    //vision
+    private float viewAngle; 
+    private Vector3 facingDirection = Vector3.up;
 
     // Tohle necháme nastavitelné na Prefabu ducha, je to spíš globální nastavení
     [SerializeField] private LayerMask wallLayer;
@@ -84,6 +87,7 @@ public class Ghost_movement : MonoBehaviour
         
         this.waitAfterLostTime = stats.waitAfterLostTime;
         
+        this.viewAngle = stats.viewAngle;
         // Uložíme si odkaz na hmotné tělo
         this.myBody = stats.gameObject; 
         

@@ -10,7 +10,10 @@ public class Animal_movement : MonoBehaviour
     public Ghost_movement.MobBehavior behavior; // Enum musíme vzít z Ghosta nebo ho dát mimo
     public float moveSpeed = 2f;
     public float runSpeed = 4f;
+    
+    [Header("Vision Settings")]
     public float visionRadius = 3f;
+    [Range(0, 360)] public float viewAngle = 90f;
     
     [Header("Breaks settings")]
     public bool canHaveBreaks = false;
