@@ -68,25 +68,25 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void UpdateCamera()
-{
-    if (cameraTransform == null) return;
-
-    Vector3 baseTargetPosition = transform.position + cameraOffset;
-
-    Vector3 lookAheadOffset = Vector3.zero;
-    if (movement.sqrMagnitude > 0.01f)
     {
-        lookAheadOffset = new Vector3(movement.x, movement.y, 0f) * lookAheadDistance;
+        if (cameraTransform == null) return;
+
+        Vector3 baseTargetPosition = transform.position + cameraOffset;
+
+        Vector3 lookAheadOffset = Vector3.zero;
+        if (movement.sqrMagnitude > 0.01f)
+        {
+            lookAheadOffset = new Vector3(movement.x, movement.y, 0f) * lookAheadDistance;
+        }
+
+        Vector3 finalTarget = baseTargetPosition + lookAheadOffset;
+
+        cameraTransform.position = Vector3.Lerp(
+            cameraTransform.position, 
+            finalTarget, 
+            cameraSmoothing * Time.deltaTime
+        );
     }
-
-    Vector3 finalTarget = baseTargetPosition + lookAheadOffset;
-
-    cameraTransform.position = Vector3.Lerp(
-        cameraTransform.position, 
-        finalTarget, 
-        cameraSmoothing * Time.deltaTime
-    );
-}
 
     private void UpdateAnimator(bool isRunning)
     {

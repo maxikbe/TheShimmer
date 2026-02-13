@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 [Serializable] 
 public class ItemSaveData
@@ -7,4 +8,7 @@ public class ItemSaveData
     public bool isOwned;
     public int level;
     public int amount;
+    public List<int> allowedCharacterIDs = new List<int>();
 }
+
+

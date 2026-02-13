@@ -5,8 +5,8 @@ using UnityEditor;
 [CanEditMultipleObjects]
 public class ItemEditor : Editor
 {
-    // Serializované vlastnosti (pro bezpečný zápis)
-    SerializedProperty isDefaultItem, defaultAmount, defaultLevel;
+    // Serializované vlastnosti
+    SerializedProperty isDefaultItem, defaultAmount, defaultLevel, allowedCharacterIDs;
     SerializedProperty itemName, description, itemType, icon, prefab;
     SerializedProperty isResearched, isUsable, maxStack;
 
@@ -16,6 +16,7 @@ public class ItemEditor : Editor
         isDefaultItem = serializedObject.FindProperty("isDefaultItem");
         defaultAmount = serializedObject.FindProperty("defaultAmount");
         defaultLevel = serializedObject.FindProperty("defaultLevel");
+        allowedCharacterIDs = serializedObject.FindProperty("allowedCharacterIDs");
         
         itemName = serializedObject.FindProperty("itemName");
         description = serializedObject.FindProperty("description");
@@ -30,7 +31,6 @@ public class ItemEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        // Načteme aktuální stav
         serializedObject.Update();
         Item item = (Item)target;
 
@@ -45,6 +45,10 @@ public class ItemEditor : Editor
         EditorGUILayout.PropertyField(isDefaultItem, new GUIContent("Získat při startu?"));
         EditorGUILayout.PropertyField(defaultAmount, new GUIContent("Počáteční množství"));
         EditorGUILayout.PropertyField(defaultLevel, new GUIContent("Počáteční level"));
+        
+        EditorGUILayout.Space(2);
+        // Vložení listu ID postav přímo do zelené sekce
+        EditorGUILayout.PropertyField(allowedCharacterIDs, new GUIContent("Povolené ID postav", "Seznam ID postav, které mohou tento předmět použít"), true);
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space();
@@ -64,7 +68,6 @@ public class ItemEditor : Editor
         EditorGUILayout.Space();
 
         // --- SPECIFICKÉ NASTAVENÍ PODLE TYPU ---
-        // Tady používáme přímo item.itemType pro větvení, ale vykreslujeme vlastnosti
         switch ((ItemType)itemType.enumValueIndex)
         {
             case ItemType.Weapon:
@@ -86,15 +89,14 @@ public class ItemEditor : Editor
         EditorGUILayout.PropertyField(icon, new GUIContent("Ikona"));
         EditorGUILayout.PropertyField(prefab, new GUIContent("Prefab"));
 
-        // Propagujeme změny do objektu
         serializedObject.ApplyModifiedProperties();
     }
 
-    // Pomocné metody pro přehlednost
     private void DrawWeaponSettings(Item item)
     {
         EditorGUILayout.LabelField("NASTAVENÍ ZBRANĚ", EditorStyles.boldLabel);
         item.weaponType = (WeaponType)EditorGUILayout.EnumPopup("Základní typ", item.weaponType);
+        item.isTurnedBaseWeapon = EditorGUILayout.Toggle("Je zbraní pro Turn Based Combat?", item.isTurnedBaseWeapon);
         item.Damage = EditorGUILayout.FloatField("Poškození", item.Damage);
         
         item.isMagical = EditorGUILayout.Toggle("Je Magická?", item.isMagical);

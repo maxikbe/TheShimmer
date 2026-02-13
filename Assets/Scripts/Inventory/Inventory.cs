@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI; 
 using TMPro;
-using System.IO; // Potřebujeme pro File.Exists
+using System.IO; 
 
 public class Inventory : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class Inventory : MonoBehaviour
     [SerializeField] private TextMeshProUGUI statsDescription; 
     [SerializeField] private Image statsIcon;
 
-    private GameData currentSaveData; // Tady budeme mít data z JSONu
+    private GameData currentSaveData; 
     private string savePath;
 
     void Awake()
@@ -29,7 +29,6 @@ public class Inventory : MonoBehaviour
 
     public void LoadAndRefresh()
     {
-        // 1. Načteme data z JSONu
         if (File.Exists(savePath))
         {
             string json = File.ReadAllText(savePath);
@@ -41,26 +40,21 @@ public class Inventory : MonoBehaviour
             return;
         }
 
-        // Výchozí filtr po načtení
         RefreshInventory(ItemType.Weapon);
     }
 
     public void RefreshInventory(ItemType filter)
     {
-        // Vyčistit kontejner
         foreach (Transform child in container) {
             Destroy(child.gameObject);
         }
 
         if (currentSaveData == null) return;
 
-        // 2. Procházíme data ze SAVU (JSONu)
         foreach (ItemSaveData saveItem in currentSaveData.OwnedItems)
         {
-            // Pokud hráč item nevlastní, rovnou ho přeskočíme
             if (!saveItem.isOwned) continue;
 
-            // Najdeme statická data v databázi podle ID ze savu
             Item staticData = database.GetItemByID(saveItem.id);
 
             if (staticData != null && staticData.itemType == filter)
@@ -74,11 +68,8 @@ public class Inventory : MonoBehaviour
     {
         GameObject slot = Instantiate(itemPrefab, container);
         
-        // Nastavení textu (ID ze savu, jméno ze statických dat)
-        // Můžeš přidat i zobrazení množství: staticData.itemName + " x" + saveItem.amount
         slot.GetComponentInChildren<TextMeshProUGUI>().text = staticData.itemName;
 
-        // Ikona
         Transform iconTransform = slot.transform.Find("Image"); 
         if (iconTransform != null) {
             Image iconImage = iconTransform.GetComponent<Image>();
@@ -86,7 +77,6 @@ public class Inventory : MonoBehaviour
         }
 
         Button btn = slot.GetComponent<Button>();
-        // Předáme oboje - statická data pro popis a save data pro level/amount
         btn.onClick.AddListener(() => ShowStats(staticData, saveItem));
 
         if (!staticData.isUsable) {
@@ -94,13 +84,11 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    // Upravená metoda ShowStats, aby uměla zobrazit i data ze savu (level, amount)
     public void ShowStats(Item item, ItemSaveData saveItem)
     {
         statsTitle.text = item.itemName;
         string enumTypeName = item.itemType.ToString();
-        
-        // Základní popis doplněný o dynamická data ze savu
+    
         string dynamicInfo = $"<b>Level: {saveItem.level} | Amount: {saveItem.amount}</b>\n\n";
         
         switch (item.itemType)

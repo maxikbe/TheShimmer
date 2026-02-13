@@ -9,5 +9,7 @@ public class Character
     public int health;
     public int level;
     public float speed;
+    public List<int> OwnedItemsInventoryItemsIDs = new List<int>();
+    public List<int> usableItemIDs = new List<int>();
 }
 

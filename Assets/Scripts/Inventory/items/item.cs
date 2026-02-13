@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Scriptable Objects/Item")]
 public class Item : ScriptableObject
@@ -6,6 +7,7 @@ public class Item : ScriptableObject
     // Vždy viditelné
     public int id = -1;
     public string itemName;
+    public List<int> allowedCharacterIDs = new List<int>(); // Seznam ID postav
     public Sprite icon;
     public GameObject prefab;   
     public string description;
@@ -19,6 +21,7 @@ public class Item : ScriptableObject
 
     // Zbraně
     public WeaponType weaponType;
+    public bool isTurnedBaseWeapon;
     public bool isMagical; 
     public float Damage;
     public float FireRate;
