@@ -28,4 +28,18 @@ public class ButtonManager : MonoBehaviour
         charPickerUI.SetActive(false);
     }
 
+    [SerializeField] private GameObject MainGrid;
+    [SerializeField] private GameObject GunChooseGrid;
+    public void OpenMainGrid()
+    {
+        MainGrid.SetActive(true);
+        GunChooseGrid.SetActive(false);
+    }
+
+    public void OpenGunChooseGrid()
+    {
+        MainGrid.SetActive(false);
+        GunChooseGrid.SetActive(true);
+    }
+
 }

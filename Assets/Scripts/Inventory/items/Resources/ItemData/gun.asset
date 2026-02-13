@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::item
   id: 2
   itemName: Gun
+  allowedCharacterIDs: 0100000002000000030000000400000005000000
   icon: {fileID: -251271911926977222, guid: a334acfdab4804b209fbfcde60b290bf, type: 3}
   prefab: {fileID: 5495661421501331160, guid: 49fbf090e5bed4519835383f99cb9524, type: 3}
   description: Zbran
@@ -25,6 +26,7 @@ MonoBehaviour:
   defaultLevel: 1
   itemType: 4
   weaponType: 1
+  isTurnedBaseWeapon: 0
   isMagical: 0
   Damage: 0
   FireRate: 0
