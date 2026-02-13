@@ -21,6 +21,7 @@ public class Ghost_movement : MonoBehaviour
     private Transform playerPosition;
     private Transform nestPosition;
 
+    private bool debugMode;
     private float moveSpeed;
     private float runSpeed;
     private float minRunningDistance;
@@ -66,6 +67,8 @@ public class Ghost_movement : MonoBehaviour
     public void Setup(Animal_movement stats)
     {
         // 1. Zkopírujeme data (Injektáž)
+        this.debugMode = stats.debugMode;
+        
         this.behavior = stats.behavior;
         this.playerPosition = stats.playerPosition;
         this.nestPosition = stats.nestPosition;
@@ -105,6 +108,11 @@ public class Ghost_movement : MonoBehaviour
     void Update()
     {
         if (!isInitialized) return;
+        
+        if (agent.velocity.sqrMagnitude > 0.1f)
+        {
+            facingDirection = agent.velocity.normalized;
+        }
 
         bool canSeePlayer = CheckForPlayer();
 
@@ -147,17 +155,37 @@ public class Ghost_movement : MonoBehaviour
         // --- FRIENDLY LOGIKA ---
         if (canSeePlayer)
         {
+            //Debug.Log("Vidím hráče");
+            // Vidím ho -> ZDRHÁM!
             currentState = State.Fleeing;
             RunAwayFromPlayer();
         }
         else
         {
+            // Nevidím ho (buď je pryč, nebo jsem k němu zády)
+            
             if (currentState == State.Fleeing)
             {
-                if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                //Debug.Log("Nevidím ho, ale zdrhám");
+                // Pokud zrovna zdrhám, musím zkontrolovat, jestli už jsem dost daleko
+                // Ignorujeme úhel pohledu, zajímá nás jen čistá vzdálenost ("Slyším ho za zády")
+                float distToPlayer = Vector3.Distance(transform.position, playerPosition.position);
+
+                if (distToPlayer < visionRadius)
                 {
-                    currentState = State.Patrolling;
-                    PatrolLogic();
+                    // Hráč je pořád moc blízko (i když ho nevidím), musím dál utíkat!
+                    RunAwayFromPlayer();
+                }
+                else
+                {
+                    //Debug.Log("Uz je dostatečně daleko");
+                    // Už je daleko -> Uklidním se
+                    if (!agent.pathPending && agent.remainingDistance < 0.5f)
+                    {
+                        currentState = State.Patrolling;
+                        agent.speed = moveSpeed;
+                        PatrolLogic();
+                    }
                 }
             }
             else if (currentState == State.Patrolling)
@@ -220,35 +248,40 @@ public class Ghost_movement : MonoBehaviour
     {
         if (playerPosition == null) return false;
 
+        // 1. KONTROLA VZDÁLENOSTI (Máš správně)
         float distanceToPlayer = Vector3.Distance(transform.position, playerPosition.position);
         if (distanceToPlayer > visionRadius) return false;
 
         Vector3 directionToPlayer = (playerPosition.position - transform.position).normalized;
 
-        // ZMĚNA: Použijeme RaycastAll - vrátí všechno v cestě
+        // --- 2. NOVÁ KONTROLA ÚHLU (Zorné pole) ---
+        // Vector3.Angle vrací úhel mezi dvěma vektory ve stupních (0-180)
+        // Pokud je úhel větší než polovina našeho zorného pole, hráč je "za rohem" nebo za zády.
+        if (Vector3.Angle(facingDirection, directionToPlayer) > viewAngle / 2f)
+        {
+            return false; // Nevidím ho, je mimo můj kužel pohledu
+        }
+        // ------------------------------------------
+
+        // 3. RAYCAST (Máš správně - kontrola zdí)
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, directionToPlayer, visionRadius);
 
-        // Projdeme všechny zásahy jeden po druhém (jsou seřazené od nejbližšího)
         foreach (RaycastHit2D hit in hits)
         {
-            // 1. Jsem to já (moje tělo)? -> IGNOROVAT a pokračovat dál
-            if (hit.collider.gameObject == myBody || hit.collider.gameObject == gameObject) 
-            {
-                continue; 
-            }
+            if (hit.collider.gameObject == myBody || hit.collider.gameObject == gameObject) continue; 
+            
             if (hit.collider.CompareTag("Player"))
             {
-                return true;
+                return true; // Vidím ho!
             }
-            // 3. Pokud jsme trefili něco jiného (Zeď, Bednu...) a NENÍ to trigger
-            // Tak nám to brání ve výhledu -> NEVIDÍME HO
+            
             if (!hit.collider.isTrigger)
             {
-                return false; // ZASTAVÍME cyklus, protože přes tohle nevidíme
+                return false; // Zeď
             }
         }
 
-        return false; // Pokud jsme prošli všechno a hráče nenašli
+        return false;
     }
 
     private Vector3 GetFleePoint(Vector3 directionAwayFromPlayer)
@@ -298,7 +331,7 @@ public class Ghost_movement : MonoBehaviour
     {
         agent.speed = runSpeed; // Přepneme na běh
 
-        Vector3 fleeDestionation;
+        Vector3 fleeDestionation; // Pozor, máš tu překlep (Destionation -> Destination), ale to funkčnost nemění :D
         
         // Pojistka pro nestPosition
         float distanceToNest = (nestPosition != null) ? Vector3.Distance(transform.position, nestPosition.position) : float.MaxValue;
@@ -315,14 +348,17 @@ public class Ghost_movement : MonoBehaviour
         }
         
         NavMeshHit hit;
-        //větsi radius at to budobí lip
-        if (NavMesh.SamplePosition(transform.position, out hit, 5.0f, NavMesh.AllAreas))
+        
+        // --- TADY BOLA CHYBA ---
+        // Původně jsi tu měl transform.position. Musíš tam dát ten vypočítaný cíl!
+        if (NavMesh.SamplePosition(fleeDestionation, out hit, 5.0f, NavMesh.AllAreas))
         {
             agent.SetDestination(hit.position);
         }
         else
         {
-            //zase pro dalsi pripadne funkec
+            // Pokud nenajdeš NavMesh v bodě útěku, zkus aspoň utéct směrem od hráče "naslepo"
+            // nebo to prostě nechat být.
         }
     }
 
@@ -392,5 +428,26 @@ public class Ghost_movement : MonoBehaviour
             isHavingBreak = false;
             GoToNextPatrolPoint();
         }
+    }
+    
+// Změněno z OnDrawGizmosSelected na OnDrawGizmos
+    private void OnDrawGizmos()
+    {
+        // Pokud není zaplý debug mode, nic nekresli a vyskoč pryč
+        if (!debugMode) return;
+
+        // --- Zbytek je stejný ---
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, visionRadius);
+
+        Gizmos.color = Color.red;
+        
+        Vector3 lookDir = Application.isPlaying ? facingDirection : transform.up;
+
+        Vector3 leftViewDir = Quaternion.Euler(0, 0, viewAngle / 2) * lookDir;
+        Vector3 rightViewDir = Quaternion.Euler(0, 0, -viewAngle / 2) * lookDir;
+
+        Gizmos.DrawLine(transform.position, transform.position + leftViewDir * visionRadius);
+        Gizmos.DrawLine(transform.position, transform.position + rightViewDir * visionRadius);
     }
 }

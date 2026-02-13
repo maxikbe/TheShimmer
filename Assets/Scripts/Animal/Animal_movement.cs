@@ -5,6 +5,7 @@ public class Animal_movement : MonoBehaviour
 {
     [Header("Ghost Settings")]
     public GameObject ghostPrefab; // Sem přetáhni prefab ducha
+    public bool debugMode = false;
 
     [Header("Stats")]
     public Ghost_movement.MobBehavior behavior; // Enum musíme vzít z Ghosta nebo ho dát mimo
