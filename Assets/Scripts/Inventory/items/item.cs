@@ -22,6 +22,7 @@ public class Item : ScriptableObject
     // Zbraně
     public WeaponType weaponType;
     public bool isTurnedBaseWeapon;
+    public int firstCharID;
     public bool isMagical; 
     public float Damage;
     public float FireRate;

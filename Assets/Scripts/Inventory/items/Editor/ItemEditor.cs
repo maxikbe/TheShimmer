@@ -97,6 +97,7 @@ public class ItemEditor : Editor
         EditorGUILayout.LabelField("NASTAVENÍ ZBRANĚ", EditorStyles.boldLabel);
         item.weaponType = (WeaponType)EditorGUILayout.EnumPopup("Základní typ", item.weaponType);
         item.isTurnedBaseWeapon = EditorGUILayout.Toggle("Je zbraní pro Turn Based Combat?", item.isTurnedBaseWeapon);
+        item.firstCharID = EditorGUILayout.IntField("Který char má tuto zbraň defaultně? (pro každého hráče 1, takže prosím neopakujte to, 0 je že nikdo)", item.firstCharID);
         item.Damage = EditorGUILayout.FloatField("Poškození", item.Damage);
         
         item.isMagical = EditorGUILayout.Toggle("Je Magická?", item.isMagical);
