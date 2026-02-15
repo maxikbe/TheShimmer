@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: ZkouskaTurnBased
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 3
+  itemName: ZkouskaGun
   allowedCharacterIDs: 0200000003000000
   icon: {fileID: -3446211083875711296, guid: 9bd13ab6e5b664791b4d97963a428d61, type: 3}
   prefab: {fileID: 0}
-  description: 
+  description: GUUUUN
   isResearched: 1
   isUsable: 1
   maxStack: 0
@@ -27,6 +27,7 @@ MonoBehaviour:
   itemType: 4
   weaponType: 1
   isTurnedBaseWeapon: 1
+  firstCharID: 1
   isMagical: 0
   Damage: 0
   FireRate: 0
