@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Item
   id: 3
   itemName: ZkouskaGun
-  allowedCharacterIDs: 0200000003000000
+  allowedCharacterIDs: 0100000002000000
   icon: {fileID: -3446211083875711296, guid: 9bd13ab6e5b664791b4d97963a428d61, type: 3}
   prefab: {fileID: 0}
   description: GUUUUN
