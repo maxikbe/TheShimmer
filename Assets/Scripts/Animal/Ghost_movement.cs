@@ -420,6 +420,9 @@ public class Ghost_movement : MonoBehaviour
         // Odečítáme čas
         currentBreakTimer -= Time.deltaTime;
 
+        
+        
+        //----------------PŘÍPADNÁ PODMÍNKA PRO ANIMACI PŘI BREAKU---------------------------
         //Debug.Log($"<color=cyan>Odpočívám... {currentBreakTimer:F1}</color>");
 
         // Konec pauzy
