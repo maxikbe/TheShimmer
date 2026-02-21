@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -18,8 +19,11 @@ public class Animal_movement : MonoBehaviour
     
     [Header("Breaks settings")]
     public bool canHaveBreaks = false;
+    [ShowIf("canHaveBreaks")]
     public float minBreakTime = 0.5f;
+    [ShowIf("canHaveBreaks")]
     public float maxBreakTime = 3f;
+    [ShowIf("canHaveBreaks")]
     [SerializeField, Range(0f, 100f)] 
     public float breakChancePercent = 25f;
 

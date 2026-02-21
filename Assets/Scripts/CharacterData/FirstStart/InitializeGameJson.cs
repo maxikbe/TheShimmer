@@ -31,7 +31,6 @@ public class InitializeGameJson : MonoBehaviour
 
     GameData data = new GameData();
 
-    // 1. Definice postav
     data.characters.Add(new Character { id = 1, name = "Dr. Ventress", health = 150, level = 1, speed = 5.0f });
     data.characters.Add(new Character { id = 2, name = "Lena", health = 80, level = 1, speed = 4.5f });
     data.characters.Add(new Character { id = 3, name = "Cass Sheppard", health = 100, level = 1, speed = 7.0f });
@@ -47,6 +46,20 @@ public class InitializeGameJson : MonoBehaviour
             if (item.allowedCharacterIDs == null || item.allowedCharacterIDs.Count == 0 || item.allowedCharacterIDs.Contains(character.id))
             {
                 character.usableItemIDs.Add(item.id);
+                character.UnOwnedItemsIDs.Add(item.id);    
+                if(item.isTurnedBaseWeapon) character.pickableTurnBaseItemIDs.Add(item.id);
+                if(item.isTurnedBaseWeapon && item.firstCharID == character.id )
+                {
+                    character.pickedItemID = item.id;
+                    character.OwnedItemsInventoryItemsIDs.Add(item.id);
+                    character.UnOwnedItemsIDs.Remove(item.id);
+                } 
+                if(item.isDefaultItem && !character.OwnedItemsInventoryItemsIDs.Contains(item.id))
+                {
+                    character.OwnedItemsInventoryItemsIDs.Add(item.id);
+                    character.UnOwnedItemsIDs.Remove(item.id);
+                }
+
             }
         }
     }
@@ -59,14 +72,11 @@ public class InitializeGameJson : MonoBehaviour
         newSaveItem.level = item.defaultLevel;
         newSaveItem.amount = item.defaultAmount;
 
-        if (item.allowedCharacterIDs == null || item.allowedCharacterIDs.Count == 0)
-        {
-            foreach (var c in data.characters) newSaveItem.allowedCharacterIDs.Add(c.id);
-        }
-        else
-        {
-            newSaveItem.allowedCharacterIDs = new List<int>(item.allowedCharacterIDs);
-        }
+        if (item.allowedCharacterIDs == null || item.allowedCharacterIDs.Count == 0) foreach (var c in data.characters) newSaveItem.allowedCharacterIDs.Add(c.id);
+        else newSaveItem.allowedCharacterIDs = new List<int>(item.allowedCharacterIDs);
+        
+        if(item.isTurnedBaseWeapon && item.firstCharID != -1 && !newSaveItem.allowedCharacterIDs.Contains(item.firstCharID)) newSaveItem.allowedCharacterIDs.Add(item.firstCharID);
+        
 
         data.OwnedItems.Add(newSaveItem);
     }
