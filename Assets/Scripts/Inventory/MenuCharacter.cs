@@ -5,7 +5,7 @@ using System.IO;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
-
+using System.Linq;
 
 public class MenuCharacter : MonoBehaviour
 {
@@ -23,6 +23,11 @@ public class MenuCharacter : MonoBehaviour
     [SerializeField] private GameObject GunchoosePrefabType;
     [SerializeField] private GameObject GunChooseConent;
     [SerializeField] private TMP_Text[] gunChooseText;
+    private int PickedPerkIndex = 0;
+    [SerializeField] private GameObject perkChoosePrefabType;
+    [SerializeField] private GameObject perkChooseContent;
+    [SerializeField] private TMP_Text[] perkChooseText;
+    [SerializeField] private GameObject[] perkPickerButtons;
 
     void Awake()
     {
@@ -60,6 +65,7 @@ public class MenuCharacter : MonoBehaviour
         {
             Character postava = loadedData.characters.Find(c => c.id == characterId + 1);
             addPickableButtons();
+            addPickablePerks();
             if (postava != null)
             {
                 nazevHrace.text = postava.name;
@@ -122,7 +128,94 @@ public class MenuCharacter : MonoBehaviour
 
     }
     
+    private void addPickablePerks()
+    {
+       Perks[] allPerksFromResources = Resources.LoadAll<Perks>("PerksData");
+
+        foreach (Transform child in perkChooseContent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (Perks perk in allPerksFromResources)
+        {
+            GameObject buttonObj = Instantiate(perkChoosePrefabType, perkChooseContent.transform);
+            TMP_Text buttonText = buttonObj.GetComponentInChildren<TMP_Text>();
+            if (buttonText != null) buttonText.text = perk.perkName;
+
+            Image buttonImage = buttonObj.GetComponentInChildren<Image>();
+            if (buttonImage != null) buttonImage.sprite = perk.icon;
+
+            Button btn = buttonObj.GetComponent<Button>();
+            if (btn != null)
+            {
+                int currentId = perk.id; 
+                
+                btn.onClick.AddListener(() => {
+                    if (PickedPerkIndex == 0)
+                    {
+                        addPerkInfo(perk);
+                    }
+                    else 
+                    {
+                        PickPerk(currentId);
+                        Debug.Log("Vybrán perk s ID: " + currentId + " do slotu: " + PickedPerkIndex);
+                    }
+                });
+            }
+        }
+    }
+
+    private void addPerkInfo(Perks perk)
+    {
+        if (perkChooseText.Length >= 3)
+        {
+            perkChooseText[0].text = "Name: " + perk.perkName;
+            perkChooseText[1].text = "Type: " + perk.perkType.ToString();
+            perkChooseText[2].text = "Description: " + perk.description;
+        }
+    }
+    
+    public void PickedIndexSetter(int index)
+    {
+        if(index != PickedPerkIndex) PickedPerkIndex = index;
+        else PickedPerkIndex = 0;
+        Debug.Log(PickedPerkIndex);
+    }
 
 
+    public void PickPerk(int idOfPerk)
+    {
+        Perks[] allPerksFromResources = Resources.LoadAll<Perks>("PerksData");
+        if (loadedData != null && loadedData.characters != null)
+        {
+            Character postava = loadedData.characters.Find(c => c.id == characterId + 1);
+            if (postava != null)
+            {
+                Perks selectedPerk = allPerksFromResources.FirstOrDefault(p => p.id == idOfPerk);
 
+                if (selectedPerk != null) 
+                {
+                    switch(PickedPerkIndex)
+                    {
+                        case 1: 
+                            postava.pickePerkID1 = idOfPerk;
+                            perkPickerButtons[0].GetComponent<Image>().sprite = selectedPerk.icon;
+                            PickedPerkIndex = 0;
+                            break;
+                        case 2:
+                            postava.pickePerkID2 = idOfPerk;
+                            perkPickerButtons[1].GetComponent<Image>().sprite = selectedPerk.icon;
+                            PickedPerkIndex = 0;
+                            break;
+                        case 3:
+                            postava.pickePerkID3 = idOfPerk;
+                            perkPickerButtons[2].GetComponent<Image>().sprite = selectedPerk.icon;
+                            PickedPerkIndex = 0;
+                            break;
+                    }
+                }
+            }
+        }
+    }
 }

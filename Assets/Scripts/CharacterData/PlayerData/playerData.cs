@@ -7,8 +7,9 @@ using System;
 public class playerData
 {
     public String playerName;
-    public int numberOfPerkUpgraders;
     public int numberOfGunUpgraders;
     public int numberOfMaterial;
     public int numberOfCoins;
+    public List<int> unFoundPerks = new List<int>();
+    public List<int> foundPerks = new List<int>();
 }
