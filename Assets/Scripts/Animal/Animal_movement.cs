@@ -37,6 +37,8 @@ public class Animal_movement : MonoBehaviour
     
     [Header("Chase Settings")]
     public float waitAfterLostTime = 2f;
+    [Tooltip("Jak dlouho mobka hlídkuje jako agresivní, než se uklidní")]
+    public float calmDownTime = 30f; // NOVÉ: Zklidní se třeba za 30 sekund
 
     [Header("References")]
     public Transform playerPosition; // Přetáhni hráče nebo ho najdi v Awake

@@ -20,7 +20,7 @@ public class PlayerHitTesting : MonoBehaviour
                 if (targetMob != null)
                 {
                     Debug.Log("BAM! Instantní hit!");
-                    targetMob.TakeDamage(5);
+                    targetMob.TakeDamage(1);
 
                     // Nyní resetujeme stopky. 
                     // Time.time je aktuální čas od spuštění hry. Přičteme k němu tvůj cooldown.

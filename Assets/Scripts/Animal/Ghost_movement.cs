@@ -20,6 +20,16 @@ public class Ghost_movement : MonoBehaviour
     // --- PROMĚNNÉ (Tyhle hodnoty nám pošle Animal přes Setup) ---
     private Transform playerPosition;
     private Transform nestPosition;
+    
+    // --- NOVÉ PROMĚNNÉ NĚKDE NAHOŘE ---
+    private Animal_movement myAnimalStats; // Odkaz zpět na tělo
+    private MobBehavior originalBehavior;  // Co jsme zač od přírody
+    
+    private float calmDownTime; // Dostaneme z Animal
+    private float currentCalmTimer; // Aktuální stav stopek
+    private bool isCoolingDown; // Zda se právě uklidňuje
+    
+    
 
     private bool debugMode;
     private float moveSpeed;
@@ -94,6 +104,12 @@ public class Ghost_movement : MonoBehaviour
         // Uložíme si odkaz na hmotné tělo
         this.myBody = stats.gameObject; 
         
+        
+        // --- NOVÉ ---
+        this.myAnimalStats = stats; // Uložíme si odkaz na Animal
+        this.originalBehavior = stats.behavior; // Zapamatujeme si, jestli jsme byli Neutral, nebo rovnou Aggressive
+        this.calmDownTime = stats.calmDownTime;
+        
         // 2. Aplikujeme to na Agenta
         agent.speed = moveSpeed;
 
@@ -117,10 +133,29 @@ public class Ghost_movement : MonoBehaviour
         bool canSeePlayer = CheckForPlayer();
 
         // --- DŮLEŽITÁ POJISTKA ---
-        // Pokud uvidíme hráče, okamžitě rušíme pauzu!
         if (canSeePlayer)
         {
             isHavingBreak = false;
+            isCoolingDown = false; // Jakmile ho znova uvidí, adrenalin se vrací na max!
+        }
+
+        // --- ODPOČÍTÁVÁNÍ UPOKOJENÍ ---
+        if (isCoolingDown && !canSeePlayer)
+        {
+            currentCalmTimer += Time.deltaTime;
+            if (currentCalmTimer >= calmDownTime)
+            {
+                // Uklidnil se!
+                isCoolingDown = false;
+                this.behavior = originalBehavior;
+                
+                if (myAnimalStats != null)
+                {
+                    myAnimalStats.behavior = originalBehavior; // Updatneme v Inspectoru
+                }
+                
+                // Debug.Log("Uff, kašlu na to, tady nikdo není. Vracím se do normálu.");
+            }
         }
 
         // --- NE-FRIENDLY LOGIKA ---
@@ -366,24 +401,25 @@ public class Ghost_movement : MonoBehaviour
     private void ChaseLostLogic()
     {
         agent.speed = runSpeed;
-
-        // 1. Nastavíme cíl na poslední známou pozici
         agent.SetDestination(lastKnownPlayerPos);
 
-        // 2. Kontrola, jestli jsme doběhli na místo, kde jsme ho naposledy viděli
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
-            // Jsme tam, ale hráč nikde (protože CheckForPlayer vrátil false)
-            // Začneme odpočítávat čas
             searchTimer += Time.deltaTime;
-
-            // Debug.Log($"Hledám hráče... {searchTimer}/{waitAfterLostTime}");
 
             if (searchTimer >= waitAfterLostTime)
             {
-                // Čas vypršel, vzdáváme to -> Patrol
+                // Čas na místě vypršel -> Jdeme zpět hlídkovat
                 currentState = State.Patrolling;
                 GoToNextPatrolPoint();
+
+                // --- NOVINKA ---
+                // Místo okamžitého návratu chování jen zapneme chladící stopky!
+                if (behavior == MobBehavior.Aggressive && originalBehavior != MobBehavior.Aggressive)
+                {
+                    isCoolingDown = true;
+                    currentCalmTimer = 0f;
+                }
             }
         }
     }
