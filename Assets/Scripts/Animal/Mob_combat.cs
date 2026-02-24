@@ -33,8 +33,9 @@ public class Mob_combat : MonoBehaviour
     
     void Update()
     {
+           
         // Pokud nejsme tahová mobka, nebo chybí reference, nebo už načítáme, nic neděláme
-        if (!isTurnBasedMob || animalMovement == null || animalMovement.playerPosition == null || isTransitioning) 
+        if (!isTurnBasedMob || animalMovement == null || animalMovement.playerPosition == null || isTransitioning || animalMovement != null || animalMovement.behavior != Ghost_movement.MobBehavior.Aggressive) 
             return;
 
         // TADY JE TVOJE DETEKCE
@@ -68,6 +69,13 @@ public class Mob_combat : MonoBehaviour
         currentHealth -= damage;
         Debug.Log($"{gameObject.name} dostal za {damage}! Zbývá {currentHealth} HP.");
 
+        if (animalMovement != null && animalMovement.behavior == Ghost_movement.MobBehavior.Neutral && isTurnBasedMob)
+        {
+            animalMovement.MakeAggressive();
+            Debug.Log("Z neutrální mobky je agresivní!");
+        }
+        
+        
         if (currentHealth <= 0)
         {
             Destroy(gameObject);

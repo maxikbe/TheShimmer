@@ -177,4 +177,18 @@ public class Animal_movement : MonoBehaviour
     {
         if (myGhost != null) Destroy(myGhost.gameObject);
     }
+    
+    // --- NOVÁ METODA PRO COMBAT SCRIPT ---
+    public void MakeAggressive()
+    {
+        // Změníme to u sebe, ať to máme správně i v Inspectoru
+        behavior = Ghost_movement.MobBehavior.Aggressive; 
+
+        // Pošleme povel našemu neviditelnému mozku
+        if (myGhost != null)
+        {
+            myGhost.ChangeBehavior(behavior);
+        }
+    }
+    
 }

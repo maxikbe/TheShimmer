@@ -453,4 +453,23 @@ public class Ghost_movement : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + leftViewDir * visionRadius);
         Gizmos.DrawLine(transform.position, transform.position + rightViewDir * visionRadius);
     }
+    
+    
+    // --- NOVÁ METODA PRO ZMĚNU CHOVÁNÍ BĚHEM HRY ---
+    public void ChangeBehavior(MobBehavior newBehavior)
+    {
+        this.behavior = newBehavior;
+
+        // Pokud se z mobky stal agresor, chceme, ať hned začne jednat!
+        if (newBehavior == MobBehavior.Aggressive)
+        {
+            // Okamžitě zrušíme případnou pauzu
+            isHavingBreak = false; 
+            currentState = State.Chasing;
+            searchTimer = 0f;
+            // Začne hledat hráče
+            lastKnownPlayerPos = playerPosition.position; 
+            ChasePlayer();
+        }
+    }
 }
