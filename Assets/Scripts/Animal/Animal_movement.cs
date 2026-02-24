@@ -31,6 +31,12 @@ public class Animal_movement : MonoBehaviour
     public float patrolRadius = 5f;
     public float runningRadius = 10f;
     
+    [Tooltip("Minimální čas, jak dlouho mobka stojí na hlídkovacím bodu")]
+    public float minPatrolWait = 0.5f;
+    [Tooltip("Maximální čas, jak dlouho mobka stojí na hlídkovacím bodu")]
+    public float maxPatrolWait = 1.5f;
+    
+    
     [Header("Flee Settings")]
     public float minRunningDistance = 1f;
     public float maxRunningDistance = 3f;
@@ -103,7 +109,7 @@ public class Animal_movement : MonoBehaviour
         {
             Vector3 previousPos = transform.position;
             // Tady řešíš vizuální pohyb za duchem (Lerp), viz předchozí rada
-            transform.position = Vector3.Lerp(transform.position, myGhost.transform.position, Time.deltaTime * 5f);
+            transform.position = myGhost.transform.position;
             
             UpdateAnimationDirection(transform.position - previousPos);
             // Tady bys mohl řešit animace podle myGhost.agent.velocity atd.

@@ -29,6 +29,10 @@ public class Ghost_movement : MonoBehaviour
     private float currentCalmTimer; // Aktuální stav stopek
     private bool isCoolingDown; // Zda se právě uklidňuje
     
+    private float minPatrolWait;
+    private float maxPatrolWait;
+    private float currentPatrolWaitTimer;
+    private bool isWaitingAtPatrol;
     
 
     private bool debugMode;
@@ -92,6 +96,9 @@ public class Ghost_movement : MonoBehaviour
         this.patrolRadius = stats.patrolRadius;
         this.runningRadius = stats.runningRadius;
         this.visionRadius = stats.visionRadius;
+        // --- NOVÉ ---
+        this.minPatrolWait = stats.minPatrolWait;
+        this.maxPatrolWait = stats.maxPatrolWait;
         
         this.canHaveBreaks = stats.canHaveBreaks;
         this.minBreakTime = stats.minBreakTime;
@@ -136,6 +143,7 @@ public class Ghost_movement : MonoBehaviour
         if (canSeePlayer)
         {
             isHavingBreak = false;
+            isWaitingAtPatrol = false; // <-- ZRUŠÍME ČEKÁNÍ, jde do tuhého!
             isCoolingDown = false; // Jakmile ho znova uvidí, adrenalin se vrací na max!
         }
 
@@ -263,17 +271,34 @@ public class Ghost_movement : MonoBehaviour
 
     private void PatrolLogic()
     {
-        // 1. Pokud zrovna máme pauzu, řešíme jen čekání
+        // 1. Pokud zrovna máme velkou pauzu, řešíme jen čekání
         if (isHavingBreak)
         {
             breakActivites();
             return; // Nepokračujeme dál, dokud pauza neskončí
         }
 
-        // 2. Pokud nemáme pauzu a došli jsme do cíle, zkusíme si ji hodit
+        // 2. Dorazili jsme na hlídkovací bod?
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
-            breakLogic();
+            // A) Ještě nečekáme? Tak začneme!
+            if (!isWaitingAtPatrol)
+            {
+                isWaitingAtPatrol = true;
+                currentPatrolWaitTimer = Random.Range(minPatrolWait, maxPatrolWait);
+            }
+            // B) Už čekáme? Tak odpočítáváme čas
+            else
+            {
+                currentPatrolWaitTimer -= Time.deltaTime;
+                
+                // Čas vypršel, jdeme dál
+                if (currentPatrolWaitTimer <= 0)
+                {
+                    isWaitingAtPatrol = false;
+                    breakLogic(); // Tady se rozhodne, jestli si dá tu tvoji velkou pauzu, nebo jde na další bod
+                }
+            }
         }
     }
 
@@ -500,7 +525,9 @@ public class Ghost_movement : MonoBehaviour
         if (newBehavior == MobBehavior.Aggressive)
         {
             // Okamžitě zrušíme případnou pauzu
-            isHavingBreak = false; 
+            isHavingBreak = false;
+            isWaitingAtPatrol = false; 
+            isCoolingDown = false; 
             currentState = State.Chasing;
             searchTimer = 0f;
             // Začne hledat hráče
