@@ -35,7 +35,7 @@ public class Mob_combat : MonoBehaviour
     {
            
         // Pokud nejsme tahová mobka, nebo chybí reference, nebo už načítáme, nic neděláme
-        if (!isTurnBasedMob || animalMovement == null || animalMovement.playerPosition == null || isTransitioning || animalMovement != null || animalMovement.behavior != Ghost_movement.MobBehavior.Aggressive) 
+        if (!isTurnBasedMob || animalMovement == null || animalMovement.playerPosition == null || isTransitioning || animalMovement.behavior != Ghost_movement.MobBehavior.Aggressive) 
             return;
 
         // TADY JE TVOJE DETEKCE
