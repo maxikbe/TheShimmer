@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 0059e960da609924596ad66bf0ccda8c
+=======
+guid: 0bc300b5cae1840f38f1a234c2a0d11d
+>>>>>>> 60b84ac (ui v perkech upraveno)
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

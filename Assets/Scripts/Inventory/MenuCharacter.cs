@@ -196,23 +196,39 @@ public class MenuCharacter : MonoBehaviour
 
                 if (selectedPerk != null) 
                 {
+                    // Pomocná proměnná pro tlačítko, se kterým zrovna pracujeme
+                    GameObject currentButton = null;
+
                     switch(PickedPerkIndex)
                     {
                         case 1: 
                             postava.pickePerkID1 = idOfPerk;
-                            perkPickerButtons[0].GetComponent<Image>().sprite = selectedPerk.icon;
-                            PickedPerkIndex = 0;
+                            currentButton = perkPickerButtons[0];
                             break;
                         case 2:
                             postava.pickePerkID2 = idOfPerk;
-                            perkPickerButtons[1].GetComponent<Image>().sprite = selectedPerk.icon;
-                            PickedPerkIndex = 0;
+                            currentButton = perkPickerButtons[1];
                             break;
                         case 3:
                             postava.pickePerkID3 = idOfPerk;
-                            perkPickerButtons[2].GetComponent<Image>().sprite = selectedPerk.icon;
-                            PickedPerkIndex = 0;
+                            currentButton = perkPickerButtons[2];
                             break;
+                    }
+
+                    if (currentButton != null)
+                    {
+                        // Najdeme objekt "Child" pod tlačítkem a změníme mu Sprite
+                        Transform childTransform = currentButton.transform.Find("Child");
+                        if (childTransform != null)
+                        {
+                            childTransform.GetComponent<Image>().sprite = selectedPerk.icon;
+                        }
+                        else
+                        {
+                            Debug.LogError("Objekt jménem 'Child' nebyl pod tlačítkem nalezen!");
+                        }
+                        
+                        PickedPerkIndex = 0;
                     }
                 }
             }

@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: b47f3d38b43365e4bbcc2c7c2eab16d8
+=======
+guid: 77a8d31a8e79847dd8e0dde12e0bfc71
+>>>>>>> 60b84ac (ui v perkech upraveno)
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0

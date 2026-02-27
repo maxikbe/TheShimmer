@@ -17,5 +17,5 @@ MonoBehaviour:
   perkType: 1
   addingAmount: 20
   description: 
-  icon: {fileID: 912992294265704845, guid: 6d34650d473634586afd3c9426ba9655, type: 3}
+  icon: {fileID: 6045535638747361049, guid: bb13384fe1f64491b9b1f2b76637c272, type: 3}
   levelOfPerk: 1
