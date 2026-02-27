@@ -178,32 +178,44 @@ public class MenuCharacter : MonoBehaviour
     
     public void PickedIndexSetter(int index)
     {
-        // 1. Logika nastavení indexu (tvoje původní)
-        if(index != PickedPerkIndex) PickedPerkIndex = index;
-        else PickedPerkIndex = 0;
-
-        // 2. Najdeme konkrétní tlačítko v poli
-        // Předpokládám, že máš definované např. public GameObject[] perkPickerButtons;
-        GameObject targetButton = perkPickerButtons[index--];
-
-        // 3. Získáme všechny grafické komponenty v jeho dětech
-        // GetComponentsInChildren najde Image, Text i TextMeshProUGUI
-        Graphic[] childrenGraphics = targetButton.GetComponentsInChildren<Graphic>();
-
-        foreach (Graphic g in childrenGraphics)
+        // 1. Nejdříve resetujeme všechna tlačítka na bílou (aby nezůstalo černé to minulé)
+        foreach (GameObject btn in perkPickerButtons)
         {
-            // Pokud je index aktivní (není 0), zčernají. Jinak zbělejí (nebo nastav jinou barvu).
-            if (PickedPerkIndex != 0)
+            if (btn == null) continue;
+            Graphic[] allGraphics = btn.GetComponentsInChildren<Graphic>();
+            foreach (Graphic g in allGraphics)
             {
-                g.color = Color.black;
-            }
-            else
-            {
-                g.color = Color.white; 
+                g.color = Color.white;
             }
         }
 
-        Debug.Log("Kliknuto na index: " + index + " | Stav: " + PickedPerkIndex);
+        // 2. Logika přepínání indexu
+        if (index != PickedPerkIndex) 
+        {
+            PickedPerkIndex = index;
+            
+            // 3. Zčernáme děti POUZE u aktivního tlačítka
+            // index - 1 protože v Unity voláš Button 1, 2, 3, ale pole je 0, 1, 2
+            int arrayIndex = index - 1; 
+
+            if (arrayIndex >= 0 && arrayIndex < perkPickerButtons.Length)
+            {
+                GameObject targetButton = perkPickerButtons[arrayIndex];
+                Graphic[] childrenGraphics = targetButton.GetComponentsInChildren<Graphic>();
+
+                foreach (Graphic g in childrenGraphics)
+                {
+                    g.color = Color.black;
+                }
+            }
+        }
+        else 
+        {
+            // Pokud klikneš na stejné tlačítko podruhé, zruší se výběr (vše už je bílé z kroku 1)
+            PickedPerkIndex = 0;
+        }
+
+        Debug.Log("Aktivní slot pro perk: " + PickedPerkIndex);
     }
 
 
