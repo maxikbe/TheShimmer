@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acece1a3b4ec344069fdcabb50ac70cf, type: 3}
+  m_Name: PerkHealth 10
+  m_EditorClassIdentifier: Assembly-CSharp::Perks
+  id: 110
+  perkName: Health
+  perkType: 0
+  addingAmount: 500
+  description: Perk adding 500 Health to your character
+  icon: {fileID: -2260445373175313735, guid: adc2d2401542742eb9bd9129ea7268cb, type: 3}
+  levelOfPerk: 10
