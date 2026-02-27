@@ -178,9 +178,32 @@ public class MenuCharacter : MonoBehaviour
     
     public void PickedIndexSetter(int index)
     {
+        // 1. Logika nastavení indexu (tvoje původní)
         if(index != PickedPerkIndex) PickedPerkIndex = index;
         else PickedPerkIndex = 0;
-        Debug.Log(PickedPerkIndex);
+
+        // 2. Najdeme konkrétní tlačítko v poli
+        // Předpokládám, že máš definované např. public GameObject[] perkPickerButtons;
+        GameObject targetButton = perkPickerButtons[index--];
+
+        // 3. Získáme všechny grafické komponenty v jeho dětech
+        // GetComponentsInChildren najde Image, Text i TextMeshProUGUI
+        Graphic[] childrenGraphics = targetButton.GetComponentsInChildren<Graphic>();
+
+        foreach (Graphic g in childrenGraphics)
+        {
+            // Pokud je index aktivní (není 0), zčernají. Jinak zbělejí (nebo nastav jinou barvu).
+            if (PickedPerkIndex != 0)
+            {
+                g.color = Color.black;
+            }
+            else
+            {
+                g.color = Color.white; 
+            }
+        }
+
+        Debug.Log("Kliknuto na index: " + index + " | Stav: " + PickedPerkIndex);
     }
 
 
@@ -196,23 +219,39 @@ public class MenuCharacter : MonoBehaviour
 
                 if (selectedPerk != null) 
                 {
+                    // Pomocná proměnná pro tlačítko, se kterým zrovna pracujeme
+                    GameObject currentButton = null;
+
                     switch(PickedPerkIndex)
                     {
                         case 1: 
                             postava.pickePerkID1 = idOfPerk;
-                            perkPickerButtons[0].GetComponent<Image>().sprite = selectedPerk.icon;
-                            PickedPerkIndex = 0;
+                            currentButton = perkPickerButtons[0];
                             break;
                         case 2:
                             postava.pickePerkID2 = idOfPerk;
-                            perkPickerButtons[1].GetComponent<Image>().sprite = selectedPerk.icon;
-                            PickedPerkIndex = 0;
+                            currentButton = perkPickerButtons[1];
                             break;
                         case 3:
                             postava.pickePerkID3 = idOfPerk;
-                            perkPickerButtons[2].GetComponent<Image>().sprite = selectedPerk.icon;
-                            PickedPerkIndex = 0;
+                            currentButton = perkPickerButtons[2];
                             break;
+                    }
+
+                    if (currentButton != null)
+                    {
+                        // Najdeme objekt "Child" pod tlačítkem a změníme mu Sprite
+                        Transform childTransform = currentButton.transform.Find("Child");
+                        if (childTransform != null)
+                        {
+                            childTransform.GetComponent<Image>().sprite = selectedPerk.icon;
+                        }
+                        else
+                        {
+                            Debug.LogError("Objekt jménem 'Child' nebyl pod tlačítkem nalezen!");
+                        }
+                        
+                        PickedPerkIndex = 0;
                     }
                 }
             }

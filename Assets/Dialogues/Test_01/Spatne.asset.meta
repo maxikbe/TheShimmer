@@ -1,5 +1,9 @@
 fileFormatVersion: 2
-guid: 507f180bd44e857429f7f4ba94ded8db
+<<<<<<<< HEAD:Assets/Dialogues/Test_01/Spatne.asset.meta
+guid: 389cadcb2033749c996348077f9306db
+========
+guid: 521bd1f5fe64841ceabede45bdbbc5d5
+>>>>>>>> 60b84ac (ui v perkech upraveno):Assets/Scripts/Inventory/perks/Resources/PerksData/PerkDamage 12.asset.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 11400000
