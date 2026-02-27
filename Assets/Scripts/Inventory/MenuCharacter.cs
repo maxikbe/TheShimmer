@@ -27,7 +27,9 @@ public class MenuCharacter : MonoBehaviour
     [SerializeField] private GameObject perkChoosePrefabType;
     [SerializeField] private GameObject perkChooseContent;
     [SerializeField] private TMP_Text[] perkChooseText;
+    [SerializeField] private Image perkChooseIcon;
     [SerializeField] private GameObject[] perkPickerButtons;
+   
 
     void Awake()
     {
@@ -170,52 +172,45 @@ public class MenuCharacter : MonoBehaviour
     {
         if (perkChooseText.Length >= 3)
         {
-            perkChooseText[0].text = "Name: " + perk.perkName;
-            perkChooseText[1].text = "Type: " + perk.perkType.ToString();
-            perkChooseText[2].text = "Description: " + perk.description;
+
+            perkChooseText[0].text = perk.perkName;
+            perkChooseText[1].text = perk.perkType.ToString();
+            perkChooseText[2].text = perk.description;
+            perkChooseIcon.sprite = perk.icon;
         }
     }
     
     public void PickedIndexSetter(int index)
     {
-        // 1. Nejdříve resetujeme všechna tlačítka na bílou (aby nezůstalo černé to minulé)
+        Color targetBlack = new Color(255f, 255f, 255f, 0.8f);
+
         foreach (GameObject btn in perkPickerButtons)
         {
             if (btn == null) continue;
-            Graphic[] allGraphics = btn.GetComponentsInChildren<Graphic>();
-            foreach (Graphic g in allGraphics)
+            foreach (Graphic g in btn.GetComponentsInChildren<Graphic>())
             {
                 g.color = Color.white;
             }
         }
 
-        // 2. Logika přepínání indexu
         if (index != PickedPerkIndex) 
         {
             PickedPerkIndex = index;
-            
-            // 3. Zčernáme děti POUZE u aktivního tlačítka
-            // index - 1 protože v Unity voláš Button 1, 2, 3, ale pole je 0, 1, 2
             int arrayIndex = index - 1; 
 
             if (arrayIndex >= 0 && arrayIndex < perkPickerButtons.Length)
             {
                 GameObject targetButton = perkPickerButtons[arrayIndex];
-                Graphic[] childrenGraphics = targetButton.GetComponentsInChildren<Graphic>();
-
-                foreach (Graphic g in childrenGraphics)
+                foreach (Graphic g in targetButton.GetComponentsInChildren<Graphic>())
                 {
-                    g.color = Color.black;
+                    g.color = targetBlack;
                 }
             }
         }
         else 
         {
-            // Pokud klikneš na stejné tlačítko podruhé, zruší se výběr (vše už je bílé z kroku 1)
             PickedPerkIndex = 0;
         }
-
-        Debug.Log("Aktivní slot pro perk: " + PickedPerkIndex);
     }
 
 
@@ -228,45 +223,92 @@ public class MenuCharacter : MonoBehaviour
             if (postava != null)
             {
                 Perks selectedPerk = allPerksFromResources.FirstOrDefault(p => p.id == idOfPerk);
-
                 if (selectedPerk != null) 
                 {
-                    // Pomocná proměnná pro tlačítko, se kterým zrovna pracujeme
-                    GameObject currentButton = null;
+                    int oldPerkId = 0;
+                    switch(PickedPerkIndex)
+                    {
+                        case 1: oldPerkId = postava.pickePerkID1; break;
+                        case 2: oldPerkId = postava.pickePerkID2; break;
+                        case 3: oldPerkId = postava.pickePerkID3; break;
+                    }
+
+                    Character ownerOfNewPerk = null;
+                    int sourceSlot = 0;
+
+                    foreach (Character c in loadedData.characters)
+                    {
+                        if (c.pickePerkID1 == idOfPerk) { ownerOfNewPerk = c; sourceSlot = 1; break; }
+                        if (c.pickePerkID2 == idOfPerk) { ownerOfNewPerk = c; sourceSlot = 2; break; }
+                        if (c.pickePerkID3 == idOfPerk) { ownerOfNewPerk = c; sourceSlot = 3; break; }
+                    }
+
+                    if (ownerOfNewPerk != null)
+                    {
+                        switch(sourceSlot)
+                        {
+                            case 1: ownerOfNewPerk.pickePerkID1 = oldPerkId; break;
+                            case 2: ownerOfNewPerk.pickePerkID2 = oldPerkId; break;
+                            case 3: ownerOfNewPerk.pickePerkID3 = oldPerkId; break;
+                        }
+                        
+                        if (ownerOfNewPerk.id == postava.id)
+                        {
+                            UpdateSlotUI(sourceSlot, oldPerkId, allPerksFromResources);
+                        }
+                    }
 
                     switch(PickedPerkIndex)
                     {
-                        case 1: 
-                            postava.pickePerkID1 = idOfPerk;
-                            currentButton = perkPickerButtons[0];
-                            break;
-                        case 2:
-                            postava.pickePerkID2 = idOfPerk;
-                            currentButton = perkPickerButtons[1];
-                            break;
-                        case 3:
-                            postava.pickePerkID3 = idOfPerk;
-                            currentButton = perkPickerButtons[2];
-                            break;
+                        case 1: postava.pickePerkID1 = idOfPerk; break;
+                        case 2: postava.pickePerkID2 = idOfPerk; break;
+                        case 3: postava.pickePerkID3 = idOfPerk; break;
                     }
 
-                    if (currentButton != null)
+                    UpdateSlotUI(PickedPerkIndex, idOfPerk, allPerksFromResources);
+
+                    foreach (GameObject btn in perkPickerButtons)
                     {
-                        // Najdeme objekt "Child" pod tlačítkem a změníme mu Sprite
-                        Transform childTransform = currentButton.transform.Find("Child");
-                        if (childTransform != null)
+                        if (btn == null) continue;
+                        foreach (Graphic g in btn.GetComponentsInChildren<Graphic>())
                         {
-                            childTransform.GetComponent<Image>().sprite = selectedPerk.icon;
+                            g.color = Color.white;
                         }
-                        else
-                        {
-                            Debug.LogError("Objekt jménem 'Child' nebyl pod tlačítkem nalezen!");
-                        }
-                        
-                        PickedPerkIndex = 0;
                     }
+
+                    PickedPerkIndex = 0; 
                 }
             }
         }
     }
+
+    private void UpdateSlotUI(int slotIndex, int perkId, Perks[] database)
+    {
+        if (slotIndex < 1 || slotIndex > 3) return;
+
+        GameObject btn = perkPickerButtons[slotIndex - 1];
+        if (btn == null) return;
+
+        Transform childTransform = btn.transform.Find("Child");
+        if (childTransform != null)
+        {
+            Image iconImage = childTransform.GetComponent<Image>();
+
+            if (perkId == 0)
+            {
+                iconImage.sprite = null;
+                iconImage.color = new Color(1, 1, 1, 0); 
+            }
+            else
+            {
+                Perks foundPerk = database.FirstOrDefault(p => p.id == perkId);
+                if (foundPerk != null)
+                {
+                    iconImage.sprite = foundPerk.icon;
+                    iconImage.color = Color.white; 
+                }
+            }
+        }
+    }
+
 }
