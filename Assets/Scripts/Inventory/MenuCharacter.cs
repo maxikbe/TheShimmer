@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using System.Linq;
+using System;
 
 public class MenuCharacter : MonoBehaviour
 {
@@ -23,12 +24,14 @@ public class MenuCharacter : MonoBehaviour
     [SerializeField] private GameObject GunchoosePrefabType;
     [SerializeField] private GameObject GunChooseConent;
     [SerializeField] private TMP_Text[] gunChooseText;
+    private int currentGunID;
     private int PickedPerkIndex = 0;
     [SerializeField] private GameObject perkChoosePrefabType;
     [SerializeField] private GameObject perkChooseContent;
     [SerializeField] private TMP_Text[] perkChooseText;
     [SerializeField] private Image perkChooseIcon;
     [SerializeField] private GameObject[] perkPickerButtons;
+    
    
 
     void Awake()
@@ -88,6 +91,13 @@ public class MenuCharacter : MonoBehaviour
             loadedData = JsonUtility.FromJson<GameData>(json);
         }
     }
+
+    public void PickGun()
+    {
+        Character postava = loadedData.characters.Find(c => c.id == characterId + 1);
+        postava.pickedItemID = currentGunID;
+        Debug.Log(postava.id + " " + postava.pickedItemID);
+    }
     
     private void addPickableButtons()
     {
@@ -101,15 +111,27 @@ public class MenuCharacter : MonoBehaviour
                 if (item != null)
                 {
                     GameObject buttonObj = Instantiate(GunchoosePrefabType, GunChooseConent.transform);
+                    UnityEngine.UI.Button btn = buttonObj.GetComponent<UnityEngine.UI.Button>();
+                    btn.onClick.AddListener(() => setCurrentGunId(itemInfo.id));
                     TMP_Text buttonText = buttonObj.GetComponentInChildren<TMP_Text>();
                     if (buttonText != null)
                     {
                         buttonText.text = itemInfo.name;
                     }
-                    addGunInfo(itemInfo, item);
+                    //addGunInfo(itemInfo, item);
                 }
             }
         }   
+    }
+
+    private void setCurrentGunId(int index)
+    {
+        Debug.Log(index);
+        currentGunID = index;
+        Item itemInfo = FindItemInDatabase(currentGunID);
+        ItemSaveData item = loadedData.OwnedItems.Find(i => i.id == index);
+        addGunInfo(itemInfo, item);
+
     }
 
     private Item FindItemInDatabase(int itemId)
@@ -172,7 +194,6 @@ public class MenuCharacter : MonoBehaviour
     {
         if (perkChooseText.Length >= 3)
         {
-
             perkChooseText[0].text = perk.perkName;
             perkChooseText[1].text = perk.perkType.ToString();
             perkChooseText[2].text = perk.description;

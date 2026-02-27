@@ -26,9 +26,9 @@ public class Character
     public List<int> pickableTurnBaseItemIDs = new List<int>();
     public int pickedItemID;
     public List<int> unpickedItemIDs = new List<int>();
-    public List<int> perksIDs = new List<int>();
-    public List<int> unfoundPerksIDs = new List<int>();
-    public List<int> usablePerksIDs = new List<int>();
+    public List<int> UpgradesIDs = new List<int>();
+    public List<int> unfoundUpgradesIDs = new List<int>();
+    public List<int> usableUpgradesIDs = new List<int>();
 
     
 

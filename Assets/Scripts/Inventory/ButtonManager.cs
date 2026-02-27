@@ -30,16 +30,26 @@ public class ButtonManager : MonoBehaviour
 
     [SerializeField] private GameObject MainGrid;
     [SerializeField] private GameObject GunChooseGrid;
+    [SerializeField] private GameObject PerksChooseGrid;
     public void OpenMainGrid()
     {
         MainGrid.SetActive(true);
         GunChooseGrid.SetActive(false);
+        PerksChooseGrid.SetActive(false);
     }
 
     public void OpenGunChooseGrid()
     {
         MainGrid.SetActive(false);
         GunChooseGrid.SetActive(true);
+        PerksChooseGrid.SetActive(false);
     }
+
+    public void OpenPerksChooseGrid()
+    {
+        MainGrid.SetActive(false);
+        GunChooseGrid.SetActive(false);
+        PerksChooseGrid.SetActive(true);
+    } 
 
 }

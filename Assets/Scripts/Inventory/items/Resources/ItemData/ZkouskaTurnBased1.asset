@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
+  m_Name: ZkouskaTurnBased1
+  m_EditorClassIdentifier: Assembly-CSharp::Item
+  id: 4
+  itemName: 
+  allowedCharacterIDs: 
+  icon: {fileID: 6674386295937086461, guid: 3fe6fcf79ab36d54bafb9ec4aef07479, type: 3}
+  prefab: {fileID: 0}
+  description: 
+  isResearched: 1
+  isUsable: 1
+  maxStack: 0
+  isDefaultItem: 1
+  defaultAmount: 1
+  defaultLevel: 1
+  itemType: 4
+  weaponType: 0
+  isTurnedBaseWeapon: 1
+  firstCharID: 0
+  isMagical: 0
+  Damage: 0
+  FireRate: 0
+  Range: 0
+  ReloadTime: 0
+  AmmoCapacity: 0
+  AmmoID: 0
+  AmmoAmount: 0
+  Speed: 0
+  magicalElement: 0
+  HealAmount: 0
+  consumeAmount: 0
+  waterAmount: 0
+  durability: 0
+  armorType: 0
+  Armor: 0
+  weight: 0
