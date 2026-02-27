@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: acece1a3b4ec344069fdcabb50ac70cf, type: 3}
-  m_Name: PerkHealth 1
+  m_Name: PerkHealth 19
   m_EditorClassIdentifier: Assembly-CSharp::Perks
-  id: 101
+  id: 119
   perkName: Health
   perkType: 0
-  addingAmount: 40
-  description: Perk adding 40 Health to your character
-  icon: {fileID: -294002770796206758, guid: eabf063d848fb4ab699df274f6a83f13, type: 3}
-  levelOfPerk: 2
+  addingAmount: 5000
+  description: Perk adding 5000 Health to your character
+  icon: {fileID: -6166610946173191319, guid: 21f8698967bbe4543ad947846d8674aa, type: 3}
+  levelOfPerk: 19
