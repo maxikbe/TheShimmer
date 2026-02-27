@@ -1,0 +1,6 @@
+VisualElement {
+    .my-button-class:active > * {
+        -unity-background-image-tint-color: black;
+        color: black;
+    }
+}

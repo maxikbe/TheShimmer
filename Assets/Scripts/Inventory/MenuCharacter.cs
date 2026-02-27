@@ -178,9 +178,32 @@ public class MenuCharacter : MonoBehaviour
     
     public void PickedIndexSetter(int index)
     {
+        // 1. Logika nastavení indexu (tvoje původní)
         if(index != PickedPerkIndex) PickedPerkIndex = index;
         else PickedPerkIndex = 0;
-        Debug.Log(PickedPerkIndex);
+
+        // 2. Najdeme konkrétní tlačítko v poli
+        // Předpokládám, že máš definované např. public GameObject[] perkPickerButtons;
+        GameObject targetButton = perkPickerButtons[index--];
+
+        // 3. Získáme všechny grafické komponenty v jeho dětech
+        // GetComponentsInChildren najde Image, Text i TextMeshProUGUI
+        Graphic[] childrenGraphics = targetButton.GetComponentsInChildren<Graphic>();
+
+        foreach (Graphic g in childrenGraphics)
+        {
+            // Pokud je index aktivní (není 0), zčernají. Jinak zbělejí (nebo nastav jinou barvu).
+            if (PickedPerkIndex != 0)
+            {
+                g.color = Color.black;
+            }
+            else
+            {
+                g.color = Color.white; 
+            }
+        }
+
+        Debug.Log("Kliknuto na index: " + index + " | Stav: " + PickedPerkIndex);
     }
 
 
