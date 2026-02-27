@@ -20,6 +20,20 @@ public class Ghost_movement : MonoBehaviour
     // --- PROMĚNNÉ (Tyhle hodnoty nám pošle Animal přes Setup) ---
     private Transform playerPosition;
     private Transform nestPosition;
+    
+    // --- NOVÉ PROMĚNNÉ NĚKDE NAHOŘE ---
+    private Animal_movement myAnimalStats; // Odkaz zpět na tělo
+    private MobBehavior originalBehavior;  // Co jsme zač od přírody
+    
+    private float calmDownTime; // Dostaneme z Animal
+    private float currentCalmTimer; // Aktuální stav stopek
+    private bool isCoolingDown; // Zda se právě uklidňuje
+    
+    private float minPatrolWait;
+    private float maxPatrolWait;
+    private float currentPatrolWaitTimer;
+    private bool isWaitingAtPatrol;
+    
 
     private bool debugMode;
     private float moveSpeed;
@@ -82,6 +96,9 @@ public class Ghost_movement : MonoBehaviour
         this.patrolRadius = stats.patrolRadius;
         this.runningRadius = stats.runningRadius;
         this.visionRadius = stats.visionRadius;
+        // --- NOVÉ ---
+        this.minPatrolWait = stats.minPatrolWait;
+        this.maxPatrolWait = stats.maxPatrolWait;
         
         this.canHaveBreaks = stats.canHaveBreaks;
         this.minBreakTime = stats.minBreakTime;
@@ -93,6 +110,12 @@ public class Ghost_movement : MonoBehaviour
         this.viewAngle = stats.viewAngle;
         // Uložíme si odkaz na hmotné tělo
         this.myBody = stats.gameObject; 
+        
+        
+        // --- NOVÉ ---
+        this.myAnimalStats = stats; // Uložíme si odkaz na Animal
+        this.originalBehavior = stats.behavior; // Zapamatujeme si, jestli jsme byli Neutral, nebo rovnou Aggressive
+        this.calmDownTime = stats.calmDownTime;
         
         // 2. Aplikujeme to na Agenta
         agent.speed = moveSpeed;
@@ -117,10 +140,30 @@ public class Ghost_movement : MonoBehaviour
         bool canSeePlayer = CheckForPlayer();
 
         // --- DŮLEŽITÁ POJISTKA ---
-        // Pokud uvidíme hráče, okamžitě rušíme pauzu!
         if (canSeePlayer)
         {
             isHavingBreak = false;
+            isWaitingAtPatrol = false; // <-- ZRUŠÍME ČEKÁNÍ, jde do tuhého!
+            isCoolingDown = false; // Jakmile ho znova uvidí, adrenalin se vrací na max!
+        }
+
+        // --- ODPOČÍTÁVÁNÍ UPOKOJENÍ ---
+        if (isCoolingDown && !canSeePlayer)
+        {
+            currentCalmTimer += Time.deltaTime;
+            if (currentCalmTimer >= calmDownTime)
+            {
+                // Uklidnil se!
+                isCoolingDown = false;
+                this.behavior = originalBehavior;
+                
+                if (myAnimalStats != null)
+                {
+                    myAnimalStats.behavior = originalBehavior; // Updatneme v Inspectoru
+                }
+                
+                // Debug.Log("Uff, kašlu na to, tady nikdo není. Vracím se do normálu.");
+            }
         }
 
         // --- NE-FRIENDLY LOGIKA ---
@@ -228,17 +271,34 @@ public class Ghost_movement : MonoBehaviour
 
     private void PatrolLogic()
     {
-        // 1. Pokud zrovna máme pauzu, řešíme jen čekání
+        // 1. Pokud zrovna máme velkou pauzu, řešíme jen čekání
         if (isHavingBreak)
         {
             breakActivites();
             return; // Nepokračujeme dál, dokud pauza neskončí
         }
 
-        // 2. Pokud nemáme pauzu a došli jsme do cíle, zkusíme si ji hodit
+        // 2. Dorazili jsme na hlídkovací bod?
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
-            breakLogic();
+            // A) Ještě nečekáme? Tak začneme!
+            if (!isWaitingAtPatrol)
+            {
+                isWaitingAtPatrol = true;
+                currentPatrolWaitTimer = Random.Range(minPatrolWait, maxPatrolWait);
+            }
+            // B) Už čekáme? Tak odpočítáváme čas
+            else
+            {
+                currentPatrolWaitTimer -= Time.deltaTime;
+                
+                // Čas vypršel, jdeme dál
+                if (currentPatrolWaitTimer <= 0)
+                {
+                    isWaitingAtPatrol = false;
+                    breakLogic(); // Tady se rozhodne, jestli si dá tu tvoji velkou pauzu, nebo jde na další bod
+                }
+            }
         }
     }
 
@@ -366,24 +426,25 @@ public class Ghost_movement : MonoBehaviour
     private void ChaseLostLogic()
     {
         agent.speed = runSpeed;
-
-        // 1. Nastavíme cíl na poslední známou pozici
         agent.SetDestination(lastKnownPlayerPos);
 
-        // 2. Kontrola, jestli jsme doběhli na místo, kde jsme ho naposledy viděli
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
-            // Jsme tam, ale hráč nikde (protože CheckForPlayer vrátil false)
-            // Začneme odpočítávat čas
             searchTimer += Time.deltaTime;
-
-            // Debug.Log($"Hledám hráče... {searchTimer}/{waitAfterLostTime}");
 
             if (searchTimer >= waitAfterLostTime)
             {
-                // Čas vypršel, vzdáváme to -> Patrol
+                // Čas na místě vypršel -> Jdeme zpět hlídkovat
                 currentState = State.Patrolling;
                 GoToNextPatrolPoint();
+
+                // --- NOVINKA ---
+                // Místo okamžitého návratu chování jen zapneme chladící stopky!
+                if (behavior == MobBehavior.Aggressive && originalBehavior != MobBehavior.Aggressive)
+                {
+                    isCoolingDown = true;
+                    currentCalmTimer = 0f;
+                }
             }
         }
     }
@@ -452,5 +513,26 @@ public class Ghost_movement : MonoBehaviour
 
         Gizmos.DrawLine(transform.position, transform.position + leftViewDir * visionRadius);
         Gizmos.DrawLine(transform.position, transform.position + rightViewDir * visionRadius);
+    }
+    
+    
+    // --- NOVÁ METODA PRO ZMĚNU CHOVÁNÍ BĚHEM HRY ---
+    public void ChangeBehavior(MobBehavior newBehavior)
+    {
+        this.behavior = newBehavior;
+
+        // Pokud se z mobky stal agresor, chceme, ať hned začne jednat!
+        if (newBehavior == MobBehavior.Aggressive)
+        {
+            // Okamžitě zrušíme případnou pauzu
+            isHavingBreak = false;
+            isWaitingAtPatrol = false; 
+            isCoolingDown = false; 
+            currentState = State.Chasing;
+            searchTimer = 0f;
+            // Začne hledat hráče
+            lastKnownPlayerPos = playerPosition.position; 
+            ChasePlayer();
+        }
     }
 }

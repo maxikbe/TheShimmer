@@ -31,11 +31,11 @@ public class InitializeGameJson : MonoBehaviour
 
     GameData data = new GameData();
 
-    data.characters.Add(new Character { id = 1, name = "Dr. Ventress", health = 150, level = 1, speed = 5.0f });
-    data.characters.Add(new Character { id = 2, name = "Lena", health = 80, level = 1, speed = 4.5f });
-    data.characters.Add(new Character { id = 3, name = "Cass Sheppard", health = 100, level = 1, speed = 7.0f });
-    data.characters.Add(new Character { id = 4, name = "Josie Radek", health = 90, level = 1, speed = 8.0f });
-    data.characters.Add(new Character { id = 5, name = "Anya Thorensen", health = 200, level = 1, speed = 3.0f });
+    data.characters.Add(new Character { id = 1, name = "Dr. Ventress", health = 150, level = 1, speed = 5.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0,});
+    data.characters.Add(new Character { id = 2, name = "Lena", health = 80, level = 1, speed = 4.5f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, });
+    data.characters.Add(new Character { id = 3, name = "Cass Sheppard", health = 100, level = 1, speed = 7.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, });
+    data.characters.Add(new Character { id = 4, name = "Josie Radek", health = 90, level = 1, speed = 8.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, });
+    data.characters.Add(new Character { id = 5, name = "Anya Thorensen", health = 200, level = 1, speed = 3.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, });
 
     List<Item> allItemsFromDB = itemDatabase.GetAllItems();
 
@@ -81,10 +81,28 @@ public class InitializeGameJson : MonoBehaviour
         data.OwnedItems.Add(newSaveItem);
     }
 
+
+
+   data.player = new playerData 
+    {
+        playerName = "Player",
+        numberOfCoins = 100,
+        numberOfMaterial = 5,
+        numberOfGunUpgraders = 1
+    };
+
+    Perks[] allPerksFromResources = Resources.LoadAll<Perks>("PerksData");
+
+    foreach (Perks perk in allPerksFromResources)
+    {
+        //data.player.unFoundPerks.Add(perk.id);
+        data.player.foundPerks.Add(perk.id); //toto pak vyměnit za to nahoře, tohle je jen na debug
+    }
+
     string json = JsonUtility.ToJson(data, true);
     File.WriteAllText(savePath, json);
 
-    Debug.Log("JSON inicializován: Postavy nyní vědí, které předměty mohou používat.");
+    Debug.Log("JSON inicializován.");
     return data;
 }
 }

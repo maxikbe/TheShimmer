@@ -105,6 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9892ac27b60a1c14d95cc0b79f280e2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Patroling
+  isHavingBreak: 0
   wallLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -119,10 +120,10 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.19000003
   m_Speed: 3.5
-  m_Acceleration: 20
+  m_Acceleration: 150
   avoidancePriority: 50
-  m_AngularSpeed: 150
-  m_StoppingDistance: 0
+  m_AngularSpeed: 2000
+  m_StoppingDistance: 0.2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1

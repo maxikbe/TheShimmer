@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acece1a3b4ec344069fdcabb50ac70cf, type: 3}
+  m_Name: PerkSpeed
+  m_EditorClassIdentifier: Assembly-CSharp::Perks
+  id: 400
+  perkName: Speed
+  perkType: 3
+  addingAmount: 10
+  description: 
+  icon: {fileID: -899477511890953583, guid: 1264b2a435c947c448be3bee99b86bce, type: 3}
+  levelOfPerk: 1
