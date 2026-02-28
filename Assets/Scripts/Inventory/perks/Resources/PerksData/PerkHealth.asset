@@ -16,6 +16,6 @@ MonoBehaviour:
   perkName: Health
   perkType: 0
   addingAmount: 20
-  description: 
-  icon: {fileID: -1974267942269126528, guid: 71239efe7a339b746bfa1cbffae58ed5, type: 3}
+  description: Perk adding 20 Health to your character
+  icon: {fileID: -848022123664647460, guid: 6b97c345160164c40a67e4082ea77346, type: 3}
   levelOfPerk: 1

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bdae2733efd51441968d3b8ec2a836c, type: 3}
+  m_Name: Spatne
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueNode
+  dialogueText: "Tak to m\u011B velice mrz\xED, jdi se zab\xEDt"
+  choices:
+  - choiceText: "\u010Cau"
+    nextNode: {fileID: 0}
+    onChoiceSelected:
+      m_PersistentCalls:
+        m_Calls: []

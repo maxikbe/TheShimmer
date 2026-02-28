@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using System.Linq;
+using System;
 
 public class MenuCharacter : MonoBehaviour
 {
@@ -23,11 +24,15 @@ public class MenuCharacter : MonoBehaviour
     [SerializeField] private GameObject GunchoosePrefabType;
     [SerializeField] private GameObject GunChooseConent;
     [SerializeField] private TMP_Text[] gunChooseText;
+    private int currentGunID;
     private int PickedPerkIndex = 0;
     [SerializeField] private GameObject perkChoosePrefabType;
     [SerializeField] private GameObject perkChooseContent;
     [SerializeField] private TMP_Text[] perkChooseText;
+    [SerializeField] private Image perkChooseIcon;
     [SerializeField] private GameObject[] perkPickerButtons;
+    
+   
 
     void Awake()
     {
@@ -86,6 +91,13 @@ public class MenuCharacter : MonoBehaviour
             loadedData = JsonUtility.FromJson<GameData>(json);
         }
     }
+
+    public void PickGun()
+    {
+        Character postava = loadedData.characters.Find(c => c.id == characterId + 1);
+        postava.pickedItemID = currentGunID;
+        Debug.Log(postava.id + " " + postava.pickedItemID);
+    }
     
     private void addPickableButtons()
     {
@@ -99,15 +111,27 @@ public class MenuCharacter : MonoBehaviour
                 if (item != null)
                 {
                     GameObject buttonObj = Instantiate(GunchoosePrefabType, GunChooseConent.transform);
+                    UnityEngine.UI.Button btn = buttonObj.GetComponent<UnityEngine.UI.Button>();
+                    btn.onClick.AddListener(() => setCurrentGunId(itemInfo.id));
                     TMP_Text buttonText = buttonObj.GetComponentInChildren<TMP_Text>();
                     if (buttonText != null)
                     {
                         buttonText.text = itemInfo.name;
                     }
-                    addGunInfo(itemInfo, item);
+                    //addGunInfo(itemInfo, item);
                 }
             }
         }   
+    }
+
+    private void setCurrentGunId(int index)
+    {
+        Debug.Log(index);
+        currentGunID = index;
+        Item itemInfo = FindItemInDatabase(currentGunID);
+        ItemSaveData item = loadedData.OwnedItems.Find(i => i.id == index);
+        addGunInfo(itemInfo, item);
+
     }
 
     private Item FindItemInDatabase(int itemId)
@@ -170,17 +194,44 @@ public class MenuCharacter : MonoBehaviour
     {
         if (perkChooseText.Length >= 3)
         {
-            perkChooseText[0].text = "Name: " + perk.perkName;
-            perkChooseText[1].text = "Type: " + perk.perkType.ToString();
-            perkChooseText[2].text = "Description: " + perk.description;
+            perkChooseText[0].text = perk.perkName;
+            perkChooseText[1].text = perk.perkType.ToString();
+            perkChooseText[2].text = perk.description;
+            perkChooseIcon.sprite = perk.icon;
         }
     }
     
     public void PickedIndexSetter(int index)
     {
-        if(index != PickedPerkIndex) PickedPerkIndex = index;
-        else PickedPerkIndex = 0;
-        Debug.Log(PickedPerkIndex);
+        Color targetBlack = new Color(255f, 255f, 255f, 0.8f);
+
+        foreach (GameObject btn in perkPickerButtons)
+        {
+            if (btn == null) continue;
+            foreach (Graphic g in btn.GetComponentsInChildren<Graphic>())
+            {
+                g.color = Color.white;
+            }
+        }
+
+        if (index != PickedPerkIndex) 
+        {
+            PickedPerkIndex = index;
+            int arrayIndex = index - 1; 
+
+            if (arrayIndex >= 0 && arrayIndex < perkPickerButtons.Length)
+            {
+                GameObject targetButton = perkPickerButtons[arrayIndex];
+                foreach (Graphic g in targetButton.GetComponentsInChildren<Graphic>())
+                {
+                    g.color = targetBlack;
+                }
+            }
+        }
+        else 
+        {
+            PickedPerkIndex = 0;
+        }
     }
 
 
@@ -193,29 +244,92 @@ public class MenuCharacter : MonoBehaviour
             if (postava != null)
             {
                 Perks selectedPerk = allPerksFromResources.FirstOrDefault(p => p.id == idOfPerk);
-
                 if (selectedPerk != null) 
                 {
+                    int oldPerkId = 0;
                     switch(PickedPerkIndex)
                     {
-                        case 1: 
-                            postava.pickePerkID1 = idOfPerk;
-                            perkPickerButtons[0].GetComponent<Image>().sprite = selectedPerk.icon;
-                            PickedPerkIndex = 0;
-                            break;
-                        case 2:
-                            postava.pickePerkID2 = idOfPerk;
-                            perkPickerButtons[1].GetComponent<Image>().sprite = selectedPerk.icon;
-                            PickedPerkIndex = 0;
-                            break;
-                        case 3:
-                            postava.pickePerkID3 = idOfPerk;
-                            perkPickerButtons[2].GetComponent<Image>().sprite = selectedPerk.icon;
-                            PickedPerkIndex = 0;
-                            break;
+                        case 1: oldPerkId = postava.pickePerkID1; break;
+                        case 2: oldPerkId = postava.pickePerkID2; break;
+                        case 3: oldPerkId = postava.pickePerkID3; break;
                     }
+
+                    Character ownerOfNewPerk = null;
+                    int sourceSlot = 0;
+
+                    foreach (Character c in loadedData.characters)
+                    {
+                        if (c.pickePerkID1 == idOfPerk) { ownerOfNewPerk = c; sourceSlot = 1; break; }
+                        if (c.pickePerkID2 == idOfPerk) { ownerOfNewPerk = c; sourceSlot = 2; break; }
+                        if (c.pickePerkID3 == idOfPerk) { ownerOfNewPerk = c; sourceSlot = 3; break; }
+                    }
+
+                    if (ownerOfNewPerk != null)
+                    {
+                        switch(sourceSlot)
+                        {
+                            case 1: ownerOfNewPerk.pickePerkID1 = oldPerkId; break;
+                            case 2: ownerOfNewPerk.pickePerkID2 = oldPerkId; break;
+                            case 3: ownerOfNewPerk.pickePerkID3 = oldPerkId; break;
+                        }
+                        
+                        if (ownerOfNewPerk.id == postava.id)
+                        {
+                            UpdateSlotUI(sourceSlot, oldPerkId, allPerksFromResources);
+                        }
+                    }
+
+                    switch(PickedPerkIndex)
+                    {
+                        case 1: postava.pickePerkID1 = idOfPerk; break;
+                        case 2: postava.pickePerkID2 = idOfPerk; break;
+                        case 3: postava.pickePerkID3 = idOfPerk; break;
+                    }
+
+                    UpdateSlotUI(PickedPerkIndex, idOfPerk, allPerksFromResources);
+
+                    foreach (GameObject btn in perkPickerButtons)
+                    {
+                        if (btn == null) continue;
+                        foreach (Graphic g in btn.GetComponentsInChildren<Graphic>())
+                        {
+                            g.color = Color.white;
+                        }
+                    }
+
+                    PickedPerkIndex = 0; 
                 }
             }
         }
     }
+
+    private void UpdateSlotUI(int slotIndex, int perkId, Perks[] database)
+    {
+        if (slotIndex < 1 || slotIndex > 3) return;
+
+        GameObject btn = perkPickerButtons[slotIndex - 1];
+        if (btn == null) return;
+
+        Transform childTransform = btn.transform.Find("Child");
+        if (childTransform != null)
+        {
+            Image iconImage = childTransform.GetComponent<Image>();
+
+            if (perkId == 0)
+            {
+                iconImage.sprite = null;
+                iconImage.color = new Color(1, 1, 1, 0); 
+            }
+            else
+            {
+                Perks foundPerk = database.FirstOrDefault(p => p.id == perkId);
+                if (foundPerk != null)
+                {
+                    iconImage.sprite = foundPerk.icon;
+                    iconImage.color = Color.white; 
+                }
+            }
+        }
+    }
+
 }

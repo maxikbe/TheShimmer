@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+<<<<<<< HEAD
+<<<<<<<< HEAD:Assets/Scripts/Inventory/perks/Resources/PerksData/PerkHealth 20.asset.meta
+guid: 4707707be9e5a4943829e34486083cf9
+========
+guid: cf51b6776579645bd90530d763b2942f
+>>>>>>>> 60b84ac (ui v perkech upraveno):Assets/Scripts/Inventory/perks/Resources/PerksData/PerkDamage 13.asset.meta
+=======
+guid: 8ddbd563a41bb4761b9f5a6c76fb734f
+>>>>>>> 60b84ac (ui v perkech upraveno)
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
