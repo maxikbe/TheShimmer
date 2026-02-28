@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6e9f43ea2e8abb24d9ec2a4a4b983456, type: 3}
-  m_Name: GrassDirtRL_4
+  m_Name: Grass_type2_15
   m_EditorClassIdentifier: Assembly-CSharp::TileData
-  tile: {fileID: 11400000, guid: 4efd4656a549e7c4a9bad8d14cf58e4c, type: 2}
-  validUp: 02000000080000000c000000
-  validDown: 030000000d00000008000000
-  validLeft: 070000000b0000000a00000001000000
-  validRight: 000000000400000005000000070000000e000000
-  tileID: 8
-  weight: 1
+  tile: {fileID: 11400000, guid: 8428f987fcac685468eee80aac87e3fc, type: 2}
+  validUp: 000000000300000005000000060000000e0000000f000000
+  validDown: 090000000200000004000000000000000e0000000e0000000f000000
+  validLeft: 000000000200000003000000080000000e0000000f000000
+  validRight: 000000000400000005000000070000000e0000000f000000
+  tileID: 15
+  weight: 0.5

@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: GrassDirtCornerLD
   m_EditorClassIdentifier: Assembly-CSharp::TileData
   tile: {fileID: 11400000, guid: 9a511bffddc50f643b86a4fb7a9afa4d, type: 2}
-  validUp: 00000000060000000500000003000000
+  validUp: 000000000600000005000000030000000e000000
   validDown: 08000000020000000d000000
   validLeft: 0d0000000400000009000000
-  validRight: 00000000070000000500000004000000
+  validRight: 000000000700000005000000040000000e000000
   tileID: 2
   weight: 1
