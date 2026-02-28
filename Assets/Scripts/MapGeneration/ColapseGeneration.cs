@@ -7,132 +7,150 @@ using System.Linq;
 public class ColapseGeneration : MonoBehaviour
 {
     public Tilemap targetTilemap;
-    public int width = 10;
-    public int height = 10;
-    public List<TileData> tileOptions; 
+    public int width = 20;
+    public int height = 20;
+    public List<TileData> tileOptions;
 
-    private class Cell {
+    private class Cell
+    {
         public Vector3Int position;
         public bool isCollapsed = false;
         public TileData chosenTile = null;
         public List<TileData> possibilities;
 
-        public Cell(Vector3Int pos, List<TileData> options) {
+        public Cell(Vector3Int pos, List<TileData> options)
+        {
             position = pos;
             possibilities = new List<TileData>(options);
         }
     }
 
     private Cell[,] grid;
-    private Coroutine activeRoutine;
 
-    void Start() => generateMap();
+    void Start() => GenerateMap();
 
-    public void generateMap() {
-        if (activeRoutine != null) StopCoroutine(activeRoutine);
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            GenerateMap();
+        }
+    }
+    public void GenerateMap()
+    {
+        StopAllCoroutines();
         targetTilemap.ClearAllTiles();
         InitializeGrid();
-        activeRoutine = StartCoroutine(CollapseRoutine());
+        StartCoroutine(WFCAlgorithm());
     }
 
-    void InitializeGrid() {
+    void InitializeGrid()
+    {
         grid = new Cell[width, height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
                 grid[x, y] = new Cell(new Vector3Int(x, y, 0), tileOptions);
             }
         }
     }
 
-    IEnumerator CollapseRoutine() {
-        while (!IsFullyCollapsed()) {
+    IEnumerator WFCAlgorithm()
+    {
+        while (!IsFullyCollapsed())
+        {
             Cell nextCell = GetLowestEntropyCell();
             if (nextCell == null) break;
 
-            if (nextCell.possibilities.Count == 0) {
-                nextCell.chosenTile = tileOptions[0]; 
-            } else {
-                nextCell.chosenTile = PickTileWithWeight(nextCell.possibilities);
-            }
-
-            nextCell.isCollapsed = true;
-            nextCell.possibilities = new List<TileData> { nextCell.chosenTile };
-            targetTilemap.SetTile(nextCell.position, nextCell.chosenTile.tile);
-
+            CollapseCell(nextCell);
             Propagate(nextCell);
-            yield return null; 
+            yield return null;
         }
     }
 
-    void Propagate(Cell collapsedCell) {
-        Stack<Vector2Int> stack = new Stack<Vector2Int>();
-        stack.Push(new Vector2Int(collapsedCell.position.x, collapsedCell.position.y));
+    void CollapseCell(Cell cell)
+    {
+        if (cell.possibilities.Count == 0)
+        {
+            cell.isCollapsed = true;
+            return;
+        }
 
-        while (stack.Count > 0) {
-            Vector2Int currentPos = stack.Pop();
-            Cell currentCell = grid[currentPos.x, currentPos.y];
-            Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+        float totalWeight = cell.possibilities.Sum(t => t.weight);
+        float r = Random.Range(0, totalWeight);
+        float currentWeight = 0;
 
-            foreach (Vector2Int dir in directions) {
-                Vector2Int neighborPos = currentPos + dir;
-                if (neighborPos.x >= 0 && neighborPos.x < width && neighborPos.y >= 0 && neighborPos.y < height) {
-                    Cell neighbor = grid[neighborPos.x, neighborPos.y];
+        foreach (var tile in cell.possibilities)
+        {
+            currentWeight += tile.weight;
+            if (r <= currentWeight)
+            {
+                cell.chosenTile = tile;
+                break;
+            }
+        }
+
+        if (cell.chosenTile == null) cell.chosenTile = cell.possibilities[0];
+
+        cell.possibilities = new List<TileData> { cell.chosenTile };
+        cell.isCollapsed = true;
+        targetTilemap.SetTile(cell.position, cell.chosenTile.tile);
+    }
+
+    void Propagate(Cell collapsedCell)
+    {
+        Queue<Cell> queue = new Queue<Cell>();
+        queue.Enqueue(collapsedCell);
+
+        while (queue.Count > 0)
+        {
+            Cell current = queue.Dequeue();
+            Vector3Int[] dirs = { Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right };
+
+            foreach (Vector3Int dir in dirs)
+            {
+                int nx = current.position.x + dir.x;
+                int ny = current.position.y + dir.y;
+
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height)
+                {
+                    Cell neighbor = grid[nx, ny];
                     if (neighbor.isCollapsed) continue;
 
-                    int optionsBefore = neighbor.possibilities.Count;
-                    neighbor.possibilities = neighbor.possibilities.Where(nTile => {
-                        return currentCell.possibilities.Any(cTile => CheckSockets(cTile, nTile, dir));
-                    }).ToList();
+                    int countBefore = neighbor.possibilities.Count;
 
-                    if (neighbor.possibilities.Count != optionsBefore) {
-                        stack.Push(neighborPos);
+                    neighbor.possibilities = neighbor.possibilities.Where(nPossible => 
+                        current.possibilities.Any(cPossible => IsCompatible(cPossible, nPossible, dir))
+                    ).ToList();
+
+                    if (neighbor.possibilities.Count < countBefore)
+                    {
+                        if (!queue.Contains(neighbor)) queue.Enqueue(neighbor);
                     }
                 }
             }
         }
     }
 
-    bool CheckSockets(TileData current, TileData neighbor, Vector2Int direction) {
-        if (direction == Vector2Int.up) return current.up == neighbor.down;
-        if (direction == Vector2Int.down) return current.down == neighbor.up;
-        if (direction == Vector2Int.left) return current.left == neighbor.right;
-        if (direction == Vector2Int.right) return current.right == neighbor.left;
+    bool IsCompatible(TileData anchor, TileData check, Vector3Int dir)
+    {
+        if (dir == Vector3Int.up) return anchor.validUp.Contains(check.tileID);
+        if (dir == Vector3Int.down) return anchor.validDown.Contains(check.tileID);
+        if (dir == Vector3Int.left) return anchor.validLeft.Contains(check.tileID);
+        if (dir == Vector3Int.right) return anchor.validRight.Contains(check.tileID);
         return false;
     }
 
-    Cell GetLowestEntropyCell() {
-        List<Cell> candidates = new List<Cell>();
-        int minOptions = int.MaxValue;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (!grid[x, y].isCollapsed) {
-                    int count = grid[x, y].possibilities.Count;
-                    if (count < minOptions) {
-                        minOptions = count;
-                        candidates.Clear();
-                        candidates.Add(grid[x, y]);
-                    } else if (count == minOptions) {
-                        candidates.Add(grid[x, y]);
-                    }
-                }
-            }
-        }
-        return candidates.Count > 0 ? candidates[Random.Range(0, candidates.Count)] : null;
+    Cell GetLowestEntropyCell()
+    {
+        var remaining = grid.Cast<Cell>().Where(c => !c.isCollapsed).ToList();
+        if (remaining.Count == 0) return null;
+
+        int minOptions = remaining.Min(c => c.possibilities.Count);
+        return remaining.Where(c => c.possibilities.Count == minOptions)
+                        .OrderBy(_ => Random.value).FirstOrDefault();
     }
 
-    TileData PickTileWithWeight(List<TileData> options) {
-        float totalWeight = options.Sum(t => (float)t.weight);
-        float rand = Random.Range(0, totalWeight);
-        float currentSum = 0;
-        foreach (var tile in options) {
-            currentSum += tile.weight;
-            if (rand <= currentSum) return tile;
-        }
-        return options[0];
-    }
-
-    bool IsFullyCollapsed() {
-        foreach (var cell in grid) if (!cell.isCollapsed) return false;
-        return true;
-    }
+    bool IsFullyCollapsed() => grid.Cast<Cell>().All(c => c.isCollapsed);
 }

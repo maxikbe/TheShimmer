@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9f43ea2e8abb24d9ec2a4a4b983456, type: 3}
+  m_Name: GrassDirtCornerLD
+  m_EditorClassIdentifier: Assembly-CSharp::TileData
+  tile: {fileID: 11400000, guid: 9a511bffddc50f643b86a4fb7a9afa4d, type: 2}
+  validUp: 00000000060000000500000003000000
+  validDown: 08000000020000000d000000
+  validLeft: 0d0000000400000009000000
+  validRight: 00000000070000000500000004000000
+  tileID: 2
+  weight: 1

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c615cb2ca01c63d479ad7a660a2201e0
+guid: 49cb11453baf23344b434b9f442b62fb
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -73,7 +73,7 @@ ScriptedImporter:
     applyGammaDecoding: 0
   previousAsepriteImporterSettings:
     fileImportMode: 0
-    importHiddenLayers: 1
+    importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
     defaultPivotAlignment: 7
@@ -88,7 +88,7 @@ ScriptedImporter:
     generateSpriteAtlas: 1
   asepriteImporterSettings:
     fileImportMode: 0
-    importHiddenLayers: 1
+    importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
     defaultPivotAlignment: 7
@@ -102,7 +102,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 639078879241674472
+  platformSettingsDirtyTick: 639078876686430384
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -127,7 +127,7 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: WaterGrassTileMap2
+  - name: DirtGrassTileMap
     originalName: 
     pivot: {x: 0.5, y: 0}
     alignment: 9
@@ -139,7 +139,7 @@ ScriptedImporter:
       y: 4
       width: 128
       height: 224
-    spriteID: d2cfd25551534ed448567165c9cb4e5f
+    spriteID: 92f354879f9069041833c581209d6649
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -149,7 +149,7 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 4, y: 4}
   spriteSheetImportData:
-  - name: WaterGrassTileMap2_0
+  - name: DirtGrassTileMap_0
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -161,7 +161,7 @@ ScriptedImporter:
       y: 196
       width: 32
       height: 32
-    spriteID: 023465fe34397a44cb133c108cb4a05d
+    spriteID: 500ce578630c53244bc9c1e2da357ea3
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -170,7 +170,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_1
+  - name: DirtGrassTileMap_1
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -182,7 +182,7 @@ ScriptedImporter:
       y: 196
       width: 32
       height: 32
-    spriteID: 5f8a281583356124f9e90369bf6f5793
+    spriteID: ae0c4bb1aa691e348a8f7a137aba85da
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -191,7 +191,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_2
+  - name: DirtGrassTileMap_2
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -203,7 +203,7 @@ ScriptedImporter:
       y: 196
       width: 32
       height: 32
-    spriteID: c2dac2db060ee70408febd8d9606806a
+    spriteID: afe1e2c58fccf544f97ffa0836ea5959
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -212,7 +212,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_3
+  - name: DirtGrassTileMap_3
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -224,7 +224,7 @@ ScriptedImporter:
       y: 196
       width: 32
       height: 32
-    spriteID: a208a63c0e4c15945871a23cc1ca1d9c
+    spriteID: 9f20ad89d7ef96643baeccf3218dd5f5
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -233,7 +233,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_4
+  - name: DirtGrassTileMap_4
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -245,7 +245,7 @@ ScriptedImporter:
       y: 164
       width: 32
       height: 32
-    spriteID: 478b96b981a5f9647a26f2ecc8784d14
+    spriteID: 3eda5ebb106b58e4dacbe16657f85508
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -254,7 +254,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_5
+  - name: DirtGrassTileMap_5
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -266,7 +266,7 @@ ScriptedImporter:
       y: 164
       width: 32
       height: 32
-    spriteID: 9d9fbfecb0136df4e931b94799c00acb
+    spriteID: bde9afbc211eba0409a25f950f7d87c8
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -275,7 +275,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_6
+  - name: DirtGrassTileMap_6
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -287,7 +287,7 @@ ScriptedImporter:
       y: 164
       width: 32
       height: 32
-    spriteID: 2b710cdb87961ee42a6b3761e237b6c6
+    spriteID: d909fdf394c79ee4581ce414bf5232c7
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -296,7 +296,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_7
+  - name: DirtGrassTileMap_7
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -308,7 +308,7 @@ ScriptedImporter:
       y: 164
       width: 32
       height: 32
-    spriteID: fe71fe74a38e7e241a392e5752a0f18e
+    spriteID: a588679a46b403940906c99bda68519d
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -317,7 +317,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_8
+  - name: DirtGrassTileMap_8
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -329,7 +329,7 @@ ScriptedImporter:
       y: 132
       width: 32
       height: 32
-    spriteID: 2c5dad5e2023cd4498bfa1590fbdce05
+    spriteID: 3ff1623f14e3f3e4ebbab2e0f0fcedd0
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -338,7 +338,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_9
+  - name: DirtGrassTileMap_9
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -350,7 +350,7 @@ ScriptedImporter:
       y: 132
       width: 32
       height: 32
-    spriteID: f3a5e200de5bd904096d1af89b76130c
+    spriteID: d7439a59f9b96dd47ab721b2047e2767
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -359,7 +359,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_10
+  - name: DirtGrassTileMap_10
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -371,7 +371,7 @@ ScriptedImporter:
       y: 132
       width: 32
       height: 32
-    spriteID: 10c49605a2f79e044a21e7fb0498743b
+    spriteID: a809fbba4fb53054abf2594764cb3ea3
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -380,7 +380,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_11
+  - name: DirtGrassTileMap_11
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -392,7 +392,7 @@ ScriptedImporter:
       y: 132
       width: 32
       height: 32
-    spriteID: fd8a6dd6b3eddbf4fa2be9de5adb7ec1
+    spriteID: bbcfcd1c4cf518d41bdd53cf9befbe66
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -401,7 +401,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_12
+  - name: DirtGrassTileMap_12
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -413,7 +413,7 @@ ScriptedImporter:
       y: 100
       width: 32
       height: 32
-    spriteID: 69307cbc6d0494845b264a5132e180e1
+    spriteID: c39a3ea85443714458bb318dc8812147
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -422,7 +422,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_13
+  - name: DirtGrassTileMap_13
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -434,7 +434,7 @@ ScriptedImporter:
       y: 100
       width: 32
       height: 32
-    spriteID: aee151b7018a96a4ea3478a472d2c438
+    spriteID: a414964ed92af4f419dcd738a5c991d8
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -443,7 +443,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_14
+  - name: DirtGrassTileMap_14
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -455,7 +455,7 @@ ScriptedImporter:
       y: 100
       width: 32
       height: 32
-    spriteID: 50f60e5299d163942a04ad0dc1aa8c0f
+    spriteID: 6cb1f3f7801f6cf45bac4a3abf2298e4
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -464,7 +464,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_15
+  - name: DirtGrassTileMap_15
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -476,7 +476,7 @@ ScriptedImporter:
       y: 100
       width: 32
       height: 32
-    spriteID: 14c4a58bc6392a04e90c68943857734c
+    spriteID: c7f11d01cc8f43f44bbb8e921d2db233
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -485,7 +485,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_16
+  - name: DirtGrassTileMap_16
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -497,7 +497,7 @@ ScriptedImporter:
       y: 68
       width: 32
       height: 32
-    spriteID: a348fc501c6706d4db2fc8b3793f3acc
+    spriteID: 3f936d247867178448a4ac11a063edb9
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -506,7 +506,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_17
+  - name: DirtGrassTileMap_17
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -518,7 +518,7 @@ ScriptedImporter:
       y: 68
       width: 32
       height: 32
-    spriteID: 8bc07d3caa132ea4d8cc6112f0abe95b
+    spriteID: 964e7ce3e50eedd44bd559246ad3b91d
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -527,7 +527,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_18
+  - name: DirtGrassTileMap_18
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -539,7 +539,7 @@ ScriptedImporter:
       y: 68
       width: 32
       height: 32
-    spriteID: 305cf920e3996ee47bdc73cc9ece7d22
+    spriteID: 04ec70db3dee8be4ea63ba580cbc4062
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -548,7 +548,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_19
+  - name: DirtGrassTileMap_19
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -560,7 +560,7 @@ ScriptedImporter:
       y: 68
       width: 32
       height: 32
-    spriteID: c4ceb9e6adfeb414f87102d8620e689d
+    spriteID: d99ff7ef9eb0be244acfdd1170b9edf7
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -569,7 +569,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_20
+  - name: DirtGrassTileMap_20
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -581,7 +581,7 @@ ScriptedImporter:
       y: 36
       width: 32
       height: 32
-    spriteID: 2bfc6618e7ba37844b54cf0f0af8e957
+    spriteID: 56a9105b33a29e641b1f4b705418788a
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -590,7 +590,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_21
+  - name: DirtGrassTileMap_21
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -602,7 +602,7 @@ ScriptedImporter:
       y: 36
       width: 32
       height: 32
-    spriteID: fd3d7aa3910dd8643ac3e2d7f1cdc971
+    spriteID: 3a0c6c8802d5dc04fa18965b34e506be
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -611,7 +611,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_22
+  - name: DirtGrassTileMap_22
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -623,7 +623,7 @@ ScriptedImporter:
       y: 36
       width: 32
       height: 32
-    spriteID: 5a6a02a458672a64f82a502ed95cd36c
+    spriteID: dea4458dc09e1bb43911b5f2217070c2
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -632,7 +632,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_23
+  - name: DirtGrassTileMap_23
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -644,7 +644,7 @@ ScriptedImporter:
       y: 36
       width: 32
       height: 32
-    spriteID: 736de720ff553e9498139606388e51c1
+    spriteID: 2fbd2885331b5bc40a97bcfa68f80d6e
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -653,7 +653,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_24
+  - name: DirtGrassTileMap_24
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -665,7 +665,7 @@ ScriptedImporter:
       y: 4
       width: 32
       height: 32
-    spriteID: 412f5bfa53ca5bb4f8b2a2972fa1b902
+    spriteID: b604ad326060ddf41ac9ae29d6706400
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -674,7 +674,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_25
+  - name: DirtGrassTileMap_25
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -686,7 +686,7 @@ ScriptedImporter:
       y: 4
       width: 32
       height: 32
-    spriteID: 6899a78f50ba2934abbf24c07c511ff0
+    spriteID: a2b140af742647f4b96f9760cc387549
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -695,7 +695,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_26
+  - name: DirtGrassTileMap_26
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -707,7 +707,7 @@ ScriptedImporter:
       y: 4
       width: 32
       height: 32
-    spriteID: 78eb479d3b96f5e4b9d4f639179dfea0
+    spriteID: 6aa7be0ecef9b1f4988cf8b1f9576a41
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -716,7 +716,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
-  - name: WaterGrassTileMap2_27
+  - name: DirtGrassTileMap_27
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -728,7 +728,7 @@ ScriptedImporter:
       y: 4
       width: 32
       height: 32
-    spriteID: fdf2aa83356aeca4b9fed417774593ab
+    spriteID: 30d6f3275c05d8640be00c9e5793352f
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -750,7 +750,7 @@ ScriptedImporter:
       y: 4
       width: 128
       height: 224
-    spriteID: ff8c5ea5a004b3e449081e0926f3c0c0
+    spriteID: 5751ccf2b84beef438b72d194885f9c4
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -771,7 +771,7 @@ ScriptedImporter:
       y: 236
       width: 128
       height: 224
-    spriteID: 78c27af83d07b094c9cc9b02f6302275
+    spriteID: 2d628724c54a192469dd65e6ab731e7d
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -783,17 +783,17 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 1984212231
+      value0: 395325431
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: WaterGrassTileMap2
+    name: DirtGrassTileMap
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: WaterGrassTileMap2
+    - name: DirtGrassTileMap
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
@@ -801,7 +801,7 @@ ScriptedImporter:
         y: 0
         width: 128
         height: 224
-      spriteId: 32ed02ea773a343409f3bff68df5d31c
+      spriteId: 92f354879f9069041833c581209d6649
     linkedCells: []
     tileCells: []
     tileSetIndex: 0
