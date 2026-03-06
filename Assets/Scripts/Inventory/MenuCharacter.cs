@@ -94,36 +94,63 @@ public class MenuCharacter : MonoBehaviour
 
     public void PickGun()
     {
-        Character postava = loadedData.characters.Find(c => c.id == characterId + 1);
-        postava.pickedItemID = currentGunID;
-        Debug.Log(postava.id + " " + postava.pickedItemID);
-    }
-    
-    private void addPickableButtons()
-    {
+        if (loadedData == null) return;
+
         Character postava = loadedData.characters.Find(c => c.id == characterId + 1);
         if (postava != null)
         {
-            foreach (int itemId in postava.pickableTurnBaseItemIDs)
-            {
-                ItemSaveData item = loadedData.OwnedItems.Find(i => i.id == itemId);
-                Item itemInfo = FindItemInDatabase(itemId);
-                if (item != null)
-                {
-                    GameObject buttonObj = Instantiate(GunchoosePrefabType, GunChooseConent.transform);
-                    UnityEngine.UI.Button btn = buttonObj.GetComponent<UnityEngine.UI.Button>();
-                    btn.onClick.AddListener(() => setCurrentGunId(itemInfo.id));
-                    TMP_Text buttonText = buttonObj.GetComponentInChildren<TMP_Text>();
-                    if (buttonText != null)
-                    {
-                        buttonText.text = itemInfo.name;
-                    }
-                    //addGunInfo(itemInfo, item);
-                }
-            }
-        }   
-    }
+            postava.pickedItemID = currentGunID;
+            Debug.Log($"[PickGun] Postava {postava.id} vybavena zbraní {postava.pickedItemID}");  
+            addPickableButtons();
+        }
+}
+    
+    private void addPickableButtons()
+    {
 
+        foreach (Transform child in GunChooseConent.transform) Destroy(child.gameObject);
+
+        Character postava = loadedData.characters.Find(c => c.id == characterId + 1);
+        if (postava == null) return;
+
+        foreach (int itemId in postava.pickableTurnBaseItemIDs)
+        {
+            ItemSaveData item = loadedData.OwnedItems.Find(i => i.id == itemId);
+            Item itemInfo = FindItemInDatabase(itemId);
+            if (item == null || itemInfo == null) continue;
+
+            GameObject buttonObj = Instantiate(GunchoosePrefabType, GunChooseConent.transform);
+            buttonObj.name = $"Button_Gun_{itemInfo.id}";
+            
+            Button btn = buttonObj.GetComponent<Button>();
+            btn.transition = Selectable.Transition.None; 
+
+            btn.onClick.AddListener(() => {
+                setCurrentGunId(itemInfo.id);
+            });
+
+            LongPressHandler lph = buttonObj.GetComponent<LongPressHandler>();
+            if (lph == null) lph = buttonObj.AddComponent<LongPressHandler>();
+            
+            int localId = itemInfo.id;
+            lph.onLongPress.RemoveAllListeners();
+            lph.onLongPress.AddListener(() => {
+                currentGunID = localId;
+                PickGun();
+            });
+
+            bool isCurrentlyPicked = (itemInfo.id == postava.pickedItemID);
+            lph.SetPickedStatus(isCurrentlyPicked);
+
+            TMP_Text buttonText = buttonObj.GetComponentInChildren<TMP_Text>();
+            if (buttonText != null) buttonText.text = itemInfo.name;
+
+            if (isCurrentlyPicked && btn.transform.childCount > 0)
+            {
+                btn.transform.GetChild(0).gameObject.SetActive(true);
+            }
+        }
+    }
     private void setCurrentGunId(int index)
     {
         Debug.Log(index);
