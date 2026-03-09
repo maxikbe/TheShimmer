@@ -21,6 +21,8 @@ public class MenuCharacter : MonoBehaviour
     [SerializeField] private TMP_Text nazevHrace;
     [SerializeField] private Sprite[] seznamPostav;
     [SerializeField] private Image uiImageDisplay;
+    [SerializeField] private TMP_Text[] charText;
+
     [SerializeField] private GameObject GunchoosePrefabType;
     [SerializeField] private GameObject GunChooseConent;
     [SerializeField] private TMP_Text[] gunChooseText;
@@ -57,9 +59,22 @@ public class MenuCharacter : MonoBehaviour
             if (characterId != lastProcessedId)
             {
                 UpdateCharacterUI();
+                
                 lastProcessedId = characterId;
             }
         }
+    }
+
+    private void addCharInfo(Character character)
+    {
+        charText[0].text = character.name;
+        charText[1].text = "Level: " + character.level.ToString();
+        charText[2].text = "HP: " + character.health.ToString();
+        charText[3].text = "Speed: " + character.speed.ToString();
+        charText[4].text = "Perk Upgrade: " + character.perkUpgradersNumber.ToString();
+       // charText[5].text = "Picked item" + character.pickedItemID.ToString();
+
+
     }
 
     
@@ -80,6 +95,7 @@ public class MenuCharacter : MonoBehaviour
                     uiImageDisplay.sprite = seznamPostav[characterId];
                 }
             }
+            addCharInfo(postava);
         }
     }
 
@@ -182,7 +198,6 @@ public class MenuCharacter : MonoBehaviour
         gunChooseText[1].text = "Amount: " + itemSaveData.amount;
         gunChooseText[2].text = "Damage: " + itemInfo.Damage;
         gunChooseText[3].text = "Fire Rate: " + itemInfo.weaponType; 
-
     }
     
     private void addPickablePerks()
@@ -364,5 +379,4 @@ public class MenuCharacter : MonoBehaviour
             }
         }
     }
-
 }
