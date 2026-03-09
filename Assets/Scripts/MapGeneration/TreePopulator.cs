@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class TreePopulator : MonoBehaviour
 {
-    [Header("References")]
+    /*/[Header("References")]
     public Tilemap groundTilemap;
     public List<GameObject> treePrefabs;
     public Transform treeContainer;
@@ -57,5 +57,5 @@ public class TreePopulator : MonoBehaviour
 
         GameObject randomTree = treePrefabs[Random.Range(0, treePrefabs.Count)];
         Instantiate(randomTree, spawnPos, Quaternion.identity, treeContainer);
-    }
+    }/*/
 }
