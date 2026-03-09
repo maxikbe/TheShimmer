@@ -6,6 +6,7 @@ using System.Collections;
 
 public class LongPressHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
 {
+    [SerializeField] private float delayBeforeStart = 0.5f;
     [SerializeField] private float requiredHoldTime = 0.6f;
     public UnityEvent onLongPress = new UnityEvent();
 
@@ -16,11 +17,12 @@ public class LongPressHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     [Header("Selection Status")]
     [SerializeField] private Image backgroundToColor; 
     [SerializeField] private Color normalColor = Color.white;
-    [SerializeField] private Color pickedColor = new Color(0.7f, 1f, 0.7f); 
+    [SerializeField] private Color pickedColor = new Color(0.9f, 0.9f, 0.9f); 
 
     private bool isPointerDown;
     private float pointerDownTimer;
     private Color originalFillColor;
+    private bool longPressTriggered;
 
     void Start()
     {
@@ -33,31 +35,30 @@ public class LongPressHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void SetPickedStatus(bool isPicked)
     {
-        if (backgroundToColor != null)
-        {
-            backgroundToColor.color = isPicked ? pickedColor : normalColor;
-        }
+        if (backgroundToColor != null) backgroundToColor.color = isPicked ? pickedColor : normalColor;
     }
 
     void Update()
     {
-        if (isPointerDown)
+        if (isPointerDown && !longPressTriggered)
         {
             pointerDownTimer += Time.deltaTime;
-            float progress = Mathf.Clamp01(pointerDownTimer / requiredHoldTime);
 
-            if (fillImage != null)
+            if (pointerDownTimer > delayBeforeStart)
             {
-                fillImage.fillAmount = progress;
-                Debug.Log($"[LongPress] Progress: {progress * 100}% na {gameObject.name}");
-            }
+                float progress = Mathf.Clamp01((pointerDownTimer - delayBeforeStart) / requiredHoldTime);
 
-            if (pointerDownTimer >= requiredHoldTime)
-            {
-                Debug.Log($"[LongPress] DOSAŽENO LIMITU na {gameObject.name}");
-                onLongPress?.Invoke();
-                StartCoroutine(SuccessFlash());
-                ResetPointer();
+                if (fillImage != null)
+                {
+                    fillImage.fillAmount = progress;
+                }
+
+                if (pointerDownTimer >= delayBeforeStart + requiredHoldTime)
+                {
+                    longPressTriggered = true;
+                    onLongPress?.Invoke();
+                    StartCoroutine(SuccessFlash());
+                }
             }
         }
     }
@@ -76,9 +77,9 @@ public class LongPressHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log($"[LongPress] Pointer DOWN na {gameObject.name}");
         isPointerDown = true;
         pointerDownTimer = 0;
+        longPressTriggered = false;
     }
 
     public void OnPointerUp(PointerEventData eventData) => ResetPointer();
@@ -87,12 +88,10 @@ public class LongPressHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private void ResetPointer()
     {
         isPointerDown = false;
-        pointerDownTimer = 0;
-        if (fillImage != null && !LeanTweenIsActive()) 
+        if (!longPressTriggered && fillImage != null)
         {
             fillImage.fillAmount = 0;
         }
+        pointerDownTimer = 0;
     }
-
-    private bool LeanTweenIsActive() => pointerDownTimer >= requiredHoldTime;
 }

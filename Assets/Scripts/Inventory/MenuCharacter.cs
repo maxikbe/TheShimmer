@@ -103,7 +103,7 @@ public class MenuCharacter : MonoBehaviour
             Debug.Log($"[PickGun] Postava {postava.id} vybavena zbraní {postava.pickedItemID}");  
             addPickableButtons();
         }
-}
+    }
     
     private void addPickableButtons()
     {
@@ -144,11 +144,17 @@ public class MenuCharacter : MonoBehaviour
 
             TMP_Text buttonText = buttonObj.GetComponentInChildren<TMP_Text>();
             if (buttonText != null) buttonText.text = itemInfo.name;
+            
+            Transform imageTransform = buttonObj.transform.Find("Image");
 
-            if (isCurrentlyPicked && btn.transform.childCount > 0)
+            if (imageTransform != null)
             {
-                btn.transform.GetChild(0).gameObject.SetActive(true);
+                Image buttonImage = imageTransform.GetComponent<Image>();
+                if (buttonImage != null) buttonImage.sprite = itemInfo.icon;
             }
+
+            if (isCurrentlyPicked && btn.transform.childCount > 0) btn.transform.GetChild(0).gameObject.SetActive(true);
+            
         }
     }
     private void setCurrentGunId(int index)

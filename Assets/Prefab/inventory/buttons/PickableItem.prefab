@@ -137,6 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26fc180e66f92c24ea75d5d24b8cbc39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LongPressHandler
+  delayBeforeStart: 0.5
   requiredHoldTime: 1
   onLongPress:
     m_PersistentCalls:
@@ -157,7 +158,7 @@ MonoBehaviour:
   successColor: {r: 0, g: 1, b: 0, a: 1}
   backgroundToColor: {fileID: 7088965512606589623}
   normalColor: {r: 1, g: 1, b: 1, a: 0}
-  pickedColor: {r: 0.0031594948, g: 0.6698113, b: 0.0031594948, a: 0.2901961}
+  pickedColor: {r: 1, g: 0.85, b: 0, a: 0.2}
 --- !u!1 &3420223247358825877
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,8 +233,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -353,7 +354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 2100000, guid: 749b9069dc4742c5bfa5c74644049926, type: 2}
-  m_Color: {r: 0.6603774, g: 0, b: 0, a: 0.40392157}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.40392157}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
