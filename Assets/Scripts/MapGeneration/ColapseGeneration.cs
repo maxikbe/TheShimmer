@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 public class ColapseGeneration : MonoBehaviour
 {
@@ -15,9 +14,9 @@ public class ColapseGeneration : MonoBehaviour
     {
         public Vector3Int position;
         public bool isCollapsed = false;
-        public bool isPainted = false;
         public TileData chosenTile = null;
         public List<TileData> possibilities;
+        public bool inQueue = false;
 
         public Cell(Vector3Int pos, List<TileData> options)
         {
@@ -27,32 +26,14 @@ public class ColapseGeneration : MonoBehaviour
     }
 
     private Cell[,] grid;
+    private readonly Vector3Int[] directions = { Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right };
 
     void Start() => GenerateMap();
-
-    void SeedDirtLakes(int count)
-    {
-        var dirtTile = tileOptions.Find(t => t.tileID == 1); // Dirt_1 ID
-        if (dirtTile == null) return;
-
-        for (int i = 0; i < count; i++)
-        {
-            int x = Random.Range(3, width - 3);
-            int y = Random.Range(3, height - 3);
-
-            var cell = grid[x, y];
-            cell.chosenTile = dirtTile;
-            cell.possibilities = new List<TileData> { dirtTile };
-            cell.isCollapsed = true;
-            targetTilemap.SetTile(cell.position, dirtTile.tile);
-            Propagate(cell);
-        }
-    }
 
     public void GenerateMap()
     {
         StopAllCoroutines();
-        InitializeGrid();  
+        InitializeGrid();
         StartCoroutine(WFCAlgorithm());
     }
 
@@ -64,7 +45,7 @@ public class ColapseGeneration : MonoBehaviour
             for (int y = 0; y < height; y++)
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
-                Cell cell = new Cell(pos, tileOptions);
+                grid[x, y] = new Cell(pos, tileOptions);
 
                 TileBase existing = targetTilemap.GetTile(pos);
                 if (existing != null)
@@ -72,27 +53,20 @@ public class ColapseGeneration : MonoBehaviour
                     TileData match = tileOptions.Find(t => t.tile == existing);
                     if (match != null)
                     {
-                        cell.chosenTile = match;
-                        cell.possibilities = new List<TileData> { match };
-                        cell.isCollapsed = true;
-                        cell.isPainted = true;
+                        grid[x, y].chosenTile = match;
+                        grid[x, y].possibilities = new List<TileData> { match };
+                        grid[x, y].isCollapsed = true;
                     }
                 }
-
-                grid[x, y] = cell;
             }
         }
 
-        for (int x = 0; x < width; x++){
-            for (int y = 0; y < height; y++){
-                if (grid[x, y].isPainted){
-                    Propagate(grid[x, y]);
-                }
-            }
-        }
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                if (grid[x, y].isCollapsed) Propagate(grid[x, y]);
     }
 
-    public int tilesPerFrame = 5; // At 60fps
+    public int tilesPerFrame = 10; 
 
     IEnumerator WFCAlgorithm()
     {
@@ -107,14 +81,12 @@ public class ColapseGeneration : MonoBehaviour
             Propagate(nextCell);
 
             tilesCollapsedThisFrame++;
-
             if (tilesCollapsedThisFrame >= tilesPerFrame)
             {
                 tilesCollapsedThisFrame = 0;
-                yield return null; 
+                yield return null;
             }
         }
-        
         Debug.Log("Generation Complete!");
     }
 
@@ -126,7 +98,10 @@ public class ColapseGeneration : MonoBehaviour
             return;
         }
 
-        float totalWeight = cell.possibilities.Sum(t => t.weight);
+        float totalWeight = 0;
+        for (int i = 0; i < cell.possibilities.Count; i++)
+            totalWeight += cell.possibilities[i].weight;
+
         float r = Random.Range(0, totalWeight);
         float currentWeight = 0;
 
@@ -142,7 +117,8 @@ public class ColapseGeneration : MonoBehaviour
 
         if (cell.chosenTile == null) cell.chosenTile = cell.possibilities[0];
 
-        cell.possibilities = new List<TileData> { cell.chosenTile };
+        cell.possibilities.Clear();
+        cell.possibilities.Add(cell.chosenTile);
         cell.isCollapsed = true;
         targetTilemap.SetTile(cell.position, cell.chosenTile.tile);
     }
@@ -151,13 +127,14 @@ public class ColapseGeneration : MonoBehaviour
     {
         Queue<Cell> queue = new Queue<Cell>();
         queue.Enqueue(collapsedCell);
+        collapsedCell.inQueue = true;
 
         while (queue.Count > 0)
         {
             Cell current = queue.Dequeue();
-            Vector3Int[] dirs = { Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right };
+            current.inQueue = false;
 
-            foreach (Vector3Int dir in dirs)
+            foreach (Vector3Int dir in directions)
             {
                 int nx = current.position.x + dir.x;
                 int ny = current.position.y + dir.y;
@@ -165,17 +142,33 @@ public class ColapseGeneration : MonoBehaviour
                 if (nx >= 0 && nx < width && ny >= 0 && ny < height)
                 {
                     Cell neighbor = grid[nx, ny];
-                    if (neighbor.isCollapsed || neighbor.isPainted) continue;
+                    if (neighbor.isCollapsed) continue;
 
-                    int countBefore = neighbor.possibilities.Count;
-
-                    neighbor.possibilities = neighbor.possibilities.Where(nPossible => 
-                        current.possibilities.Any(cPossible => IsCompatible(cPossible, nPossible, dir))
-                    ).ToList();
-
-                    if (neighbor.possibilities.Count < countBefore)
+                    int startCount = neighbor.possibilities.Count;
+                    for (int i = neighbor.possibilities.Count - 1; i >= 0; i--)
                     {
-                        if (!queue.Contains(neighbor)) queue.Enqueue(neighbor);
+                        bool possible = false;
+                        TileData nTile = neighbor.possibilities[i];
+
+                        for (int j = 0; j < current.possibilities.Count; j++)
+                        {
+                            if (IsCompatible(current.possibilities[j], nTile, dir))
+                            {
+                                possible = true;
+                                break;
+                            }
+                        }
+
+                        if (!possible)
+                        {
+                            neighbor.possibilities.RemoveAt(i);
+                        }
+                    }
+
+                    if (neighbor.possibilities.Count < startCount && !neighbor.inQueue)
+                    {
+                        queue.Enqueue(neighbor);
+                        neighbor.inQueue = true;
                     }
                 }
             }
@@ -193,13 +186,28 @@ public class ColapseGeneration : MonoBehaviour
 
     Cell GetLowestEntropyCell()
     {
-        var remaining = grid.Cast<Cell>().Where(c => !c.isCollapsed).ToList();
-        if (remaining.Count == 0) return null;
+        Cell bestCell = null;
+        int minEntropy = int.MaxValue;
 
-        int minOptions = remaining.Min(c => c.possibilities.Count);
-        return remaining.Where(c => c.possibilities.Count == minOptions)
-                        .OrderBy(_ => Random.value).FirstOrDefault();
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Cell cell = grid[x, y];
+                if (cell.isCollapsed) continue;
+
+                int count = cell.possibilities.Count;
+                if (count < minEntropy)
+                {
+                    minEntropy = count;
+                    bestCell = cell;
+                }
+                else if (count == minEntropy && Random.value > 0.5f)
+                {
+                    bestCell = cell;
+                }
+            }
+        }
+        return bestCell;
     }
-
-    bool IsFullyCollapsed() => grid.Cast<Cell>().All(c => c.isCollapsed);
 }
