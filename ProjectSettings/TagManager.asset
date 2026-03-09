@@ -41,6 +41,12 @@ TagManager:
   - name: BackGround
     uniqueID: 2646042921
     locked: 0
+  - name: GenerationMap
+    uniqueID: 1881948473
+    locked: 0
+  - name: LakeMap
+    uniqueID: 831052261
+    locked: 0
   - name: Behind
     uniqueID: 1748805237
     locked: 0

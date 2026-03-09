@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: GrassDirtUD_5
   m_EditorClassIdentifier: Assembly-CSharp::TileData
   tile: {fileID: 11400000, guid: 2faf45c0c21f7df43b12c9e2afce5204, type: 2}
-  validUp: 000000000500000006000000030000000e000000
+  validUp: 000000000500000006000000030000000e0000000f000000
   validDown: 01000000060000000c0000000a000000
   validLeft: 0d0000000400000009000000
   validRight: 02000000090000000b000000
   tileID: 9
-  weight: 1
+  weight: 5

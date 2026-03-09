@@ -15,6 +15,7 @@ public class ColapseGeneration : MonoBehaviour
     {
         public Vector3Int position;
         public bool isCollapsed = false;
+        public bool isPainted = false;
         public TileData chosenTile = null;
         public List<TileData> possibilities;
 
@@ -29,18 +30,29 @@ public class ColapseGeneration : MonoBehaviour
 
     void Start() => GenerateMap();
 
-    void Update()
+    void SeedDirtLakes(int count)
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        var dirtTile = tileOptions.Find(t => t.tileID == 1); // Dirt_1 ID
+        if (dirtTile == null) return;
+
+        for (int i = 0; i < count; i++)
         {
-            GenerateMap();
+            int x = Random.Range(3, width - 3);
+            int y = Random.Range(3, height - 3);
+
+            var cell = grid[x, y];
+            cell.chosenTile = dirtTile;
+            cell.possibilities = new List<TileData> { dirtTile };
+            cell.isCollapsed = true;
+            targetTilemap.SetTile(cell.position, dirtTile.tile);
+            Propagate(cell);
         }
     }
+
     public void GenerateMap()
     {
         StopAllCoroutines();
-        targetTilemap.ClearAllTiles();
-        InitializeGrid();
+        InitializeGrid();  
         StartCoroutine(WFCAlgorithm());
     }
 
@@ -51,22 +63,59 @@ public class ColapseGeneration : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                grid[x, y] = new Cell(new Vector3Int(x, y, 0), tileOptions);
+                Vector3Int pos = new Vector3Int(x, y, 0);
+                Cell cell = new Cell(pos, tileOptions);
+
+                TileBase existing = targetTilemap.GetTile(pos);
+                if (existing != null)
+                {
+                    TileData match = tileOptions.Find(t => t.tile == existing);
+                    if (match != null)
+                    {
+                        cell.chosenTile = match;
+                        cell.possibilities = new List<TileData> { match };
+                        cell.isCollapsed = true;
+                        cell.isPainted = true;
+                    }
+                }
+
+                grid[x, y] = cell;
+            }
+        }
+
+        for (int x = 0; x < width; x++){
+            for (int y = 0; y < height; y++){
+                if (grid[x, y].isPainted){
+                    Propagate(grid[x, y]);
+                }
             }
         }
     }
 
+    public int tilesPerFrame = 5; // At 60fps
+
     IEnumerator WFCAlgorithm()
     {
-        while (!IsFullyCollapsed())
+        int tilesCollapsedThisFrame = 0;
+
+        while (true)
         {
             Cell nextCell = GetLowestEntropyCell();
             if (nextCell == null) break;
 
             CollapseCell(nextCell);
             Propagate(nextCell);
-            yield return null;
+
+            tilesCollapsedThisFrame++;
+
+            if (tilesCollapsedThisFrame >= tilesPerFrame)
+            {
+                tilesCollapsedThisFrame = 0;
+                yield return null; 
+            }
         }
+        
+        Debug.Log("Generation Complete!");
     }
 
     void CollapseCell(Cell cell)
@@ -116,7 +165,7 @@ public class ColapseGeneration : MonoBehaviour
                 if (nx >= 0 && nx < width && ny >= 0 && ny < height)
                 {
                     Cell neighbor = grid[nx, ny];
-                    if (neighbor.isCollapsed) continue;
+                    if (neighbor.isCollapsed || neighbor.isPainted) continue;
 
                     int countBefore = neighbor.possibilities.Count;
 
