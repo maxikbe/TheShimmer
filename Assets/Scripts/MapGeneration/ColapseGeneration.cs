@@ -31,12 +31,14 @@ public class ColapseGeneration : MonoBehaviour
 
     private Cell[,] grid;
     private readonly Vector3Int[] directions = { Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right };
+    private readonly Vector3Int[] directions = { Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right };
 
     void Start() => GenerateMap();
 
     public void GenerateMap()
     {
         StopAllCoroutines();
+        InitializeGrid();
         InitializeGrid();
         StartCoroutine(WFCAlgorithm());
     }
@@ -125,6 +127,8 @@ public class ColapseGeneration : MonoBehaviour
 
         cell.possibilities.Clear();
         cell.possibilities.Add(cell.chosenTile);
+        cell.possibilities.Clear();
+        cell.possibilities.Add(cell.chosenTile);
         cell.isCollapsed = true;
         targetTilemap.SetTile(cell.position, cell.chosenTile.tile);
     }
@@ -134,12 +138,15 @@ public class ColapseGeneration : MonoBehaviour
         Queue<Cell> queue = new Queue<Cell>();
         queue.Enqueue(collapsedCell);
         collapsedCell.inQueue = true;
+        collapsedCell.inQueue = true;
 
         while (queue.Count > 0)
         {
             Cell current = queue.Dequeue();
             current.inQueue = false;
+            current.inQueue = false;
 
+            foreach (Vector3Int dir in directions)
             foreach (Vector3Int dir in directions)
             {
                 int nx = current.x + dir.x;
@@ -186,6 +193,7 @@ public class ColapseGeneration : MonoBehaviour
 
     bool IsCompatible(TileData anchor, TileData check, Vector3Int dir)
     {
+        // Direct List.Contains is fine for small lists, but HashSet in TileData would be even faster
         if (dir == Vector3Int.up) return anchor.validUp.Contains(check.tileID);
         if (dir == Vector3Int.down) return anchor.validDown.Contains(check.tileID);
         if (dir == Vector3Int.left) return anchor.validLeft.Contains(check.tileID);
