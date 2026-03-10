@@ -4,58 +4,72 @@ using System.Collections.Generic;
 
 public class TreePopulator : MonoBehaviour
 {
-    /*/[Header("References")]
+    [Header("References")]
     public Tilemap groundTilemap;
+    public TileBase targetTile;
     public List<GameObject> treePrefabs;
     public Transform treeContainer;
 
-    [Header("Settings")]
-    public int targetTileID = 1; 
-    public int spawnRadius = 3;
-    [Range(0, 1)] public float density = 0.4f;
+    [Header("Spawn Settings")]
+    public float spawnRadius = 3.5f; 
+    public int treesPerTile = 8; 
+    [Range(0, 1)] public float spawnChance = 0.7f;
 
-    public void GrowForestOnSpecialTiles(int[,] gridData)
+    void Start()
     {
-        for (int x = 0; x < gridData.GetLength(0); x++)
+        GenerateForests();
+    }
+
+    public void GenerateForests()
+    {
+        BoundsInt bounds = groundTilemap.cellBounds;
+
+        foreach (Vector3Int pos in bounds.allPositionsWithin)
         {
-            for (int y = 0; y < gridData.GetLength(1); y++)
+            TileBase tile = groundTilemap.GetTile(pos);
+
+            if (tile == targetTile)
             {
-                if (gridData[x, y] == targetTileID)
-                {
-                    Vector3 worldPos = groundTilemap.CellToWorld(new Vector3Int(x, y, 0));
-                    GrowForestAtPoint(worldPos);
-                }
+                Vector3 worldPos = groundTilemap.GetCellCenterWorld(pos);
+                //Debug.Log(worldPos);
+                GrowForestAtPoint(worldPos);
             }
         }
     }
 
-    public void GrowForestAtPoint(Vector3 worldPosition)
+    private void GrowForestAtPoint(Vector3 centerPos)
+{
+    for (int i = 0; i < treesPerTile; i++)
     {
-        Vector3Int centerCell = groundTilemap.WorldToCell(worldPosition);
+        if (Random.value > spawnChance) continue;
 
-        for (int x = -spawnRadius; x <= spawnRadius; x++)
+        float angle = Random.value * Mathf.PI * 2;
+        float radius = Mathf.Sqrt(Random.value) * spawnRadius; 
+        
+        Vector3 scatter = new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, 0);
+        Vector3 spawnPos = centerPos + scatter;
+
+        // 2. Validation: Only spawn if there's a tile (uncomment if needed)
+        /*
+        if (groundTilemap.HasTile(groundTilemap.WorldToCell(spawnPos)))
         {
-            for (int y = -spawnRadius; y <= spawnRadius; y++)
-            {
-                if (x * x + y * y <= spawnRadius * spawnRadius)
-                {
-                    Vector3Int currentPos = new Vector3Int(centerCell.x + x, centerCell.y + y, 0);
-                    TryPlaceTree(currentPos);
-                }
-            }
+            PlaceTree(spawnPos);
         }
+        */
+        
+        PlaceTree(spawnPos);
     }
+}
 
-    private void TryPlaceTree(Vector3Int pos)
-    {
-        TileBase groundTile = groundTilemap.GetTile(pos);
-        if (groundTile == null) return;
+private void PlaceTree(Vector3 pos)
+{
+    if (treePrefabs.Count == 0) return;
 
-        if (Random.value > density) return;
+    GameObject prefab = treePrefabs[Random.Range(0, treePrefabs.Count)];
+    
+    GameObject tree = Instantiate(prefab, pos, Quaternion.identity, treeContainer);
 
-        Vector3 spawnPos = groundTilemap.GetCellCenterWorld(pos);
-
-        GameObject randomTree = treePrefabs[Random.Range(0, treePrefabs.Count)];
-        Instantiate(randomTree, spawnPos, Quaternion.identity, treeContainer);
-    }/*/
+    float randomScale = Random.Range(8*0.75f, 8*1.25f);
+    tree.transform.localScale = new Vector3(randomScale, randomScale, 1f);
+}
 }

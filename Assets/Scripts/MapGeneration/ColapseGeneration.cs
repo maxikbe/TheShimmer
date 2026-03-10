@@ -9,18 +9,22 @@ public class ColapseGeneration : MonoBehaviour
     public int width = 20;
     public int height = 20;
     public List<TileData> tileOptions;
+    public int tilesPerFrame = 10;
 
     private class Cell
     {
         public Vector3Int position;
+        public int x, y;
         public bool isCollapsed = false;
         public TileData chosenTile = null;
         public List<TileData> possibilities;
         public bool inQueue = false;
 
-        public Cell(Vector3Int pos, List<TileData> options)
+        public Cell(int x, int y, List<TileData> options)
         {
-            position = pos;
+            this.x = x;
+            this.y = y;
+            position = new Vector3Int(x, y, 0);
             possibilities = new List<TileData>(options);
         }
     }
@@ -44,47 +48,55 @@ public class ColapseGeneration : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                Vector3Int pos = new Vector3Int(x, y, 0);
-                grid[x, y] = new Cell(pos, tileOptions);
+                grid[x, y] = new Cell(x, y, tileOptions);
+            }
+        }
 
-                TileBase existing = targetTilemap.GetTile(pos);
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                TileBase existing = targetTilemap.GetTile(grid[x, y].position);
                 if (existing != null)
                 {
                     TileData match = tileOptions.Find(t => t.tile == existing);
                     if (match != null)
                     {
                         grid[x, y].chosenTile = match;
-                        grid[x, y].possibilities = new List<TileData> { match };
+                        grid[x, y].possibilities.Clear();
+                        grid[x, y].possibilities.Add(match);
                         grid[x, y].isCollapsed = true;
+                        Propagate(grid[x, y]);
                     }
                 }
             }
         }
-
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
-                if (grid[x, y].isCollapsed) Propagate(grid[x, y]);
     }
-
-    public int tilesPerFrame = 10; 
 
     IEnumerator WFCAlgorithm()
     {
-        int tilesCollapsedThisFrame = 0;
+        int processedThisFrame = 0;
 
         while (true)
         {
             Cell nextCell = GetLowestEntropyCell();
             if (nextCell == null) break;
 
+            if (nextCell.possibilities.Count == 0)
+            {
+                Debug.LogError($"Contradiction at {nextCell.position}! Restarting...");
+                GenerateMap();
+                yield break;
+            }
+
             CollapseCell(nextCell);
             Propagate(nextCell);
 
-            tilesCollapsedThisFrame++;
-            if (tilesCollapsedThisFrame >= tilesPerFrame)
+            processedThisFrame++;
+            if (processedThisFrame >= tilesPerFrame)
             {
-                tilesCollapsedThisFrame = 0;
-                yield return null;
+                processedThisFrame = 0;
+                yield return null; 
             }
         }
         Debug.Log("Generation Complete!");
@@ -92,12 +104,6 @@ public class ColapseGeneration : MonoBehaviour
 
     void CollapseCell(Cell cell)
     {
-        if (cell.possibilities.Count == 0)
-        {
-            cell.isCollapsed = true;
-            return;
-        }
-
         float totalWeight = 0;
         for (int i = 0; i < cell.possibilities.Count; i++)
             totalWeight += cell.possibilities[i].weight;
@@ -136,8 +142,8 @@ public class ColapseGeneration : MonoBehaviour
 
             foreach (Vector3Int dir in directions)
             {
-                int nx = current.position.x + dir.x;
-                int ny = current.position.y + dir.y;
+                int nx = current.x + dir.x;
+                int ny = current.y + dir.y;
 
                 if (nx >= 0 && nx < width && ny >= 0 && ny < height)
                 {
@@ -145,34 +151,37 @@ public class ColapseGeneration : MonoBehaviour
                     if (neighbor.isCollapsed) continue;
 
                     int startCount = neighbor.possibilities.Count;
+                    
                     for (int i = neighbor.possibilities.Count - 1; i >= 0; i--)
                     {
-                        bool possible = false;
                         TileData nTile = neighbor.possibilities[i];
-
-                        for (int j = 0; j < current.possibilities.Count; j++)
-                        {
-                            if (IsCompatible(current.possibilities[j], nTile, dir))
-                            {
-                                possible = true;
-                                break;
-                            }
-                        }
-
-                        if (!possible)
+                        if (!IsStillValid(nTile, current.possibilities, dir))
                         {
                             neighbor.possibilities.RemoveAt(i);
                         }
                     }
 
-                    if (neighbor.possibilities.Count < startCount && !neighbor.inQueue)
+                    if (neighbor.possibilities.Count < startCount)
                     {
-                        queue.Enqueue(neighbor);
-                        neighbor.inQueue = true;
+                        if (neighbor.possibilities.Count == 0) return;
+                        if (!neighbor.inQueue)
+                        {
+                            queue.Enqueue(neighbor);
+                            neighbor.inQueue = true;
+                        }
                     }
                 }
             }
         }
+    }
+
+    bool IsStillValid(TileData neighborTile, List<TileData> currentPossibilities, Vector3Int dir)
+    {
+        for (int i = 0; i < currentPossibilities.Count; i++)
+        {
+            if (IsCompatible(currentPossibilities[i], neighborTile, dir)) return true;
+        }
+        return false;
     }
 
     bool IsCompatible(TileData anchor, TileData check, Vector3Int dir)
@@ -202,7 +211,7 @@ public class ColapseGeneration : MonoBehaviour
                     minEntropy = count;
                     bestCell = cell;
                 }
-                else if (count == minEntropy && Random.value > 0.5f)
+                else if (count == minEntropy && Random.value > 0.8f)
                 {
                     bestCell = cell;
                 }
