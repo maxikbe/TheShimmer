@@ -8,7 +8,10 @@ public class DialogueChoice
 {
     public string choiceText; // Text na tlačítku
     public DialogueNode nextNode; // Kam to vede dál
-    public UnityEvent onChoiceSelected; // Event na questy
+    
+    // TADY JE TA ZMĚNA! Zahoď UnityEvent. Místo toho řekneme:
+    // "Pokud tahle odpověď startuje quest, hoď ho sem. Jinak to nech prázdné."
+    public QuestData questToStart; 
 }
 
 // --- 2. TVŮJ PŮVODNÍ KÓD ---

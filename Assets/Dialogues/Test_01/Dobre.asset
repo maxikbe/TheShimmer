@@ -16,6 +16,4 @@ MonoBehaviour:
   choices:
   - choiceText: Super
     nextNode: {fileID: 0}
-    onChoiceSelected:
-      m_PersistentCalls:
-        m_Calls: []
+    questToStart: {fileID: 11400000, guid: 9ee723e1f034f734b89a95626bc052d1, type: 2}

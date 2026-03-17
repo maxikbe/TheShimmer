@@ -51,18 +51,22 @@ public class DialogueManager : MonoBehaviour
             // --- MAGIE PRO QUESTY A VĚTVENÍ ---
             newButton.GetComponent<Button>().onClick.AddListener(() => 
             {
-                // Odpálí to všechno, co sis v Inspectoru naklikal pro tuhle odpověď
-                choice.onChoiceSelected?.Invoke(); 
+                // --- NOVÁ MAGIE PRO QUESTY ---
+                // Pokud je v Inspectoru u této odpovědi přiřazený nějaký quest, tak ho odstartuj!
+                if (choice.questToStart != null)
+                {
+                    // Tady voláme tvého QuestManagera! 
+                    // Tím, že to je Singleton (.Instance), nepotřebujeme žádné propojování v Inspectoru!
+                    QuestManager.Instance.StartQuest(choice.questToStart);
+                }
 
                 // Zkontrolujeme, jestli rozhovor pokračuje na další uzel
                 if (choice.nextNode != null)
                 {
-                    // TADY JE ZMĚNA: Voláme ContinueDialogue místo původního StartDialogue
                     ContinueDialogue(choice.nextNode); 
                 }
                 else
                 {
-                    // Pokud je nextNode prázdný, NPC s tebou domluvilo a okno se zavře
                     dialoguePanel.SetActive(false);
                 }
             });
