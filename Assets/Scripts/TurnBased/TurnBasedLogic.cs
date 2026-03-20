@@ -1,23 +1,29 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics;
-using System.Reflection;
+using Unity.Burst.Intrinsics;
+
+
 
 public class TurnBasedLogic : MonoBehaviour
 {
-    private GameData gameData; 
-    private List<Character> characters = new List<Character>();
+    GameData data = new GameData(); 
+    private List<Character> characters;
     private Character currentCharacter;
     private List<Enemy> enemies = new List<Enemy>();
     private Enemy currentEnemy;
     private int EnemyID;
     private int currentTurn;
-    private List<type> turnOrder = new List<type>();
-    enum type
+    private List<TurnType> turnOrder = new List<TurnType>();
+    private int maxVisibleTurns = 5;
+    enum TurnType
     {
         Enemy,
-        Player,
+        Player1,
+        Player2,
+        Player3,    
+        Player4,
+        Player5,
         Animation
     }
     
@@ -25,5 +31,32 @@ public class TurnBasedLogic : MonoBehaviour
     {
         currentEnemy = enemies[currentTurn];
     }
-   
+
+    void CreateTurnOrder()
+    {
+        turnOrder.Clear();
+        int enemyTurns = Random.Range(1, 4);
+        for (int i = 0; i < enemyTurns; i++) turnOrder.Add(TurnType.Enemy);
+    
+        List<Character> activeCharacters = characters.Where(c => !c.isDead).ToList();
+        activeCharacters = activeCharacters.OrderByDescending(c => c.speed).ToList();
+
+        foreach (var character in activeCharacters)
+        {
+            turnOrder.Add((TurnType)character.id);
+        }
+        
+        Debug.Log("Turn order: " + string.Join(", ", turnOrder));
+    }
+
+    void inicializeGame()
+    {
+        
+    }
+    void Start()
+    {
+        characters = gameDataManager.currentGameData.characters;
+        Debug.Log("Characters loaded: " + string.Join(", ", characters.Select(c => c.name)));   
+        CreateTurnOrder();
+    }
 }
