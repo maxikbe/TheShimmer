@@ -13,7 +13,7 @@ public class TurnBasedLogic : MonoBehaviour
     private Enemy currentEnemy;
     private int EnemyID;
     private int currentTurn;
-    private List<Type> turnOrder = new List<Type>();
+    private List<type> turnOrder = new List<type>();
     enum type
     {
         Enemy,

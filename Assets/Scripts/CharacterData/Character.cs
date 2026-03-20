@@ -21,10 +21,17 @@ public class Character
     public int staminaLevel;
     public int nervousnessLevel;
 
-    public int pickedPerkID1;
-    public int pickedPerkID2;
-    public int pickedPerkID3;
+    public int pickePerkID1;
+    public int pickePerkID2;
+    public int pickePerkID3;
 
+    public int pickedItemID;
+
+    public List<int> usableItemIDs = new List<int>();
+    public List<int> UnOwnedItemsIDs = new List<int>();
+    public List<int> pickableTurnBaseItemIDs = new List<int>();
+    public List<int> OwnedItemsInventoryItemsIDs = new List<int>();
+    
     public List<int> ownedItemsIDs = new List<int>();
     public List<int> equippedUpgradesIDs = new List<int>();
     public List<int> activeBuffsIDs = new List<int>();
