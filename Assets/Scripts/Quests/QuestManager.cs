@@ -66,4 +66,11 @@ public class QuestManager : MonoBehaviour
         // Pokud cyklus dojel až sem, znamená to, že všechny kroky jsou hotové
         trackerObjectiveText.text = "- Vrať se pro odměnu!";
     }
+    
+    // Tuhle funkci zavoláme, když chceme UI tracker úplně schovat
+    public void UntrackQuest()
+    {
+        trackedQuest = null; // Vymažeme paměť
+        trackerPanel.SetActive(false); // Vypneme to okno vlevo nahoře
+    }
 }

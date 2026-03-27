@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestData
   questID: test-test-test
   questName: Tady toto je jenom test
-  currentState: 0
+  currentState: 1
   questSteps:
   - objectiveDescription: "Totot je prvn\xED \u010D\xE1st\t\t\t"
     logText: "Toto je log \u010D\xE1st"
