@@ -19,6 +19,10 @@ public class QuestStep
     public string logText; // Detailnější text, co se připíše do deníku, když tuhle fázi odemkneš
     
     public bool isCompleted; // Je tahle konkrétní část hotová?
+    
+    public QuestData[] questsToAddOnComplete;
+    
+    public QuestData questToStartOnComplete;
 }
 
 [CreateAssetMenu(fileName = "NewQuest", menuName = "Quest/New Quest")]
@@ -33,4 +37,5 @@ public class QuestData : ScriptableObject
     [Header("Průběh Questu")]
     // Tohle je ten tvůj seznam fází. Hráč uvidí vždy jen texty z fází, ve kterých už je nebo je prošel.
     public QuestStep[] questSteps; 
+    
 }

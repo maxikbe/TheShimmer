@@ -19,6 +19,10 @@ MonoBehaviour:
   - objectiveDescription: "Totot je prvn\xED \u010D\xE1st\t\t\t"
     logText: "Toto je log \u010D\xE1st"
     isCompleted: 0
+    questsToAddOnComplete: []
+    questToStartOnComplete: {fileID: 0}
   - objectiveDescription: Tady toto je druha castr
     logText: "Toto je log \u010D\xE1st 2"
     isCompleted: 0
+    questsToAddOnComplete: []
+    questToStartOnComplete: {fileID: 0}
