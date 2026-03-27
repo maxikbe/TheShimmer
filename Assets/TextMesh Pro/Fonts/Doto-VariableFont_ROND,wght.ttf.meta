@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 427b6270dd739470fa8f56d9eb7a6c5d
+guid: 1e61ab6e6f84447e9ada821908d58c10
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,10 +9,10 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Pixelify Sans
+  - Doto
   fallbackFontReferences: []
   customCharacters: 
-  fontRenderingMode: 2
+  fontRenderingMode: 0
   ascentCalculationMode: 1
   useLegacyBoundsCalculation: 0
   shouldRoundAdvanceValue: 1
