@@ -7,9 +7,11 @@ public class QuestJournalUI : MonoBehaviour
     [Header("Hlavní Okno")]
     public GameObject journalPanel; // Celý tento Panel
 
-    [Header("Levá Strana - Seznam")]
-    public Transform questListContainer; // Místo, kam se sázejí tlačítka
-    public GameObject questButtonPrefab; // Šablona tlačítka (Prefab)
+    [Header("Levá Strana - Seznamy")]
+    // --- TADY MÁME TEĎ DVA KONTEJNERY ---
+    public Transform mainQuestListContainer; 
+    public Transform sideQuestListContainer; 
+    public GameObject questButtonPrefab;
 
     [Header("Pravá Strana - Detaily")]
     public TextMeshProUGUI detailTitleText;
@@ -46,19 +48,20 @@ public class QuestJournalUI : MonoBehaviour
 
     private void RefreshQuestList()
     {
-        // čistka tlačítek!
-        foreach (Transform child in questListContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        // Čistka obou kontejnerů!
+        foreach (Transform child in mainQuestListContainer) Destroy(child.gameObject);
+        foreach (Transform child in sideQuestListContainer) Destroy(child.gameObject);
 
-        // Projdeme všechny aktivní questy v našem QuestManagerovi
+        // Projdeme všechny aktivní questy
         foreach (QuestData quest in QuestManager.Instance.activeQuests)
         {
-            GameObject newBtn = Instantiate(questButtonPrefab, questListContainer);
+            // Zjistíme, do jakého kontejneru to máme hodit
+            Transform targetContainer = (quest.questType == QuestType.MainQuest) ? mainQuestListContainer : sideQuestListContainer;
+
+            // Spawneme tlačítko do správného seznamu
+            GameObject newBtn = Instantiate(questButtonPrefab, targetContainer);
             newBtn.GetComponentInChildren<TextMeshProUGUI>().text = quest.questName;
             
-            // Řekneme tlačítku: "Když na mě klikneš, ukaž svoje detaily napravo"
             newBtn.GetComponent<Button>().onClick.AddListener(() => 
             {
                 ShowQuestDetails(quest);

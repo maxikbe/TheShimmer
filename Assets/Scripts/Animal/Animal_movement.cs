@@ -5,11 +5,11 @@ using UnityEngine;
 public class Animal_movement : MonoBehaviour
 {
     [Header("Ghost Settings")]
-    public GameObject ghostPrefab; // Sem přetáhni prefab ducha
+    public GameObject ghostPrefab; 
     public bool debugMode = false;
 
     [Header("Stats")]
-    public Ghost_movement.MobBehavior behavior; // Enum musíme vzít z Ghosta nebo ho dát mimo
+    public Ghost_movement.MobBehavior behavior; //mob behavior z ghosta
     public float moveSpeed = 2f;
     public float runSpeed = 4f;
     
@@ -44,11 +44,11 @@ public class Animal_movement : MonoBehaviour
     [Header("Chase Settings")]
     public float waitAfterLostTime = 2f;
     [Tooltip("Jak dlouho mobka hlídkuje jako agresivní, než se uklidní")]
-    public float calmDownTime = 30f; // NOVÉ: Zklidní se třeba za 30 sekund
+    public float calmDownTime = 30f; 
 
     [Header("References")]
-    public Transform playerPosition; // Přetáhni hráče nebo ho najdi v Awake
-    public Transform nestPosition;   // Přetáhni hnízdo
+    public Transform playerPosition; // hráč objekt
+    public Transform nestPosition;   // nest animal
 
     
     
@@ -57,7 +57,7 @@ public class Animal_movement : MonoBehaviour
     //pro animace při breaku
     private bool isFacingRight = true;
     
-    // Reference na vytvořeného ducha, abychom ho mohli sledovat
+    // Reference na vytvořeného ducha, pro sledování
     private Ghost_movement myGhost;
     
     private Vector3 lastPosition;
@@ -76,15 +76,14 @@ public class Animal_movement : MonoBehaviour
             return;
         }
 
-        // 1. Vytvoříme ducha na pozici zvířete
+        // vytvoří ducha na pozici zvířete
         GameObject ghostObj = Instantiate(ghostPrefab, transform.position, Quaternion.identity);
         ghostObj.name = $"{gameObject.name}_Ghost";
 
-        // 2. Získáme jeho skript
+        // získá jeho sript
         myGhost = ghostObj.GetComponent<Ghost_movement>();
 
-        // 3. PŘEDÁME MU DATA (To je to kouzlo)
-        // Předáváme "this", tedy tento skript s nastavením
+        // předá nastavení z tohoto scirptu
         myGhost.Setup(this); 
     }
 
@@ -108,18 +107,16 @@ public class Animal_movement : MonoBehaviour
         if (myGhost != null)
         {
             Vector3 previousPos = transform.position;
-            // Tady řešíš vizuální pohyb za duchem (Lerp), viz předchozí rada
+            // pohyb
             transform.position = myGhost.transform.position;
             
             UpdateAnimationDirection(transform.position - previousPos);
-            // Tady bys mohl řešit animace podle myGhost.agent.velocity atd.
         }
     }
     
-    // --- NOVÁ METODA NA SMĚRY ---
     void UpdateAnimationDirection(Vector3 movementVector)
     {
-        // Pokud je pohyb moc malý, považujeme to za IDLE a neřešíme směr
+        // pohyb malý - iddle
         if (movementVector.magnitude < MovementTreshold)
         {
             // Debug.Log("IDLE (Stojím)");
@@ -129,15 +126,15 @@ public class Animal_movement : MonoBehaviour
         // --- pro breaky  ---
         if (movementVector.x > 0) 
         {
-            isFacingRight = true; // Jde doprava
+            isFacingRight = true; //  doprava
         }
         else if (movementVector.x < 0) 
         {
-            isFacingRight = false; // Jde doleva
+            isFacingRight = false; //  doleva
         }
         // ---
         
-        // Normalizujeme vektor (chceme jen směr, ne délku)
+        // jenom směr ne vzdálenost
         Vector3 dir = movementVector.normalized;
 
         // vraci v radialech prevadime na stupne
@@ -180,19 +177,18 @@ public class Animal_movement : MonoBehaviour
         */
     }
     
-    // Uklidíme po sobě
     void OnDestroy()
     {
         if (myGhost != null) Destroy(myGhost.gameObject);
     }
     
-    // --- NOVÁ METODA PRO COMBAT SCRIPT ---
+    // pro combat
     public void MakeAggressive()
     {
-        // Změníme to u sebe, ať to máme správně i v Inspectoru
+        // měníme pro sebe (kvuli inspektoru)
         behavior = Ghost_movement.MobBehavior.Aggressive; 
 
-        // Pošleme povel našemu neviditelnému mozku
+        // pošleme povel ghostu
         if (myGhost != null)
         {
             myGhost.ChangeBehavior(behavior);

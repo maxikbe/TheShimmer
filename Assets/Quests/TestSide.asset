@@ -10,20 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9493bc83af80e2428450a3e45424dd4, type: 3}
-  m_Name: Test
+  m_Name: TestSide
   m_EditorClassIdentifier: Assembly-CSharp::QuestData
-  questID: test-test-test
-  questName: Tady toto je jenom test
-  questType: 0
+  questID: jisao iosa diosadsaio
+  questName: Side Quest Test
+  questType: 1
   currentState: 0
   questSteps:
-  - objectiveDescription: "Totot je prvn\xED \u010D\xE1st\t\t\t"
-    logText: "Toto je log \u010D\xE1st"
-    isCompleted: 0
-    questsToAddOnComplete: []
-    questToStartOnComplete: {fileID: 0}
-  - objectiveDescription: Tady toto je druha castr
-    logText: "Toto je log \u010D\xE1st 2"
+  - objectiveDescription: "Pod ke mn\u011B"
+    logText: "Hej tady chci jenom otestovat proc to nefunguje a proc to funguje takze
+      to je tak jako vsechno co tady chci ud\u011Bkat"
     isCompleted: 0
     questsToAddOnComplete: []
     questToStartOnComplete: {fileID: 0}

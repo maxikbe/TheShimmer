@@ -66,9 +66,21 @@ public class QuestManager : MonoBehaviour
     public void TrackQuest(QuestData quest)
     {
         trackedQuest = quest;
-        trackerPanel.SetActive(true); // Ukážeme UI
+        trackerPanel.SetActive(true); 
         
         trackerNameText.text = quest.questName;
+
+        // --- MAGIE PRO ROZLIŠENÍ BAREV ---
+        if (quest.questType == QuestType.MainQuest)
+        {
+            trackerNameText.color = new Color(1f, 0.8f, 0f); // Zlatá barva pro Main
+            trackerNameText.fontStyle = FontStyles.Bold; // Uděláme to i tučně!
+        }
+        else
+        {
+            trackerNameText.color = Color.white; // Obyčejná bílá pro Side
+            trackerNameText.fontStyle = FontStyles.Normal;
+        }
 
         // Najdeme první nesplněný krok (Step) a vypíšeme jeho zadání
         foreach (QuestStep step in quest.questSteps)
