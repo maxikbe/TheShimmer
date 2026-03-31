@@ -68,7 +68,6 @@ Shader "Custom/Tree-Individual-Swap-Unity6-Lit"
             half4 frag (Varyings input) : SV_Target {
                 half4 col = tex2D(_MainTex, input.uv);
                 
-                // 1. COLOR SWAP
                 float d = distance(col.rgb, _TargetColor.rgb);
 
                 float mask = step(d, _Tolerance);
@@ -80,7 +79,6 @@ Shader "Custom/Tree-Individual-Swap-Unity6-Lit"
 
                 col *= input.color;
 
-                // 2. LIGHTING (UNITY 6 2D)
                 float2 screenUV = input.screenPos.xy / input.screenPos.w;
                 half4 lightColor = tex2D(_ShapeLightTexture0, screenUV);
                 col.rgb *= lightColor.rgb;

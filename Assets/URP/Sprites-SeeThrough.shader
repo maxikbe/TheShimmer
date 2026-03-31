@@ -67,7 +67,6 @@ Shader "Custom/Tree-Individual-Swap-Unity6-Lit"
                 output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
                 output.positionCS = TransformWorldToHClip(output.positionWS);
                 
-                // Get the object's pivot Y position
                 output.objectYWS = TransformObjectToWorld(float3(0,0,0)).y;
                 
                 output.uv = input.uv;
@@ -77,7 +76,6 @@ Shader "Custom/Tree-Individual-Swap-Unity6-Lit"
             }
 
             half4 frag (Varyings input) : SV_Target {
-                // 1. COLOR SWAP
                 half4 col = tex2D(_MainTex, input.uv);
 
                 float d_color = distance(col.rgb, _TargetColor.rgb);
@@ -89,15 +87,13 @@ Shader "Custom/Tree-Individual-Swap-Unity6-Lit"
 
                 col *= input.color;
 
-                // 2. SEE-THROUGH
-                float d_dist = distance(input.positionWS.xyz, _GlobalPlayerPos.xyz);
+                float d_dist = distance(input.positionWS.xy, _GlobalPlayerPos.xy);
                 float mask = smoothstep(_GlobalRadius - _GlobalSoftness, _GlobalRadius, d_dist);
                 
                 if (_GlobalPlayerPos.y > input.objectYWS + 0.1) {
                     col.a *= mask;
                 }
 
-                // 3. UNITY 6 LIGHTING HOOK
                 float2 uv = input.screenPos.xy / input.screenPos.w;
                 half4 lightColor = tex2D(_ShapeLightTexture0, uv);
                 col.rgb *= lightColor.rgb;
