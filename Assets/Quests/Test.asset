@@ -14,11 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestData
   questID: test-test-test
   questName: Tady toto je jenom test
+  questType: 0
   currentState: 0
   questSteps:
   - objectiveDescription: "Totot je prvn\xED \u010D\xE1st\t\t\t"
     logText: "Toto je log \u010D\xE1st"
     isCompleted: 0
+    questsToAddOnComplete: []
+    questToStartOnComplete: {fileID: 0}
   - objectiveDescription: Tady toto je druha castr
     logText: "Toto je log \u010D\xE1st 2"
     isCompleted: 0
+    questsToAddOnComplete: []
+    questToStartOnComplete: {fileID: 0}

@@ -8,6 +8,12 @@ public enum QuestState
     Completed
 }
 
+public enum QuestType
+{
+    MainQuest,
+    SideQuest
+}
+
 // Tohle reprezentuje jednu fázi questu (to postupné odkrývání)
 [System.Serializable]
 public class QuestStep
@@ -19,6 +25,10 @@ public class QuestStep
     public string logText; // Detailnější text, co se připíše do deníku, když tuhle fázi odemkneš
     
     public bool isCompleted; // Je tahle konkrétní část hotová?
+    
+    public QuestData[] questsToAddOnComplete;
+    
+    public QuestData questToStartOnComplete;
 }
 
 [CreateAssetMenu(fileName = "NewQuest", menuName = "Quest/New Quest")]
@@ -28,9 +38,12 @@ public class QuestData : ScriptableObject
     public string questID; // Unikátní jméno (např. "Q_Main_01_Kovar")
     public string questName; // To, co uvidí hráč v UI (např. "Ztracená dcera")
     
+    public QuestType questType;
+    
     public QuestState currentState; // Jestli je aktivní, hotový, atd.
 
     [Header("Průběh Questu")]
     // Tohle je ten tvůj seznam fází. Hráč uvidí vždy jen texty z fází, ve kterých už je nebo je prošel.
     public QuestStep[] questSteps; 
+    
 }

@@ -16,11 +16,7 @@ MonoBehaviour:
   choices:
   - choiceText: "\u0160patn\u011B"
     nextNode: {fileID: 11400000, guid: 389cadcb2033749c996348077f9306db, type: 2}
-    onChoiceSelected:
-      m_PersistentCalls:
-        m_Calls: []
+    questToStart: {fileID: 0}
   - choiceText: "Dob\u0159e"
     nextNode: {fileID: 11400000, guid: e072b2dbca6c44d9cb86ba8bc1420d65, type: 2}
-    onChoiceSelected:
-      m_PersistentCalls:
-        m_Calls: []
+    questToStart: {fileID: 11400000, guid: c6e0389050f174e4aba65abd561e9d26, type: 2}
