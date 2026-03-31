@@ -10,7 +10,7 @@ public class TurnBasedLogic : MonoBehaviour
     GameData data = new GameData(); 
     private List<Character> characters;
     private Character currentCharacter;
-    private List<Enemy> enemies = new List<Enemy>();
+    private List<Enemy> enemies;
     private Enemy currentEnemy;
     private int numberOfEnemies = 1;
     private int EnemyID;
@@ -78,6 +78,7 @@ public class TurnBasedLogic : MonoBehaviour
     void Start()
     {
         characters = gameDataManager.currentGameData.characters;
+        enemies = gameDataManager.currentGameData.enemies;
         Debug.Log("Characters loaded: " + string.Join(", ", characters.Select(c => c.name)));   
         CreateTurnOrder();
     }
@@ -118,6 +119,18 @@ public class TurnBasedLogic : MonoBehaviour
         // After animation, move player back
 
         MovePlayerBackToPosition(playerPositionIndex);
+    }
+
+    void EnemyAttackPlayer(int enemyPositionIndex, int playerPositionIndex)
+    {
+        // Move enemy to attack position
+
+        Vector3 targetPosition = getAnimationPositions(enemyPositionIndex, playerPositionIndex, false);
+        enemyPosition[enemyPositionIndex].transform.position = targetPosition;
+
+        // Trigger attack animation here and apply damage to player
+
+        // After animation, move enemy back
     }
 
     
