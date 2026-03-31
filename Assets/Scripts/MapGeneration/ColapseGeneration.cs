@@ -29,7 +29,7 @@ public class ColapseGeneration : MonoBehaviour
         }
     }
 
-    private- Cell[,] grid;
+    private Cell[,] grid;
     private readonly Vector3Int[] directions = { Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right };
 
     void Start() => GenerateMap();
