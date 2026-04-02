@@ -1,12 +1,31 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Burst.Intrinsics;
 
-
+[System.Serializable] 
+public struct CameraInfo
+{
+    public int ID;
+    public int IDofCamera;
+    public Camera targetCamera;
+}
 
 public class TurnBasedLogic : MonoBehaviour
 {
+    //turn Based ShortCuts
+    private KeyCode keySpecial = KeyBoardSetting.chooseSpecialSpell;
+    private KeyCode keyNormal = KeyBoardSetting.chooseNormalSpell;
+    private KeyCode keyItem = KeyBoardSetting.chooseItem;
+    private KeyCode keyAccept = KeyBoardSetting.doAccept;
+    private KeyCode keyBack = KeyBoardSetting.doBack;
+    private KeyCode keyUp = KeyBoardSetting.swapUp;
+    private KeyCode keyDown = KeyBoardSetting.swapDown;
+    private KeyCode keyLeft = KeyBoardSetting.swapLeft;
+    private KeyCode keyRight = KeyBoardSetting.swapRight;
+    private KeyCode keyAliveUp = KeyBoardSetting.swapAliveUp;
+    private KeyCode keyAliveDown = KeyBoardSetting.swapAliveDown;
+
+    // VARIABLES
     GameData data = new GameData(); 
     private List<Character> characters;
     private Character currentCharacter;
@@ -17,25 +36,52 @@ public class TurnBasedLogic : MonoBehaviour
     private int currentTurn;
     private List<TurnType> turnOrder = new List<TurnType>();
     private int maxVisibleTurns = 5;
-    enum TurnType
-    {
-        Enemy,
-        Enemy2,
-        Enemy3,
-        Player1,
-        Player2,
-        Player3,    
-        Player4,
-        Player5,
-        Animation
-    }
+    enum TurnType{ Enemy, Enemy2, Enemy3, Player1, Player2, Player3, Player4, Player5, Animation }
 
     [SerializeField] private List<GameObject> enemyPosition = new List<GameObject>();
     [SerializeField] private  List<GameObject> playerPosition = new List<GameObject>();
     private List<Vector3> defaultPlayerPositons = new List<Vector3>();
     private List<Vector3> defaultEnemyPositions = new List<Vector3>();
     [SerializeField] private List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();    
+    [SerializeField] private List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
 
+    // CAMERAS
+    [SerializeField] private List<CameraInfo> camerasInfo = new List<CameraInfo>();
+    private Camera currentActiveCamera;
+
+    void SetActiveCamera(int cameraID, bool isEnemy)
+    {
+        foreach (var camInfo in camerasInfo)
+            camInfo.targetCamera.enabled = false;
+
+        var target = camerasInfo.FirstOrDefault(c => c.IDofCamera == cameraID);
+        if (target.targetCamera != null)
+        {
+            target.targetCamera.enabled = true;
+            currentActiveCamera = target.targetCamera;
+        }
+    }
+
+    void SwitchToOverviewCamera()
+    {
+        SetActiveCamera(0, false);
+    }
+
+    void SwitchToPlayerCamera(int playerID)
+    {
+        SetActiveCamera(playerID, false);
+    }
+
+    void SwitchToEnemyCamera(int enemyID)
+    {
+        SetActiveCamera(enemyID, true);
+    }
+
+    void SwitchToAttackCamera(int attackerID, bool attackerIsEnemy)
+    {
+        SetActiveCamera(attackerID, attackerIsEnemy);
+    }
+    // CODE
 
     void inicializeTurnBasedGame()
     {
@@ -106,6 +152,11 @@ public class TurnBasedLogic : MonoBehaviour
         Vector3 targetPosition = defaultPlayerPositons[playerPositionIndex];
     }
 
+    void MoveEnemyBackToPosition(int enemyPositionIndex)
+    {
+        Vector3 targetPosition = defaultEnemyPositions[enemyPositionIndex];
+    }
+
     void PlayerAttackEnemy(int playerPositionIndex, int enemyPositionIndex)
     {
         // Move player to attack position
@@ -131,6 +182,13 @@ public class TurnBasedLogic : MonoBehaviour
         // Trigger attack animation here and apply damage to player
 
         // After animation, move enemy back
+
+        MoveEnemyBackToPosition(enemyPositionIndex);
+    }
+
+    void HandlePlayerAttack()
+    {
+        
     }
 
     

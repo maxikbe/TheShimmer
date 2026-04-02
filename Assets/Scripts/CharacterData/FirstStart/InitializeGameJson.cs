@@ -6,9 +6,19 @@ public class InitializeGameJson : MonoBehaviour
 {
     [SerializeField] private Database _databaseReference; 
     [SerializeField] public List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();
+    [SerializeField] private List<EnemyAnimationData> enemyAnimations;
+    [SerializeField] public List<EnemySprite> enemySprites = new List<EnemySprite>();
 
+    public struct EnemySprite
+    {
+        public int id;
+        public Sprite sprite;
+    }
     private static string savePath;
     private static List<CharacterAnimationData> characterAnimationsStatic;
+    private static List<EnemyAnimationData> enemyAnimationsStatic;
+    private static List<EnemySprite> enemySpritesStatic;
+
     private static Database itemDatabase;
 
     void Awake()
@@ -16,6 +26,8 @@ public class InitializeGameJson : MonoBehaviour
         savePath = Path.Combine(Application.persistentDataPath, "Data.json");
         itemDatabase = _databaseReference;
         characterAnimationsStatic = characterAnimations;
+        enemyAnimationsStatic = enemyAnimations;
+        enemySpritesStatic = enemySprites;
 
          if (!File.Exists(savePath))
         {
@@ -114,7 +126,18 @@ public class InitializeGameJson : MonoBehaviour
         }}
         );
 
+        foreach (var enemySprite in enemySpritesStatic)
+        {
+            Enemy targetEnemy = data.enemies.Find(e => e.id == enemySprite.id);
+            
+            if (targetEnemy != null)
+            {
+                targetEnemy.sprite = enemySprite.sprite;
+            }
+        }
+
         data.characterAnimations = characterAnimationsStatic;
+        data.enemyAnimations = enemyAnimationsStatic;
         gameDataManager.currentGameData = data;
         
         string json = JsonUtility.ToJson(data, true);

@@ -7,4 +7,5 @@ public class GameData
     public List<ItemSaveData> OwnedItems = new List<ItemSaveData>();
     public List<Enemy> enemies = new List<Enemy>();
     public List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();
+    public List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
 }
