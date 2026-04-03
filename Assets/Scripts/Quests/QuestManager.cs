@@ -8,7 +8,8 @@ public class QuestManager : MonoBehaviour
     public static QuestManager Instance;
 
     [Header("Databáze")]
-    public QuestData[] allGameQuests; // Sem přetáhneš VŠECHNY své ScriptableObjecty questů
+    // Smazali jsme staré pole a dali sem odkaz na tvoji novou chytrou databázi!
+    public QuestDatabase questDatabase; 
 
     [Header("Aktivní Questy")]
     public List<QuestData> activeQuests = new List<QuestData>();
