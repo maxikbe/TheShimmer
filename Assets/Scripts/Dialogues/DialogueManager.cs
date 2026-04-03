@@ -16,11 +16,13 @@ public class DialogueManager : MonoBehaviour
     // Tady si DialogueManager "pamatuje", s kým zrovna mluví
     private string currentSpeakerName;
 
+    private Merchant currentMerchant;
     // 1. ZCELA NOVÁ FUNKCE - Volá ji skript na NPC (např. Kováři), když rozhovor začíná
-    public void StartConversation(string npcName, DialogueNode firstNode)
+    public void StartConversation(string npcName, DialogueNode firstNode, Merchant merchant = null)
     {
         // Uložíme si jméno do inventáře, ať ho máme po ruce pro další texty
         currentSpeakerName = npcName; 
+        currentMerchant = merchant;
         
         // A pustíme samotné vykreslení dialogu
         ContinueDialogue(firstNode);
@@ -51,23 +53,40 @@ public class DialogueManager : MonoBehaviour
             // --- MAGIE PRO QUESTY A VĚTVENÍ ---
             newButton.GetComponent<Button>().onClick.AddListener(() => 
             {
-                // --- NOVÁ MAGIE PRO QUESTY ---
-                // Pokud je v Inspectoru u této odpovědi přiřazený nějaký quest, tak ho odstartuj!
-                if (choice.questToStart != null)
-                {
-                    // Tady voláme tvého QuestManagera! 
-                    // Tím, že to je Singleton (.Instance), nepotřebujeme žádné propojování v Inspectoru!
-                    QuestManager.Instance.StartQuest(choice.questToStart);
-                }
 
-                // Zkontrolujeme, jestli rozhovor pokračuje na další uzel
-                if (choice.nextNode != null)
+                if (choice.opensShop)
                 {
-                    ContinueDialogue(choice.nextNode); 
+                    dialoguePanel.SetActive(false);
+
+                    if (currentMerchant != null)
+                    {
+                        Debug.Log("Začínáme obchodovat: " + currentMerchant.name);
+                    }
+                    else
+                    {
+                        Debug.Log("Někdo se snaží obchodovat s někým kdo není prodejce");
+                    }
                 }
                 else
                 {
-                    dialoguePanel.SetActive(false);
+                    // --- NOVÁ MAGIE PRO QUESTY ---
+                    // Pokud je v Inspectoru u této odpovědi přiřazený nějaký quest, tak ho odstartuj!
+                    if (choice.questToStart != null)
+                    {
+                        // Tady voláme tvého QuestManagera! 
+                        // Tím, že to je Singleton (.Instance), nepotřebujeme žádné propojování v Inspectoru!
+                        QuestManager.Instance.StartQuest(choice.questToStart);
+                    }
+
+                    // Zkontrolujeme, jestli rozhovor pokračuje na další uzel
+                    if (choice.nextNode != null)
+                    {
+                        ContinueDialogue(choice.nextNode); 
+                    }
+                    else
+                    {
+                        dialoguePanel.SetActive(false);
+                    }
                 }
             });
         }

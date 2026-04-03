@@ -19,7 +19,10 @@ public class NPCController : MonoBehaviour
     // Tuhle funkci odpálíme
     public void Interact()
     {
+        //Zjistí jestli není obchodník
+        Merchant myMerchant = GetComponent<Merchant>();
+        
         // Najdeme našeho manažera a hodíme po něm jméno i scénář
-        FindObjectOfType<DialogueManager>().StartConversation(npcName, startingNode);
+        FindObjectOfType<DialogueManager>().StartConversation(npcName, startingNode, myMerchant);
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEditor;
 using UnityEngine.Events; // Tohle je důležité přidat kvůli UnityEvent!
 
 // --- 1. TADY JE TA CHYBĚJÍCÍ TŘÍDA ---
@@ -6,12 +7,17 @@ using UnityEngine.Events; // Tohle je důležité přidat kvůli UnityEvent!
 [System.Serializable]
 public class DialogueChoice
 {
+
+    public bool opensShop;
+    
     public string choiceText; // Text na tlačítku
+    
     public DialogueNode nextNode; // Kam to vede dál
     
     // TADY JE TA ZMĚNA! Zahoď UnityEvent. Místo toho řekneme:
     // "Pokud tahle odpověď startuje quest, hoď ho sem. Jinak to nech prázdné."
     public QuestData questToStart; 
+    
 }
 
 // --- 2. TVŮJ PŮVODNÍ KÓD ---
