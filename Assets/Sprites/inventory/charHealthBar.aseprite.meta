@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 87f2d872856bbff498645f2f68b34c29
+guid: dc07e97413f201b44ac2b7c558692b7a
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -127,7 +127,7 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: HealthManaBar
+  - name: charHealthBar
     originalName: 
     pivot: {x: 0.5, y: 0}
     alignment: 9
@@ -138,8 +138,8 @@ ScriptedImporter:
       x: 4
       y: 4
       width: 57
-      height: 57
-    spriteID: c6448ff220b5b274d83d68bdd6718af2
+      height: 6
+    spriteID: 4bb4c57ca45c85443b9c96450dc8d984
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -153,25 +153,25 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 42762596
+      value0: 2536302629
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: HealthManaBar
+    name: charHealthBar
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: HealthManaBar
+    - name: charHealthBar
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
         width: 57
-        height: 57
-      spriteId: c6448ff220b5b274d83d68bdd6718af2
+        height: 6
+      spriteId: 4bb4c57ca45c85443b9c96450dc8d984
     linkedCells: []
     tileCells: []
     tileSetIndex: 0
@@ -181,5 +181,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 57, y: 57}
-  previousTextureSize: {x: 128, y: 128}
+  canvasSize: {x: 57, y: 6}
+  previousTextureSize: {x: 128, y: 16}

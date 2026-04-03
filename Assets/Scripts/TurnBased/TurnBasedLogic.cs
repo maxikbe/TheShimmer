@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine.UI;
+using TMPro;
+
 //using System.Diagnostics;
 
 
@@ -21,6 +23,14 @@ public struct FacesSprite
     public bool isEnemy;
     public int ID;
     public Sprite sprite;
+}
+
+[System.Serializable] 
+public struct characterBars
+{
+    public int ID;
+    public Image healthBar;
+    public Image manaBar;
 }
 public class TurnBasedLogic : MonoBehaviour
 {
@@ -48,8 +58,7 @@ public class TurnBasedLogic : MonoBehaviour
     private int EnemyID;
     private int currentTurn;
     private List<TurnType> turnOrder = new List<TurnType>();
-    [SerializeField] private List<Image> FaceHolders = new List<Image>();
-    [SerializeField] private List<FacesSprite> Faces = new List<FacesSprite>();
+
     private int maxVisibleTurns = 5;
     enum TurnType{ Enemy, Enemy2, Enemy3, Player1, Player2, Player3, Player4, Player5 }
 
@@ -59,7 +68,13 @@ public class TurnBasedLogic : MonoBehaviour
     private List<Vector3> defaultEnemyPositions = new List<Vector3>();
     [SerializeField] private List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();    
     [SerializeField] private List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
-  
+
+    // UI
+    [SerializeField] private List<Image> FaceHolders = new List<Image>();
+    [SerializeField] private List<FacesSprite> Faces = new List<FacesSprite>();
+    [SerializeField] private TextMeshProUGUI EnemyName;
+    [SerializeField] private Image EnemyHealthBar;
+    [SerializeField] private List<characterBars> characterBars = new List<characterBars>();
 
     // DEFAULT
     void Start()
@@ -75,6 +90,7 @@ public class TurnBasedLogic : MonoBehaviour
        // if (Input.GetKey(keySpecial)) PlayerAttackEnemy(0, 0);
         //if (Input.GetKey(keyNormal)) EnemyAttackPlayer(0, 0);
        // Debug.Log("Current Turn Order: " + string.Join(", ", turnOrder.Select(t => t.ToString())));
+
     }
 
     // CAMERAS
@@ -114,7 +130,10 @@ public class TurnBasedLogic : MonoBehaviour
     {
         onTurnbasedStart();
         getDefaultPositions();
-        CreateTurnOrder();
+        createTurnOrder();
+        updateEnemyHealthBar();
+        updateCharacterBars();
+        EnemyName.text = currentEnemy[0].name;
     }
 
     void onTurnbasedStart()
@@ -128,7 +147,7 @@ public class TurnBasedLogic : MonoBehaviour
             .ToList();
         Debug.Log("Current enemy: " + string.Join(", ", currentEnemy.Select(e => e.name)));
     }
-    void CreateTurnOrder()
+    void createTurnOrder()
     {
         turnOrder.Clear();
         
@@ -311,6 +330,31 @@ public class TurnBasedLogic : MonoBehaviour
     void HandlePlayerAttack()
     {
         
+    }
+    void updateEnemyHealthBar()
+    {
+        int maxHealth = 0;
+        int currentHealth = 0;
+        for (int i = 0; i < currentEnemy.Count; i++)
+        {
+            maxHealth += currentEnemy[i].maxHealth;
+            currentHealth += currentEnemy[i].health;
+        }
+        EnemyHealthBar.fillAmount = currentHealth / (float)maxHealth;
+    }
+    
+    void updateCharacterBars()
+    {
+        int i = 0;
+        foreach (characterBars bars in characterBars)
+        {
+            if (bars.ID == characters[i].id)
+            {
+                bars.healthBar.fillAmount = characters[i].health / (float)characters[i].maxHealth;
+                bars.manaBar.fillAmount = characters[i].mana / 10;
+            }
+            i++;
+        }
     }
 
     

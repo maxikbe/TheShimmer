@@ -138,7 +138,7 @@ ScriptedImporter:
       x: 4
       y: 4
       width: 57
-      height: 46
+      height: 57
     spriteID: ea4e6e17f868b8d4f91c8f239f2bd324
     spriteBone: []
     spriteOutline: []
@@ -170,7 +170,7 @@ ScriptedImporter:
         x: 0
         y: 0
         width: 57
-        height: 46
+        height: 57
       spriteId: ea4e6e17f868b8d4f91c8f239f2bd324
     linkedCells: []
     tileCells: []
@@ -182,4 +182,4 @@ ScriptedImporter:
   secondarySpriteTextures: []
   spritePackingTag: 
   canvasSize: {x: 57, y: 57}
-  previousTextureSize: {x: 128, y: 64}
+  previousTextureSize: {x: 128, y: 128}
