@@ -34,6 +34,7 @@ public class ShopItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
                 iconImage.color = new Color(0.5f, 0.5f, 0.5f, 1f); // RGB seda
             }
             else
+            
             {
                 iconImage.color = Color.white; // normalni barva
             }

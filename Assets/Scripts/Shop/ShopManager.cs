@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using Unity.AppUI.UI;
 
 public class ShopManager : MonoBehaviour
 {
@@ -35,10 +36,14 @@ public class ShopManager : MonoBehaviour
     private Merchant currentMerchant;
     private ShopItemSlot hoveredSlot; // ví na cem mys prebyva
 
+    private Color priceColor;
+    
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+        
+        priceColor = tooltipPrice.color;
     }
 
     void Update()
@@ -92,6 +97,7 @@ public class ShopManager : MonoBehaviour
             CreateItemSlot(itemData, staticData, buyPrice, false, merchantInventoryContainer);
         }
 
+        
         // vykresluje muj batoh 
         foreach (ItemSaveData itemData in gameDataManager.currentGameData.OwnedItems)
         {
@@ -104,6 +110,7 @@ public class ShopManager : MonoBehaviour
             int sellPrice = Mathf.RoundToInt(staticData.basePrice * currentMerchant.buyModifier);
             CreateItemSlot(itemData, staticData, sellPrice, true, playerInventoryContainer);
         }
+        
     }
 
     private void CreateItemSlot(ItemSaveData data, Item staticData, int price, bool isPlayer, Transform container)
@@ -131,7 +138,7 @@ public class ShopManager : MonoBehaviour
         else
         {
             tooltipPrice.text = "Cena: " + slot.myPrice.ToString() + " G";
-            tooltipPrice.color = Color.white; // vrati zpet bilou
+            tooltipPrice.color = priceColor; // vrati zpet bilou
         }
         
         if (slot.myItemStaticData.icon != null) 
