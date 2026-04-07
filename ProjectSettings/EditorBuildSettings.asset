@@ -5,19 +5,19 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/dominik_testing_scene.unity
     guid: de37329a4617def4b976f00fbad7201f
   - enabled: 1
     path: Assets/Scenes/MainStoryMap.unity
     guid: 1fd731bd0e3ef684e9f27c5bfe079f99
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DavidScene.unity
     guid: 0361f1927e9394a57b8582506e4c96a1
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/TurnBase_test.unity
     guid: b685ce173bf7b4c4dbd6414e43abaa39
   m_configObjects:
