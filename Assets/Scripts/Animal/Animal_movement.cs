@@ -47,17 +47,17 @@ public class Animal_movement : MonoBehaviour
     public float calmDownTime = 30f; 
 
     [Header("References")]
-    public Transform playerPosition; // hráč objekt
+    public Transform playerPosition; // rhac
     public Transform nestPosition;   // nest animal
 
     
     
     
-    //Lokální proměnné!!!!!!
+    //LOKALNI PROMENNE
     //pro animace při breaku
     private bool isFacingRight = true;
     
-    // Reference na vytvořeného ducha, pro sledování
+    // sleduje ducha
     private Ghost_movement myGhost;
     
     private Vector3 lastPosition;
@@ -76,14 +76,14 @@ public class Animal_movement : MonoBehaviour
             return;
         }
 
-        // vytvoří ducha na pozici zvířete
+        // vytvori ducha na pozici zvirete
         GameObject ghostObj = Instantiate(ghostPrefab, transform.position, Quaternion.identity);
         ghostObj.name = $"{gameObject.name}_Ghost";
 
-        // získá jeho sript
+        // ziska jeho sript
         myGhost = ghostObj.GetComponent<Ghost_movement>();
 
-        // předá nastavení z tohoto scirptu
+        // predava nastaveni
         myGhost.Setup(this); 
     }
 
@@ -119,7 +119,7 @@ public class Animal_movement : MonoBehaviour
         // pohyb malý - iddle
         if (movementVector.magnitude < MovementTreshold)
         {
-            // Debug.Log("IDLE (Stojím)");
+            // Debug.Log("IDLE");
             return;
         }
 
@@ -132,9 +132,8 @@ public class Animal_movement : MonoBehaviour
         {
             isFacingRight = false; //  doleva
         }
-        // ---
         
-        // jenom směr ne vzdálenost
+        // pouze smer bez vzdalenosti
         Vector3 dir = movementVector.normalized;
 
         // vraci v radialech prevadime na stupne
@@ -185,10 +184,10 @@ public class Animal_movement : MonoBehaviour
     // pro combat
     public void MakeAggressive()
     {
-        // měníme pro sebe (kvuli inspektoru)
+        // menime kvuli inpektoru
         behavior = Ghost_movement.MobBehavior.Aggressive; 
 
-        // pošleme povel ghostu
+        // posilame povel ghostovi
         if (myGhost != null)
         {
             myGhost.ChangeBehavior(behavior);

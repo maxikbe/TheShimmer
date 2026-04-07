@@ -5,10 +5,9 @@ using TMPro;
 public class QuestJournalUI : MonoBehaviour
 {
     [Header("Hlavní Okno")]
-    public GameObject journalPanel; // Celý tento Panel
+    public GameObject journalPanel; 
 
     [Header("Levá Strana - Seznamy")]
-    // --- TADY MÁME TEĎ DVA KONTEJNERY ---
     public Transform mainQuestListContainer; 
     public Transform sideQuestListContainer; 
     public GameObject questButtonPrefab;
@@ -16,13 +15,13 @@ public class QuestJournalUI : MonoBehaviour
     [Header("Pravá Strana - Detaily")]
     public TextMeshProUGUI detailTitleText;
     public TextMeshProUGUI detailDescriptionText;
-    public Button trackButton; // Tlačítko pro hození do levého horního rohu
+    public Button trackButton; 
 
-    private QuestData selectedQuest; // Který quest máš zrovna rozkliknutý
+    private QuestData selectedQuest; // zrovna rozkliknuty quest
 
     void Update()
     {
-        // Otevírání deníku klávesou 'J'
+        // otevirani journalu pomoci J
         if (Input.GetKeyDown(KeyCode.J))
         {
             if (journalPanel.activeSelf) CloseJournal();
@@ -33,12 +32,12 @@ public class QuestJournalUI : MonoBehaviour
     public void OpenJournal()
     {
         journalPanel.SetActive(true);
-        RefreshQuestList(); // Načteme seznam úkolů
+        RefreshQuestList(); // nacte seznam ukolu
         
-        // Vyčistíme pravou stranu, než hráč na něco klikne
+        // vycisti pravou stranu nez na neco klikne
         detailTitleText.text = "Choose quest from list";
         detailDescriptionText.text = "";
-        trackButton.gameObject.SetActive(false); // Schováme tlačítko Trackeru
+        trackButton.gameObject.SetActive(false); // schovava tracker tlacitko
     }
 
     public void CloseJournal()
@@ -48,17 +47,17 @@ public class QuestJournalUI : MonoBehaviour
 
     private void RefreshQuestList()
     {
-        // Čistka obou kontejnerů!
+        // Kontejnery se seznamem cisti
         foreach (Transform child in mainQuestListContainer) Destroy(child.gameObject);
         foreach (Transform child in sideQuestListContainer) Destroy(child.gameObject);
 
-        // Projdeme všechny aktivní questy
+        // projede vsechny aktivni quest
         foreach (QuestData quest in QuestManager.Instance.activeQuests)
         {
-            // Zjistíme, do jakého kontejneru to máme hodit
+            // zjisti jestli je main nebo side
             Transform targetContainer = (quest.questType == QuestType.MainQuest) ? mainQuestListContainer : sideQuestListContainer;
 
-            // Spawneme tlačítko do správného seznamu
+            // hodi ho do spravneho seznamu
             GameObject newBtn = Instantiate(questButtonPrefab, targetContainer);
             newBtn.GetComponentInChildren<TextMeshProUGUI>().text = quest.questName;
             
@@ -82,33 +81,31 @@ public class QuestJournalUI : MonoBehaviour
         }
         detailDescriptionText.text = storySoFar;
 
-        // --- NOVÁ MAGIE PRO CHYTRÉ TLAČÍTKO ---
+
         trackButton.gameObject.SetActive(true);
         
-        // Najdeme textový komponent uvnitř tlačítka, abychom ho mohli přepisovat
+        //najde text uprostred track tlacitka
         TextMeshProUGUI btnText = trackButton.GetComponentInChildren<TextMeshProUGUI>();
         
-        trackButton.onClick.RemoveAllListeners(); // Smažeme staré akce
+        trackButton.onClick.RemoveAllListeners();
 
-        // Zkontrolujeme: Je tenhle rozkliknutý quest ten samý, co zrovna svítí vlevo nahoře?
+        // kontroluje jestli je ted trackován nebo ne, podle toho mení text a trackuje/untrackuje podle toho co tam zrovna je 
         if (QuestManager.Instance.trackedQuest == selectedQuest)
         {
-            // Pokud ANO, tlačítko bude sloužit k vypnutí
             btnText.text = "Stop Tracking";
             trackButton.onClick.AddListener(() => 
             {
                 QuestManager.Instance.UntrackQuest();
-                ShowQuestDetails(selectedQuest); // Znovu načteme detaily, ať se tlačítko hned přepíše!
+                ShowQuestDetails(selectedQuest); 
             });
         }
         else
         {
-            // Pokud NE, tlačítko bude sloužit k zapnutí
             btnText.text = "Track quest";
             trackButton.onClick.AddListener(() => 
             {
                 QuestManager.Instance.TrackQuest(selectedQuest);
-                ShowQuestDetails(selectedQuest); // Znovu načteme detaily
+                ShowQuestDetails(selectedQuest); // Znovu nacteme detaily
             });
         }
     }

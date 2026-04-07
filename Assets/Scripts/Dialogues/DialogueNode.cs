@@ -1,27 +1,29 @@
 using UnityEngine;
-using UnityEngine.Events; // Tohle je důležité přidat kvůli UnityEvent!
+using UnityEditor;
+using UnityEngine.Events; 
 
-// --- 1. TADY JE TA CHYBĚJÍCÍ TŘÍDA ---
-// Musí nad ní být [System.Serializable], jinak ji Unity neukáže v Inspectoru
+
 [System.Serializable]
 public class DialogueChoice
 {
-    public string choiceText; // Text na tlačítku
-    public DialogueNode nextNode; // Kam to vede dál
+
+    public bool opensShop;
     
-    // TADY JE TA ZMĚNA! Zahoď UnityEvent. Místo toho řekneme:
-    // "Pokud tahle odpověď startuje quest, hoď ho sem. Jinak to nech prázdné."
+    public string choiceText; // Text na talcitku
+    
+    public DialogueNode nextNode; // kam vede da choice
+    
+
     public QuestData questToStart; 
+    
 }
 
-// --- 2. TVŮJ PŮVODNÍ KÓD ---
 [CreateAssetMenu(fileName = "NewDialogueNode", menuName = "Dialogue/Dialogue Node")]
 public class DialogueNode : ScriptableObject
 {
     
     [TextArea(3, 10)] 
-    public string dialogueText; // Co říká NPC
-    
-    // Nyní už kompilátor ví, co je DialogueChoice, a chyba zmizí!
+    public string dialogueText; // co NPC rika
+
     public DialogueChoice[] choices; 
 }
