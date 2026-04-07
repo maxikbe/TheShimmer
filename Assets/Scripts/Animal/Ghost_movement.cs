@@ -5,29 +5,26 @@ using UnityEngine.AI;
 
 public class Ghost_movement : MonoBehaviour
 {
-    // --- KOMPONENTY ---
     private NavMeshAgent agent;
     
     private GameObject myBody;
 
-    // --- ENUMY (Musí být public, aby je viděl i Animal) ---
     public enum State { Patrolling, Fleeing, Returning, Chasing}
     private State currentState;
 
     public enum MobBehavior { Friendly, Neutral, Aggressive }
-    private MobBehavior behavior; // Už není SerializeField, dostane to zvenčí
+    private MobBehavior behavior; 
 
-    // --- PROMĚNNÉ (Tyhle hodnoty nám pošle Animal přes Setup) ---
+    // posílá animal pres setup
     private Transform playerPosition;
     private Transform nestPosition;
     
-    // --- NOVÉ PROMĚNNÉ NĚKDE NAHOŘE ---
-    private Animal_movement myAnimalStats; // Odkaz zpět na tělo
-    private MobBehavior originalBehavior;  // Co jsme zač od přírody
+    private Animal_movement myAnimalStats; // odkazuje zpet na hmotne telo
+    private MobBehavior originalBehavior;  
     
-    private float calmDownTime; // Dostaneme z Animal
-    private float currentCalmTimer; // Aktuální stav stopek
-    private bool isCoolingDown; // Zda se právě uklidňuje
+    private float calmDownTime; 
+    private float currentCalmTimer; 
+    private bool isCoolingDown; 
     
     private float minPatrolWait;
     private float maxPatrolWait;
@@ -48,39 +45,35 @@ public class Ghost_movement : MonoBehaviour
     private float maxBreakTime;
     private float breakChancePercent;
     
-    // Nová proměnná pro čekání po ztrátě hráče
+    // cekani po ztrate hrace
     private float waitAfterLostTime;
-    // Interní proměnné pro Chasing logiku
+    // chaing logika
     private Vector3 lastKnownPlayerPos;
     private float searchTimer;
     
-    //Proměnné pro přestávky
     public bool isHavingBreak;
     private float currentBreakTimer;
     
-    //vision
     private float viewAngle; 
     private Vector3 facingDirection = Vector3.up;
 
-    // Tohle necháme nastavitelné na Prefabu ducha, je to spíš globální nastavení
+    // nastavitelne na prefabu ducha toto je jenom globalni
     [SerializeField] private LayerMask wallLayer;
-
-    // Pojistka: dokud nás Animal nenastaví, nic neděláme (Brain Dead)
+    
+    
     private bool isInitialized = false;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        // Nastavení agenta pro 2D top-down
+        // nastaveni pro 2D
         agent.updateRotation = false;
         agent.updateUpAxis = false;
     }
 
-    // --- TOTO JE TA KLÍČOVÁ METODA ---
-    // Animal_movement zavolá tuto metodu a předá sám sebe (stats)
+    // předávání proměnných z animal sem
     public void Setup(Animal_movement stats)
     {
-        // 1. Zkopírujeme data (Injektáž)
         this.debugMode = stats.debugMode;
         
         this.behavior = stats.behavior;
@@ -108,23 +101,19 @@ public class Ghost_movement : MonoBehaviour
         this.waitAfterLostTime = stats.waitAfterLostTime;
         
         this.viewAngle = stats.viewAngle;
-        // Uložíme si odkaz na hmotné tělo
+        // odkaz na hmotne telo
         this.myBody = stats.gameObject; 
         
         
-        // --- NOVÉ ---
-        this.myAnimalStats = stats; // Uložíme si odkaz na Animal
-        this.originalBehavior = stats.behavior; // Zapamatujeme si, jestli jsme byli Neutral, nebo rovnou Aggressive
+        this.myAnimalStats = stats; 
+        this.originalBehavior = stats.behavior; 
         this.calmDownTime = stats.calmDownTime;
         
-        // 2. Aplikujeme to na Agenta
         agent.speed = moveSpeed;
 
-        // 3. Odstartujeme logiku
         currentState = State.Patrolling;
         GoToNextPatrolPoint();
         
-        // 4. Jsme ready!
         isInitialized = true;
     }
 
@@ -139,34 +128,31 @@ public class Ghost_movement : MonoBehaviour
 
         bool canSeePlayer = CheckForPlayer();
 
-        // --- DŮLEŽITÁ POJISTKA ---
         if (canSeePlayer)
         {
             isHavingBreak = false;
-            isWaitingAtPatrol = false; // <-- ZRUŠÍME ČEKÁNÍ, jde do tuhého!
-            isCoolingDown = false; // Jakmile ho znova uvidí, adrenalin se vrací na max!
+            isWaitingAtPatrol = false; 
+            isCoolingDown = false; 
         }
 
-        // --- ODPOČÍTÁVÁNÍ UPOKOJENÍ ---
         if (isCoolingDown && !canSeePlayer)
         {
             currentCalmTimer += Time.deltaTime;
             if (currentCalmTimer >= calmDownTime)
             {
-                // Uklidnil se!
                 isCoolingDown = false;
                 this.behavior = originalBehavior;
                 
                 if (myAnimalStats != null)
                 {
-                    myAnimalStats.behavior = originalBehavior; // Updatneme v Inspectoru
+                    myAnimalStats.behavior = originalBehavior; 
                 }
                 
-                // Debug.Log("Uff, kašlu na to, tady nikdo není. Vracím se do normálu.");
+                // Debug.Log("Nikdo nebyl nalezen, vracím se zpět do normálu");
             }
         }
 
-        // --- NE-FRIENDLY LOGIKA ---
+        // --- NO-FRIENDLY LOGIKA ---
         if (behavior != MobBehavior.Friendly)
         {
             if (canSeePlayer)
@@ -199,30 +185,26 @@ public class Ghost_movement : MonoBehaviour
         if (canSeePlayer)
         {
             //Debug.Log("Vidím hráče");
-            // Vidím ho -> ZDRHÁM!
             currentState = State.Fleeing;
             RunAwayFromPlayer();
         }
         else
         {
-            // Nevidím ho (buď je pryč, nebo jsem k němu zády)
-            
+            //nevidí hráče
             if (currentState == State.Fleeing)
             {
-                //Debug.Log("Nevidím ho, ale zdrhám");
-                // Pokud zrovna zdrhám, musím zkontrolovat, jestli už jsem dost daleko
-                // Ignorujeme úhel pohledu, zajímá nás jen čistá vzdálenost ("Slyším ho za zády")
+                //Debug.Log("Nevidím ho, ale utíkám");
+                // kdyz utika ignoruje uhel pohledu, resi jenom vzdalenost
                 float distToPlayer = Vector3.Distance(transform.position, playerPosition.position);
 
                 if (distToPlayer < visionRadius)
                 {
-                    // Hráč je pořád moc blízko (i když ho nevidím), musím dál utíkat!
+                    // hrac je blizko
                     RunAwayFromPlayer();
                 }
                 else
                 {
-                    //Debug.Log("Uz je dostatečně daleko");
-                    // Už je daleko -> Uklidním se
+                    //Debug.Log("Hráč je dostatečně daleko");
                     if (!agent.pathPending && agent.remainingDistance < 0.5f)
                     {
                         currentState = State.Patrolling;
@@ -238,11 +220,9 @@ public class Ghost_movement : MonoBehaviour
         }
     }
 
-    // --- LOGIKA POHYBU (Zůstala stejná) ---
 
     Vector3 PatrolPosition()
     {
-        // Pojistka, kdyby nest nebyl nastaven
         Vector3 centerPoint = (nestPosition != null) ? nestPosition.position : transform.position;
         
         Vector3 rand = Random.insideUnitCircle * patrolRadius;
@@ -252,51 +232,49 @@ public class Ghost_movement : MonoBehaviour
 
     private void GoToNextPatrolPoint()
     {
-        agent.speed = moveSpeed; // Ujistíme se, že při hlídce chodíme pomalu
+        agent.speed = moveSpeed; //Chození pomalu pri patrolingu
 
         Vector3 randomPoint = PatrolPosition();
         NavMeshHit hit;
         
-        //Pokud najde poblíž podlahu
+        //kdyz najde podlahu
         if (NavMesh.SamplePosition(randomPoint, out hit, 2.0f, NavMesh.AllAreas))
         {
-            // kdyz nasel nejaky bod
             agent.SetDestination(hit.position);
         }
         else
         {
-            //pro pripadne dalsi funkce kdyz nenajde zadne misto
+            //pro nejake dlasi funkce kdyz podlahu nenajde
         }
     }
 
     private void PatrolLogic()
     {
-        // 1. Pokud zrovna máme velkou pauzu, řešíme jen čekání
+        // ma pauzu resi jenom logiku pauz
         if (isHavingBreak)
         {
             breakActivites();
-            return; // Nepokračujeme dál, dokud pauza neskončí
+            return; 
         }
 
-        // 2. Dorazili jsme na hlídkovací bod?
+        // pokud dorazil na pozici
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
-            // A) Ještě nečekáme? Tak začneme!
+            // pokud jeste neceka, spustit se cekani
             if (!isWaitingAtPatrol)
             {
                 isWaitingAtPatrol = true;
                 currentPatrolWaitTimer = Random.Range(minPatrolWait, maxPatrolWait);
             }
-            // B) Už čekáme? Tak odpočítáváme čas
+            // pokud se uz ceka, ceka se a pak se spusti jestli si da velkou pauzu nebo ne
             else
             {
                 currentPatrolWaitTimer -= Time.deltaTime;
                 
-                // Čas vypršel, jdeme dál
                 if (currentPatrolWaitTimer <= 0)
                 {
                     isWaitingAtPatrol = false;
-                    breakLogic(); // Tady se rozhodne, jestli si dá tu tvoji velkou pauzu, nebo jde na další bod
+                    breakLogic(); // rozhodne se velka pauza
                 }
             }
         }
@@ -308,22 +286,22 @@ public class Ghost_movement : MonoBehaviour
     {
         if (playerPosition == null) return false;
 
-        // 1. KONTROLA VZDÁLENOSTI (Máš správně)
+        // kontrola vzdalenosti
         float distanceToPlayer = Vector3.Distance(transform.position, playerPosition.position);
         if (distanceToPlayer > visionRadius) return false;
 
         Vector3 directionToPlayer = (playerPosition.position - transform.position).normalized;
 
         // --- 2. NOVÁ KONTROLA ÚHLU (Zorné pole) ---
-        // Vector3.Angle vrací úhel mezi dvěma vektory ve stupních (0-180)
-        // Pokud je úhel větší než polovina našeho zorného pole, hráč je "za rohem" nebo za zády.
+        // pokud je uhel od hrace vetsi nez polovina zorneho pole, hrace nevidime
         if (Vector3.Angle(facingDirection, directionToPlayer) > viewAngle / 2f)
         {
-            return false; // Nevidím ho, je mimo můj kužel pohledu
+            return false;
         }
-        // ------------------------------------------
+        
+        
 
-        // 3. RAYCAST (Máš správně - kontrola zdí)
+        // kontrola zdí
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, directionToPlayer, visionRadius);
 
         foreach (RaycastHit2D hit in hits)
@@ -332,12 +310,12 @@ public class Ghost_movement : MonoBehaviour
             
             if (hit.collider.CompareTag("Player"))
             {
-                return true; // Vidím ho!
+                return true; // vidi hrace
             }
             
             if (!hit.collider.isTrigger)
             {
-                return false; // Zeď
+                return false; // vidi zed
             }
         }
 
@@ -349,7 +327,7 @@ public class Ghost_movement : MonoBehaviour
         float randomAngle = Random.Range(-60f, 60f);
         float randomDistance = Random.Range(minRunningDistance, maxRunningDistance);
 
-        Quaternion rotation = Quaternion.AngleAxis(randomAngle, Vector3.forward); // Ve 2D rotujeme kolem osy Z (forward)!
+        Quaternion rotation = Quaternion.AngleAxis(randomAngle, Vector3.forward);
         Vector3 finalDirection = rotation * directionAwayFromPlayer;
 
         return transform.position + finalDirection * randomDistance;
@@ -361,7 +339,6 @@ public class Ghost_movement : MonoBehaviour
 
         Vector3 directionToNest = (nestPosition.position - transform.position).normalized;
 
-        // Ve 2D používáme Vector3.forward pro rotaci
         Vector3 leftDirection = Quaternion.AngleAxis(-60f, Vector3.forward) * directionAwayFromPlayer;
         Vector3 rightDirection = Quaternion.AngleAxis(60f, Vector3.forward) * directionAwayFromPlayer;
 
@@ -389,11 +366,11 @@ public class Ghost_movement : MonoBehaviour
 
     private void RunAwayFromPlayer()
     {
-        agent.speed = runSpeed; // Přepneme na běh
+        agent.speed = runSpeed; // prepina na beh speed
 
-        Vector3 fleeDestionation; // Pozor, máš tu překlep (Destionation -> Destination), ale to funkčnost nemění :D
+        Vector3 fleeDestionation;
         
-        // Pojistka pro nestPosition
+        // pojistka pro nestposition
         float distanceToNest = (nestPosition != null) ? Vector3.Distance(transform.position, nestPosition.position) : float.MaxValue;
 
         Vector3 directionAwayFromPlayer = (transform.position - playerPosition.position).normalized;
@@ -409,20 +386,18 @@ public class Ghost_movement : MonoBehaviour
         
         NavMeshHit hit;
         
-        // --- TADY BOLA CHYBA ---
-        // Původně jsi tu měl transform.position. Musíš tam dát ten vypočítaný cíl!
+
         if (NavMesh.SamplePosition(fleeDestionation, out hit, 5.0f, NavMesh.AllAreas))
         {
             agent.SetDestination(hit.position);
         }
         else
         {
-            // Pokud nenajdeš NavMesh v bodě útěku, zkus aspoň utéct směrem od hráče "naslepo"
-            // nebo to prostě nechat být.
+            // pokud nenajde zadny bod na navmeshi. Pro pridani dalsich funkci
         }
     }
 
-// --- LOGIKA CHASINGU (Když ztratíme vizuál) ---
+// --- CHASING LOGIC ---
     private void ChaseLostLogic()
     {
         agent.speed = runSpeed;
@@ -434,12 +409,11 @@ public class Ghost_movement : MonoBehaviour
 
             if (searchTimer >= waitAfterLostTime)
             {
-                // Čas na místě vypršel -> Jdeme zpět hlídkovat
+                // zpet na patroling, vyprsel cas
                 currentState = State.Patrolling;
                 GoToNextPatrolPoint();
 
-                // --- NOVINKA ---
-                // Místo okamžitého návratu chování jen zapneme chladící stopky!
+                // pokud nebyl puvodne agresive, tak chvili trva nez se prepne zpět
                 if (behavior == MobBehavior.Aggressive && originalBehavior != MobBehavior.Aggressive)
                 {
                     isCoolingDown = true;
@@ -457,36 +431,35 @@ public class Ghost_movement : MonoBehaviour
 
     private void breakLogic()
     {
-        // Nejdřív zjistíme, jestli jsou pauzy vůbec povolené
+        // zjistuje jestli jsou pauzy povolene
         if (canHaveBreaks)
         {
             float roll = Random.Range(0f, 100f);
             
-            // Pokud hodíme méně než je šance (WIN)
+            // pokud hodi mene nez je sance na prestavku
             if (roll < breakChancePercent)
             {
                 isHavingBreak = true;
                 currentBreakTimer = Random.Range(minBreakTime, maxBreakTime);
-                // Debug.Log($"<color=green>Pauza na {currentBreakTimer}s (Roll: {roll})</color>");
-                return; // Ukončíme metodu, nejdeme na další bod
+                // Debug.Log($"Pauza na {currentBreakTimer}s (Roll: {roll})");
+                return; 
             }
         }
 
-        // Pokud pauzy nejsou povolené NEBO jsme prohráli hod -> Jdeme dál
+        // pokud nejsou povolene pauzy, nebo nevysel hod
         GoToNextPatrolPoint();
     }
 
     private void breakActivites()
     {
-        // Odečítáme čas
         currentBreakTimer -= Time.deltaTime;
 
         
         
-        //----------------PŘÍPADNÁ PODMÍNKA PRO ANIMACI PŘI BREAKU---------------------------
-        //Debug.Log($"<color=cyan>Odpočívám... {currentBreakTimer:F1}</color>");
+        //----------------PRIPADNE TADY PODMINKA PRO ANIMACI PRI BREKAU---------------------------
+        //Debug.Log($"Odpočívá... {currentBreakTimer:F1}");
 
-        // Konec pauzy
+        // konec pauzy
         if (currentBreakTimer <= 0)
         {
             isHavingBreak = false;
@@ -494,13 +467,11 @@ public class Ghost_movement : MonoBehaviour
         }
     }
     
-// Změněno z OnDrawGizmosSelected na OnDrawGizmos
+// zase jenom pro editor
     private void OnDrawGizmos()
     {
-        // Pokud není zaplý debug mode, nic nekresli a vyskoč pryč
         if (!debugMode) return;
 
-        // --- Zbytek je stejný ---
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, visionRadius);
 
@@ -516,21 +487,19 @@ public class Ghost_movement : MonoBehaviour
     }
     
     
-    // --- NOVÁ METODA PRO ZMĚNU CHOVÁNÍ BĚHEM HRY ---
+    // --- ZMENA CHOVÁNÍ MIDGAME ---
     public void ChangeBehavior(MobBehavior newBehavior)
     {
         this.behavior = newBehavior;
 
-        // Pokud se z mobky stal agresor, chceme, ať hned začne jednat!
+        // pokud se zmeni na agresivni, okamzite se vypinaji vsechny prestavky a jde hledat hrace
         if (newBehavior == MobBehavior.Aggressive)
         {
-            // Okamžitě zrušíme případnou pauzu
             isHavingBreak = false;
             isWaitingAtPatrol = false; 
             isCoolingDown = false; 
             currentState = State.Chasing;
             searchTimer = 0f;
-            // Začne hledat hráče
             lastKnownPlayerPos = playerPosition.position; 
             ChasePlayer();
         }
