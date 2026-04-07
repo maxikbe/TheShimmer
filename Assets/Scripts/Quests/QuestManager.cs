@@ -1,49 +1,47 @@
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro; // Pro ty texty na obrazovce
+using TMPro; 
 
 public class QuestManager : MonoBehaviour
 {
-    // Tohle z něj udělá Singleton (přístupný odevšad přes QuestManager.Instance)
+    // aby byl script pristupny odevsad
     public static QuestManager Instance;
 
     [Header("Databáze")]
-    public QuestData[] allGameQuests; // Sem přetáhneš VŠECHNY své ScriptableObjecty questů
+    public QuestDatabase questDatabase; 
 
     [Header("Aktivní Questy")]
     public List<QuestData> activeQuests = new List<QuestData>();
-    public QuestData trackedQuest; // Ten, který ti právě svítí na obrazovce vlevo nahoře
+    public QuestData trackedQuest; 
 
     [Header("UI Tracker (vlevo nahoře)")]
-    public GameObject trackerPanel; // Celé to pozadí trackeru
-    public TextMeshProUGUI trackerNameText; // Název questu
-    public TextMeshProUGUI trackerObjectiveText; // Co máš zrovna udělat
+    public GameObject trackerPanel; 
+    public TextMeshProUGUI trackerNameText; 
+    public TextMeshProUGUI trackerObjectiveText; 
     
     
 
     private void Awake()
     {
-        // Ošetření Singletonu - aby se nám tenhle mozek nespawnul dvakrát
+        // ošetření aby nebyl dvakrat
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
 
-    // Místo 'string questID' teď vyžadujeme přímo ten konkrétní ScriptableObject!
     public void StartQuest(QuestData questToStart)
     {
-        // Už nemusíme nic složitě hledat v databázi. 
-        // Rovnou se zeptáme toho konkrétního questu, jestli už není náhodou začatý.
+        // zjistime jestli neni nahodou zacaty
         if (questToStart.currentState == QuestState.NotStarted)
         {
-            questToStart.currentState = QuestState.Active; // Změníme stav
-            activeQuests.Add(questToStart); // Přidáme ho do batohu aktivních úkolů
+            questToStart.currentState = QuestState.Active; // aktivujeme
+            activeQuests.Add(questToStart); // pridame do aktivnich
             
-            TrackQuest(questToStart); // Hodíme ho do UI
+            TrackQuest(questToStart); // a dame trackovat
             Debug.Log("Quest přijat: " + questToStart.questName);
         }
         else
         {
-            Debug.LogWarning("Bacha! Quest " + questToStart.questName + " už máš nebo je hotový.");
+            Debug.LogWarning("Quest " + questToStart.questName + " už máš nebo je hotový.");
         }
     }
 
@@ -58,11 +56,11 @@ public class QuestManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Bacha! Quest " + questToAdd.questName + " už máš nebo je hotový.");
+            Debug.LogWarning("Quest " + questToAdd.questName + " už máš nebo je hotový.");
         }
     }
 
-    // Funkce, která aktualizuje ten text v levém horním rohu
+    // aktulizuje trackovaný quest
     public void TrackQuest(QuestData quest)
     {
         trackedQuest = quest;
@@ -70,80 +68,79 @@ public class QuestManager : MonoBehaviour
         
         trackerNameText.text = quest.questName;
 
-        // --- MAGIE PRO ROZLIŠENÍ BAREV ---
         if (quest.questType == QuestType.MainQuest)
         {
-            trackerNameText.color = new Color(1f, 0.8f, 0f); // Zlatá barva pro Main
-            trackerNameText.fontStyle = FontStyles.Bold; // Uděláme to i tučně!
+            trackerNameText.color = new Color(1f, 0.8f, 0f); // zlatá pro main
+            trackerNameText.fontStyle = FontStyles.Bold; // ztucneni
         }
         else
         {
-            trackerNameText.color = Color.white; // Obyčejná bílá pro Side
+            trackerNameText.color = Color.white; // bila pro side
             trackerNameText.fontStyle = FontStyles.Normal;
         }
 
-        // Najdeme první nesplněný krok (Step) a vypíšeme jeho zadání
+        // najdeme prvni nesplneni step a vypiseme ho
         foreach (QuestStep step in quest.questSteps)
         {
             if (!step.isCompleted)
             {
                 trackerObjectiveText.text = "- " + step.objectiveDescription;
-                return; // Našli jsme, co jsme potřebovali, dál nehledáme
+                return; 
             }
         }
         
-        // Pokud cyklus dojel až sem, znamená to, že všechny kroky jsou hotové
+        //Pokud neni zadny dalsi
         trackerObjectiveText.text = "- Vrať se pro odměnu!";
     }
     
-    // Tuhle funkci zavoláme, když chceme UI tracker úplně schovat
+    // pokud chceme schovat trackované questy
     public void UntrackQuest()
     {
-        trackedQuest = null; // Vymažeme paměť
-        trackerPanel.SetActive(false); // Vypneme to okno vlevo nahoře
+        trackedQuest = null; 
+        trackerPanel.SetActive(false); 
     }
     
     
-    // Tuhle funkci zavoláš, když hráč reálně něco udělá (sebere meč, zabije bossa)
+    // pokdu hrac neco dela
     public void AdvanceQuest(QuestData quest)
     {
-        // Najdeme první nesplněný krok v tomto questu
+        // najde prvni nesplneni krok
         foreach (QuestStep step in quest.questSteps)
         {
             if (!step.isCompleted)
             {
-                // 1. Odfajfkneme krok jako splněný
+                // odfajfkne ho jako splneny
                 step.isCompleted = true; 
                 Debug.Log("Krok splněn: " + step.objectiveDescription);
 
-                // --- 2. TVOJE NOVÁ MAGIE PRO ŘETĚZENÍ QUESTŮ ---
+                // PRO PRIDAVANI QUESTU UPROSTRED KROKU
                 
-                // Přidáme všechny skryté questy potichu do deníku
+                // pouze prida do journalu, netrackuje
                 foreach(QuestData newQuest in step.questsToAddOnComplete)
                 {
-                    if(newQuest != null) AddQuest(newQuest); // Voláme tvoji super funkci!
+                    if(newQuest != null) AddQuest(newQuest); 
                 }
 
-                // Pokud je nastavený nějaký quest na trackování, odpálíme ho
+                // pokud je nejaky nastaveni aby ho to zrova trackovalo
                 if(step.questToStartOnComplete != null)
                 {
-                    StartQuest(step.questToStartOnComplete); // Tím se přidá a rovnou ukáže
+                    StartQuest(step.questToStartOnComplete); // prida se a rovnou ukaze
                 }
-                // Jinak, pokud nic nového netrackujeme a tenhle aktuální quest nám svítí vlevo nahoře...
+                // pokud tam nic neni tak se pouze updatne aktualni
                 else if (trackedQuest == quest)
                 {
-                    TrackQuest(quest); // ...tak jen updatneme text trackeru na další krok!
+                    TrackQuest(quest); 
                 }
 
-                // Hotovo, posunuli jsme se o jeden krok, jdeme od toho.
+                
                 return; 
             }
         }
 
-        // Pokud cyklus nenašel žádný nesplněný krok, znamená to, že quest je hotový
+        // pokud quest nenasel nic nesplneneho quest je hotovy
         Debug.Log("Quest " + quest.questName + " je už kompletně hotový.");
         quest.currentState = QuestState.Completed;
         
-        // Zde bys případně mohl hráči nasypat XPčka nebo Goldy
+        // tady kdyztak dalsi funkce pro odmeny
     }
 }

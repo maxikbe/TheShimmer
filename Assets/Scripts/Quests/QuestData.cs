@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// Stavy, ve kterých se quest může nacházet
 public enum QuestState
 {
     NotStarted,
@@ -14,17 +13,17 @@ public enum QuestType
     SideQuest
 }
 
-// Tohle reprezentuje jednu fázi questu (to postupné odkrývání)
+// cast pro stepy
 [System.Serializable]
 public class QuestStep
 {
     [TextArea(2, 5)]
-    public string objectiveDescription; // Co máš zrovna udělat (např. "Najdi kovářovu dceru")
+    public string objectiveDescription; // co ma delat hrac
     
     [TextArea(2, 5)]
-    public string logText; // Detailnější text, co se připíše do deníku, když tuhle fázi odemkneš
+    public string logText; // detailnejsi text do journalu
     
-    public bool isCompleted; // Je tahle konkrétní část hotová?
+    public bool isCompleted; // jestli je cast hotova
     
     public QuestData[] questsToAddOnComplete;
     
@@ -35,15 +34,15 @@ public class QuestStep
 public class QuestData : ScriptableObject
 {
     [Header("Základní Info")]
-    public string questID; // Unikátní jméno (např. "Q_Main_01_Kovar")
-    public string questName; // To, co uvidí hráč v UI (např. "Ztracená dcera")
+    public string questID; // unikatni ID
+    public string questName; 
     
     public QuestType questType;
     
-    public QuestState currentState; // Jestli je aktivní, hotový, atd.
+    public QuestState currentState; // aktivni/hotovy,...
 
     [Header("Průběh Questu")]
-    // Tohle je ten tvůj seznam fází. Hráč uvidí vždy jen texty z fází, ve kterých už je nebo je prošel.
+    // seznam onech casti
     public QuestStep[] questSteps; 
     
 }

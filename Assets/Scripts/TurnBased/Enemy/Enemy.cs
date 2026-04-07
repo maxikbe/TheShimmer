@@ -1,6 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+public class EnemyAnimationData
+{
+    public int enemyID;
+    public int animationID;
+    public string animationName;
+    public AnimationClip animationClip;
+}
 [System.Serializable]
 public class Hit
 {
@@ -15,6 +22,7 @@ public class EnemyAttack
     public string attackName;
     public float totalAnimationDuration; 
     public List<Hit> hits = new List<Hit>();
+    public List<EnemyAnimationData> animations = new List<EnemyAnimationData>();
     [Range(0, 100)] public float weight;
 }
 
@@ -24,6 +32,8 @@ public class Enemy
     public int id;
     public string name;
     public int health;
+    public int maxHealth;
+    public Sprite sprite;
     public List<EnemyAttack> attacks = new List<EnemyAttack>();
 
     public EnemyAttack GetRandomAttack() => attacks[Random.Range(0, attacks.Count)];

@@ -9,6 +9,7 @@ public class ItemEditor : Editor
     SerializedProperty isDefaultItem, defaultAmount, defaultLevel, allowedCharacterIDs;
     SerializedProperty itemName, description, itemType, icon, prefab;
     SerializedProperty isResearched, isUsable, maxStack;
+    SerializedProperty canBeSold, basePrice;
 
     void OnEnable()
     {
@@ -27,6 +28,9 @@ public class ItemEditor : Editor
         isResearched = serializedObject.FindProperty("isResearched");
         isUsable = serializedObject.FindProperty("isUsable");
         maxStack = serializedObject.FindProperty("maxStack");
+        
+        canBeSold = serializedObject.FindProperty("canBeSold");
+        basePrice = serializedObject.FindProperty("basePrice");
     }
 
     public override void OnInspectorGUI()
@@ -59,6 +63,15 @@ public class ItemEditor : Editor
         EditorGUILayout.PropertyField(itemName, new GUIContent("Název"));
         EditorGUILayout.PropertyField(description, new GUIContent("Popis"));
         EditorGUILayout.PropertyField(itemType, new GUIContent("Typ předmětu"));
+        
+        // Pro obchodníky
+        EditorGUILayout.PropertyField(canBeSold, new GUIContent("Lze prodat obchodníkovi?"));
+
+        // Pokud je povolen prodej
+        if (canBeSold.boolValue)
+        {
+            EditorGUILayout.PropertyField(basePrice, new GUIContent("Základní cena (Coiny)"));
+        }
         
         EditorGUILayout.Space();
         EditorGUILayout.PropertyField(isResearched, new GUIContent("Je vyzkoumaný?"));

@@ -6,9 +6,19 @@ public class InitializeGameJson : MonoBehaviour
 {
     [SerializeField] private Database _databaseReference; 
     [SerializeField] public List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();
+    [SerializeField] private List<EnemyAnimationData> enemyAnimations;
+    [SerializeField] public List<EnemySprite> enemySprites = new List<EnemySprite>();
 
+    public struct EnemySprite
+    {
+        public int id;
+        public Sprite sprite;
+    }
     private static string savePath;
     private static List<CharacterAnimationData> characterAnimationsStatic;
+    private static List<EnemyAnimationData> enemyAnimationsStatic;
+    private static List<EnemySprite> enemySpritesStatic;
+
     private static Database itemDatabase;
 
     void Awake()
@@ -16,6 +26,8 @@ public class InitializeGameJson : MonoBehaviour
         savePath = Path.Combine(Application.persistentDataPath, "Data.json");
         itemDatabase = _databaseReference;
         characterAnimationsStatic = characterAnimations;
+        enemyAnimationsStatic = enemyAnimations;
+        enemySpritesStatic = enemySprites;
 
          if (!File.Exists(savePath))
         {
@@ -40,11 +52,11 @@ public class InitializeGameJson : MonoBehaviour
 
         GameData data = new GameData();
 
-        data.characters.Add(new Character { id = 1, name = "Dr. Ventress", health = 150, level = 1, speed = 5.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0,});
-        data.characters.Add(new Character { id = 2, name = "Lena", health = 80, level = 1, speed = 4.5f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, });
-        data.characters.Add(new Character { id = 3, name = "Cass Sheppard", health = 100, level = 1, speed = 7.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, });
-        data.characters.Add(new Character { id = 4, name = "Josie Radek", health = 90, level = 1, speed = 8.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, });
-        data.characters.Add(new Character { id = 5, name = "Anya Thorensen", health = 200, level = 1, speed = 3.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, });
+        data.characters.Add(new Character { id = 1, name = "Dr. Ventress", health = 150, level = 1, speed = 5.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0 });
+        data.characters.Add(new Character { id = 2, name = "Lena", health = 80, level = 1, speed = 4.5f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0 });
+        data.characters.Add(new Character { id = 3, name = "Cass Sheppard", health = 100, level = 1, speed = 7.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0 });
+        data.characters.Add(new Character { id = 4, name = "Josie Radek", health = 90, level = 1, speed = 8.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0 });
+        data.characters.Add(new Character { id = 5, name = "Anya Thorensen", health = 200, level = 1, speed = 3.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0 });
 
       
         List<Item> allItemsFromDB = itemDatabase.GetAllItems();
@@ -108,13 +120,25 @@ public class InitializeGameJson : MonoBehaviour
         }
 
         data.enemies.Add(
-            new Enemy { id = 1, name = "Shimmering Slime", health = 50, attacks = new List<EnemyAttack> {
-            new EnemyAttack { id = 1, attackName = "Slime Slam", totalAnimationDuration = 1.5f, hits = new List<Hit> { new Hit { timeOffset = 0.5f, damage = 10 } }, weight = 70 },
-            new EnemyAttack { id = 2, attackName = "Sticky Shot", totalAnimationDuration = 2.0f, hits = new List<Hit> { new Hit { timeOffset = 1.0f, damage = 15 } }, weight = 30 }
+            new Enemy { id = 1, name = "Speaker", maxHealth = 150, health = 100, attacks = new List<EnemyAttack> {
+            new EnemyAttack { id = 1, attackName = "Thunderous Word", totalAnimationDuration = 1.8f, hits = new List<Hit> { new Hit { timeOffset = 0.8f, damage = 25 } }, weight = 60 },
+            new EnemyAttack { id = 2, attackName = "Lightning Strike", totalAnimationDuration = 2.5f, hits = new List<Hit> { new Hit { timeOffset = 1.2f, damage = 40 } }, weight = 25 },
+            new EnemyAttack { id = 3, attackName = "Static Discharge", totalAnimationDuration = 1.2f, hits = new List<Hit> { new Hit { timeOffset = 0.4f, damage = 15 } }, weight = 15 }
         }}
         );
 
+        foreach (var enemySprite in enemySpritesStatic)
+        {
+            Enemy targetEnemy = data.enemies.Find(e => e.id == enemySprite.id);
+            
+            if (targetEnemy != null)
+            {
+                targetEnemy.sprite = enemySprite.sprite;
+            }
+        }
+
         data.characterAnimations = characterAnimationsStatic;
+        data.enemyAnimations = enemyAnimationsStatic;
         gameDataManager.currentGameData = data;
         
         string json = JsonUtility.ToJson(data, true);

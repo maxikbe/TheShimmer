@@ -16,17 +16,16 @@ public class Mob_combat : MonoBehaviour
     public string turnBasedScene; 
 
     [ShowIf("isTurnBasedMob")]
-    public float encounterRadius = 1.5f; // Jak blízko musí být, aby začal boj
+    public float encounterRadius = 1.5f; // vzdalenost pro turn based combat
 
-    // Reference na tvůj hlavní script, abychom z něj vytáhli pozici hráče
+    // pozice hráče
     private Animal_movement animalMovement;
-    private bool isTransitioning = false; // Pojistka, ať nenačítáš scénu 60x za vteřinu
+    private bool isTransitioning = false; // at se scena nenacita 60x za vterinu
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         currentHealth = maxHealth;
-        // Najdeme si Animal_movement na stejném objektu
+        
         animalMovement = GetComponent<Animal_movement>();
     }
 
@@ -34,14 +33,13 @@ public class Mob_combat : MonoBehaviour
     void Update()
     {
            
-        // Pokud nejsme tahová mobka, nebo chybí reference, nebo už načítáme, nic neděláme
         if (!isTurnBasedMob || animalMovement == null || animalMovement.playerPosition == null || isTransitioning || animalMovement.behavior != Ghost_movement.MobBehavior.Aggressive) 
             return;
 
-        // TADY JE TVOJE DETEKCE
+        // vzdalenost k hraci
         float distToPlayer = Vector3.Distance(transform.position, animalMovement.playerPosition.position);
 
-        // Pokud je hráč blíž nebo přesně na hranici radiusu
+        // spousti turnbased
         if (distToPlayer <= encounterRadius)
         {
             TriggerTurnBasedCombat();
@@ -50,14 +48,13 @@ public class Mob_combat : MonoBehaviour
     
     private void TriggerTurnBasedCombat()
     {
-        // Pojistka pro prázdnou scénu
         if (string.IsNullOrEmpty(turnBasedScene))
         {
             Debug.LogError("Nemáš nastavenou scénu u mobky!");
             return;
         }
 
-        isTransitioning = true; // Zabráníme tomu, aby Update spamoval LoadScene
+        isTransitioning = true; // aby nespamoval update
         Debug.Log("Načítám scénu...");
         
         SceneManager.LoadScene(turnBasedScene);
@@ -82,7 +79,7 @@ public class Mob_combat : MonoBehaviour
         }
     }
 
-    // Abychom viděli encounter radius v editoru, podobně jako máš u visionRadius
+    // pro encounter radius v editoru
     private void OnDrawGizmos()
     {
         if (isTurnBasedMob)

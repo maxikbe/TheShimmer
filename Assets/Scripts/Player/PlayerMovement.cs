@@ -4,11 +4,11 @@ public class PlayerMovement : MonoBehaviour
 {
     private float walkSpeed = 5f;
     private float runSpeed = 8f;
-    private KeyCode keyUp = KeyCode.W;
-    private KeyCode keyDown = KeyCode.S;
-    private KeyCode keyLeft = KeyCode.A;
-    private KeyCode keyRight = KeyCode.D;
-    private KeyCode keyRun = KeyCode.LeftShift;
+    private KeyCode keyUp = KeyBoardSetting.keyUp;
+    private KeyCode keyDown = KeyBoardSetting.keyDown;
+    private KeyCode keyLeft = KeyBoardSetting.keyLeft;
+    private KeyCode keyRight = KeyBoardSetting.keyRight;
+    private KeyCode keyRun = KeyBoardSetting.keyRun;
 
     [SerializeField] private Animator animator;
     [SerializeField] private Transform cameraTransform;

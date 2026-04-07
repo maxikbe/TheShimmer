@@ -9,6 +9,7 @@ public class Character
     public int health;
     public int maxHealth;
     public int level;
+    public int mana = 0;
     public float speed; 
     public float ExperiencePoints;
     

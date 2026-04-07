@@ -13,6 +13,10 @@ public class Item : ScriptableObject
     public string description;
     public bool isResearched;
     public bool isUsable;
+    //Upravy Dominika kvůli shop systému
+    public bool canBeSold = true;
+    public int basePrice;
+    //konec úprav
     public int maxStack;
     public bool isDefaultItem = false;
     public int defaultAmount = 0;

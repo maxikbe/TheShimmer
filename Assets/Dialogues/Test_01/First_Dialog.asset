@@ -14,9 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueNode
   dialogueText: "Ahoj jak se m\xE1\u0161"
   choices:
-  - choiceText: "\u0160patn\u011B"
+  - opensShop: 0
+    choiceText: "\u0160patn\u011B"
     nextNode: {fileID: 11400000, guid: 389cadcb2033749c996348077f9306db, type: 2}
     questToStart: {fileID: 0}
-  - choiceText: "Dob\u0159e"
+  - opensShop: 0
+    choiceText: "Dob\u0159e"
+    nextNode: {fileID: 11400000, guid: e072b2dbca6c44d9cb86ba8bc1420d65, type: 2}
+    questToStart: {fileID: 11400000, guid: c6e0389050f174e4aba65abd561e9d26, type: 2}
+  - opensShop: 1
+    choiceText: "Poj\u010F obchodovat"
     nextNode: {fileID: 11400000, guid: e072b2dbca6c44d9cb86ba8bc1420d65, type: 2}
     questToStart: {fileID: 11400000, guid: c6e0389050f174e4aba65abd561e9d26, type: 2}
