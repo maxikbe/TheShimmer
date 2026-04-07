@@ -60,12 +60,13 @@ public class DialogueManager : MonoBehaviour
 
                     if (currentMerchant != null)
                     {
-                        Debug.Log("Začínáme obchodovat: " + currentMerchant.name);
+                        ShopManager.Instance.OpenShop(currentMerchant);
                     }
                     else
                     {
                         Debug.Log("Někdo se snaží obchodovat s někým kdo není prodejce");
                     }
+                    return;
                 }
                 else
                 {
