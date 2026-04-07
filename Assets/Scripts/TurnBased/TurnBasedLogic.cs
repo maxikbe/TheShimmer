@@ -32,6 +32,15 @@ public struct characterBars
     public Image healthBar;
     public Image manaBar;
 }
+
+[System.Serializable]
+public struct BackgroundPicture
+{
+    public int ID;
+    public string name;
+    public Sprite sprite;
+}
+
 public class TurnBasedLogic : MonoBehaviour
 {
     //turn Based ShortCuts
@@ -54,7 +63,7 @@ public class TurnBasedLogic : MonoBehaviour
     private List<Enemy> enemies;
     private List<Enemy> currentEnemy;
     public List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 1 };
-    private int numberOfEnemies = 1;
+    private int currentBackgroundPictureID = 2;
     private int EnemyID;
     private int currentTurn;
     private List<TurnType> turnOrder = new List<TurnType>();
@@ -75,6 +84,8 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private TextMeshProUGUI EnemyName;
     [SerializeField] private Image EnemyHealthBar;
     [SerializeField] private List<characterBars> characterBars = new List<characterBars>();
+    [SerializeField] private List<BackgroundPicture> BackgroundPictures = new List<BackgroundPicture>();
+    [SerializeField] private SpriteRenderer BackgroundPicture; 
 
     // DEFAULT
     void Start()
@@ -134,6 +145,7 @@ public class TurnBasedLogic : MonoBehaviour
         updateEnemyHealthBar();
         updateCharacterBars();
         EnemyName.text = currentEnemy[0].name;
+        BackgroundPicture.sprite = BackgroundPictures[currentBackgroundPictureID].sprite;
     }
 
     void onTurnbasedStart()
@@ -356,6 +368,5 @@ public class TurnBasedLogic : MonoBehaviour
             i++;
         }
     }
-
     
 }
