@@ -84,7 +84,11 @@ public class ColapseGeneration : MonoBehaviour
 
             if (nextCell.possibilities.Count == 0)
             {
-                Debug.LogError($"Contradiction at {nextCell.position}! Restarting...");
+                Debug.LogError($"Contradiction at {nextCell.position}! Waiting 1s and restarting...");
+                targetTilemap.ClearAllTiles(); 
+
+                yield return new WaitForSeconds(1f); 
+                
                 GenerateMap();
                 yield break;
             }
