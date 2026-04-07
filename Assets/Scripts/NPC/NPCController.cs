@@ -3,26 +3,26 @@ using UnityEngine;
 public class NPCController : MonoBehaviour
 {
     [Header("Nastavení NPC")]
-    public string npcName; // Tady napíšeš "Kovář" rovnou v Inspectoru na scéně
-    public DialogueNode startingNode; // Tady mu dáš do ruky první část rozhovoru
+    public string npcName; 
+    public DialogueNode startingNode; // prvni cast dialogu
 
-    // Když jakýkoliv fyzikální objekt vstoupí do Trigger zóny tohoto NPC...
+    // pokud cokolic vsoupi do triggru
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Zkontrolujeme, jestli do nás narazil opravdu Hráč a ne něco jiného
+        // a pokud je to hrac
         if (collision.CompareTag("Player"))
         {
             Interact();
         }
     }
 
-    // Tuhle funkci odpálíme
+
     public void Interact()
     {
-        //Zjistí jestli není obchodník
+        //pokud je obchodnik  ulozime merchant script
         Merchant myMerchant = GetComponent<Merchant>();
         
-        // Najdeme našeho manažera a hodíme po něm jméno i scénář
+        // pripadne spustime konvezaci pres dialogue managera
         FindObjectOfType<DialogueManager>().StartConversation(npcName, startingNode, myMerchant);
     }
 }

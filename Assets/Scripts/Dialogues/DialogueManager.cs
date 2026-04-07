@@ -1,56 +1,56 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Nutnost pro kvalitní fonty!
+using TMPro;
 
 public class DialogueManager : MonoBehaviour
 {
     [Header("UI Reference")]
-    public GameObject dialoguePanel; // Celé to UI okno
-    public TextMeshProUGUI npcNameText; // Kdo mluví
-    public TextMeshProUGUI dialogueText; // Co říká
+    public GameObject dialoguePanel; // cele okno 
+    public TextMeshProUGUI npcNameText; // kdo mluvi
+    public TextMeshProUGUI dialogueText; 
     
     [Header("Tlačítka")]
-    public GameObject buttonPrefab; // Šablona tlačítka (Prefab)
-    public Transform buttonContainer; // Složka, kam se tlačítka sází pod sebe
+    public GameObject buttonPrefab; 
+    public Transform buttonContainer; // container pro ty tacitka
 
-    // Tady si DialogueManager "pamatuje", s kým zrovna mluví
+
     private string currentSpeakerName;
 
     private Merchant currentMerchant;
-    // 1. ZCELA NOVÁ FUNKCE - Volá ji skript na NPC (např. Kováři), když rozhovor začíná
+    // Vola script na NPC pro start konverzace
     public void StartConversation(string npcName, DialogueNode firstNode, Merchant merchant = null)
     {
-        // Uložíme si jméno do inventáře, ať ho máme po ruce pro další texty
+        // uklada jmeno pro dalsi pouziti
         currentSpeakerName = npcName; 
         currentMerchant = merchant;
         
-        // A pustíme samotné vykreslení dialogu
+        // pusti dialog
         ContinueDialogue(firstNode);
     }
 
-    // 2. TVÁ PŮVODNÍ FUNKCE - Upravená pro tenhle nový systém
+
     public void ContinueDialogue(DialogueNode node)
     {
-        // Zapneme okno dialogu
+        // zapne dialog okno
         dialoguePanel.SetActive(true);
 
-        // Použijeme uložené jméno místo toho, abychom ho tahali ze ScriptableObjectu!
+        // pouze ono jmeno
         npcNameText.text = currentSpeakerName; 
         dialogueText.text = node.dialogueText;
 
-        // Brutální čistka: Smažeme stará tlačítka z minulého uzlu
+        // maze stara tlacitka z minuleho pouziti
         foreach (Transform child in buttonContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // Naklonujeme nová tlačítka pro každou odpověď v tomto uzlu
+        // vytvori tlacitka pro kazdou choice
         foreach (DialogueChoice choice in node.choices)
         {
             GameObject newButton = Instantiate(buttonPrefab, buttonContainer);
             newButton.GetComponentInChildren<TextMeshProUGUI>().text = choice.choiceText;
 
-            // --- MAGIE PRO QUESTY A VĚTVENÍ ---
+            // Pro qeuesty a dalsi veci
             newButton.GetComponent<Button>().onClick.AddListener(() => 
             {
 
@@ -69,16 +69,14 @@ public class DialogueManager : MonoBehaviour
                 }
                 else
                 {
-                    // --- NOVÁ MAGIE PRO QUESTY ---
-                    // Pokud je v Inspectoru u této odpovědi přiřazený nějaký quest, tak ho odstartuj!
+                    // pokud je u odpovedi choice, spusti quest
                     if (choice.questToStart != null)
                     {
-                        // Tady voláme tvého QuestManagera! 
-                        // Tím, že to je Singleton (.Instance), nepotřebujeme žádné propojování v Inspectoru!
+                    // volá QuestManagera
                         QuestManager.Instance.StartQuest(choice.questToStart);
                     }
 
-                    // Zkontrolujeme, jestli rozhovor pokračuje na další uzel
+                    // kontroluje jeslti je dalsi dialog pokracujici
                     if (choice.nextNode != null)
                     {
                         ContinueDialogue(choice.nextNode); 
