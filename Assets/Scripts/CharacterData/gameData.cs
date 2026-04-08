@@ -8,4 +8,5 @@ public class GameData
     public List<Enemy> enemies = new List<Enemy>();
     public List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();
     public List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
+    public List<MerchantReputation> merchantReputations = new List<MerchantReputation>();
 }

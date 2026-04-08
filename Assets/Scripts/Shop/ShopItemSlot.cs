@@ -2,61 +2,63 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems; 
 
-public class ShopItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+// PŘIDÁNO: IPointerClickHandler, abychom mohli registrovat kliknutí myší
+public class ShopItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [Header("UI Prvek na Tlačítku")]
-    public Image iconImage; // ukona itemu
+    public Image iconImage; 
     
     [HideInInspector] public ItemSaveData myItemData;
     [HideInInspector] public Item myItemStaticData; 
     [HideInInspector] public int myPrice;
     [HideInInspector] public bool isOwnedByPlayer;
-    [HideInInspector] public bool canSell; // nova promenna pro logiku prodeje
+    [HideInInspector] public bool canSell; 
 
-    // nastaveni vzhledu tlacitka pri vytvareni vola se z Śhopmanageru
     public void SetupSlot(ItemSaveData data, Item staticData, int price, bool isPlayerItem)
     {
         myItemData = data;
         myItemStaticData = staticData;
         myPrice = price;
         isOwnedByPlayer = isPlayerItem;
-        canSell = staticData.canBeSold; // natahne si to ze sablony
+        canSell = staticData.canBeSold; 
 
-        // Vykresluje se pouze obrazek
         if (staticData.icon != null) 
         {
             iconImage.sprite = staticData.icon;
             iconImage.enabled = true;
 
-            // logka na zasednuti quest itemu v mojem batohu
             if (!canSell && isPlayerItem)
             {
-                iconImage.color = new Color(0.5f, 0.5f, 0.5f, 1f); // RGB seda
+                iconImage.color = new Color(0.5f, 0.5f, 0.5f, 1f); 
             }
             else
-            
             {
-                iconImage.color = Color.white; // normalni barva
+                iconImage.color = Color.white; 
             }
         }
         else
         {
-            // pokud tam nic neni tak to nic nevykrasluje 
             iconImage.enabled = false; 
         }
     }
 
-    // najetí myší 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // shop manager uklazuje data 
         ShopManager.Instance.ShowTooltip(this);
     }
 
-    // odjede mys 
     public void OnPointerExit(PointerEventData eventData)
     {
-        // ukrije data
         ShopManager.Instance.HideTooltip();
+    }
+
+    // --- NOVÁ FUNKCE PRO KLIKÁNÍ ---
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // Zajistíme, že hráč klikl opravdu LEVÝM tlačítkem
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            ShopManager.Instance.OnSlotClicked(this);
+        }
     }
 }
