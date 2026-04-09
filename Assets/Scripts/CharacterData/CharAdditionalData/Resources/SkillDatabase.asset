@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ff8e09f498c4c34788f086a5ca5b87e, type: 3}
   m_Name: SkillDatabase
   m_EditorClassIdentifier: Assembly-CSharp::SkillDatabase
+  _skillDatabase:
+  - {fileID: 11400000, guid: 9ddf2aa9cbf8df047a32de7d0fac0d44, type: 2}
