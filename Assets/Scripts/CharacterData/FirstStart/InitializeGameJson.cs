@@ -2,9 +2,18 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 
+[System.Serializable]
+public class SkillSaveData
+{
+    public int id;
+    public int characterID;
+    public int skillLevel;
+}
+
 public class InitializeGameJson : MonoBehaviour
 {
-    [SerializeField] private Database _databaseReference; 
+    [SerializeField] private Database _databaseReference;
+    [SerializeField] private SkillDatabase _skillDatabaseReference;
     [SerializeField] public List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();
     [SerializeField] private List<EnemyAnimationData> enemyAnimations;
     [SerializeField] public List<EnemySprite> enemySprites = new List<EnemySprite>();
@@ -14,39 +23,34 @@ public class InitializeGameJson : MonoBehaviour
         public int id;
         public Sprite sprite;
     }
+
     private static string savePath;
     private static List<CharacterAnimationData> characterAnimationsStatic;
     private static List<EnemyAnimationData> enemyAnimationsStatic;
     private static List<EnemySprite> enemySpritesStatic;
 
     private static Database itemDatabase;
+    private static SkillDatabase skillDatabase;
 
     void Awake()
     {
         savePath = Path.Combine(Application.persistentDataPath, "Data.json");
         itemDatabase = _databaseReference;
+        skillDatabase = _skillDatabaseReference;
         characterAnimationsStatic = characterAnimations;
         enemyAnimationsStatic = enemyAnimations;
         enemySpritesStatic = enemySprites;
 
-         if (!File.Exists(savePath))
-        {
-            Debug.Log("Soubor Data.json nenalezen. Provádím první inicializaci...");
-            SaveInitialData();
-        }
-
         if (!File.Exists(savePath))
         {
-            Debug.Log("Soubor Data.json nenalezen. Provádím první inicializaci...");
             SaveInitialData();
         }
     }
 
     public static GameData SaveInitialData()
     {
-        if (itemDatabase == null)
+        if (itemDatabase == null || skillDatabase == null)
         {
-            Debug.LogError("Chyba: ItemDatabase není přiřazena!");
             return null;
         }
 
@@ -58,8 +62,8 @@ public class InitializeGameJson : MonoBehaviour
         data.characters.Add(new Character { id = 4, name = "Josie Radek", health = 90, level = 1, speed = 8.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0 });
         data.characters.Add(new Character { id = 5, name = "Anya Thorensen", health = 200, level = 1, speed = 3.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0 });
 
-      
         List<Item> allItemsFromDB = itemDatabase.GetAllItems();
+        List<Skills> allSkillsFromDB = skillDatabase.GetAllSkills();
 
         foreach (var character in data.characters)
         {
@@ -68,20 +72,19 @@ public class InitializeGameJson : MonoBehaviour
                 if (item.allowedCharacterIDs == null || item.allowedCharacterIDs.Count == 0 || item.allowedCharacterIDs.Contains(character.id))
                 {
                     character.usableItemIDs.Add(item.id);
-                    character.UnOwnedItemsIDs.Add(item.id);    
-                    if(item.isTurnedBaseWeapon) character.pickableTurnBaseItemIDs.Add(item.id);
-                    if(item.isTurnedBaseWeapon && item.firstCharID == character.id )
+                    character.UnOwnedItemsIDs.Add(item.id);
+                    if (item.isTurnedBaseWeapon) character.pickableTurnBaseItemIDs.Add(item.id);
+                    if (item.isTurnedBaseWeapon && item.firstCharID == character.id)
                     {
                         character.pickedItemID = item.id;
                         character.OwnedItemsInventoryItemsIDs.Add(item.id);
                         character.UnOwnedItemsIDs.Remove(item.id);
-                    } 
-                    if(item.isDefaultItem && !character.OwnedItemsInventoryItemsIDs.Contains(item.id))
+                    }
+                    if (item.isDefaultItem && !character.OwnedItemsInventoryItemsIDs.Contains(item.id))
                     {
                         character.OwnedItemsInventoryItemsIDs.Add(item.id);
                         character.UnOwnedItemsIDs.Remove(item.id);
                     }
-
                 }
             }
         }
@@ -90,20 +93,31 @@ public class InitializeGameJson : MonoBehaviour
         {
             ItemSaveData newSaveItem = new ItemSaveData();
             newSaveItem.id = item.id;
-            newSaveItem.isOwned = item.isDefaultItem; 
+            newSaveItem.isOwned = item.isDefaultItem;
             newSaveItem.level = item.defaultLevel;
             newSaveItem.amount = item.defaultAmount;
 
             if (item.allowedCharacterIDs == null || item.allowedCharacterIDs.Count == 0) foreach (var c in data.characters) newSaveItem.allowedCharacterIDs.Add(c.id);
             else newSaveItem.allowedCharacterIDs = new List<int>(item.allowedCharacterIDs);
-            
-            if(item.isTurnedBaseWeapon && item.firstCharID != -1 && !newSaveItem.allowedCharacterIDs.Contains(item.firstCharID)) newSaveItem.allowedCharacterIDs.Add(item.firstCharID);
-            
+
+            if (item.isTurnedBaseWeapon && item.firstCharID != -1 && !newSaveItem.allowedCharacterIDs.Contains(item.firstCharID)) newSaveItem.allowedCharacterIDs.Add(item.firstCharID);
 
             data.OwnedItems.Add(newSaveItem);
         }
 
-        data.player = new playerData 
+        if (data.Skills == null) data.Skills = new List<SkillSaveData>(); 
+        
+        foreach (Skills skill in allSkillsFromDB)
+        {
+            SkillSaveData newSaveSkill = new SkillSaveData();
+            newSaveSkill.id = skill.id;
+            newSaveSkill.characterID = skill.characterID;
+            newSaveSkill.skillLevel = skill.skillLevel;
+
+            data.Skills.Add(newSaveSkill);
+        }
+
+        data.player = new playerData
         {
             playerName = "Player",
             numberOfCoins = 100,
@@ -115,22 +129,28 @@ public class InitializeGameJson : MonoBehaviour
 
         foreach (Perks perk in allPerksFromResources)
         {
-            //data.player.unFoundPerks.Add(perk.id);
-            data.player.foundPerks.Add(perk.id); //toto pak vyměnit za to nahoře, tohle je jen na debug
+            data.player.foundPerks.Add(perk.id);
         }
 
         data.enemies.Add(
-            new Enemy { id = 1, name = "Speaker", maxHealth = 150, health = 100, attacks = new List<EnemyAttack> {
+            new Enemy
+            {
+                id = 1,
+                name = "Speaker",
+                maxHealth = 150,
+                health = 100,
+                attacks = new List<EnemyAttack> {
             new EnemyAttack { id = 1, attackName = "Thunderous Word", totalAnimationDuration = 1.8f, hits = new List<Hit> { new Hit { timeOffset = 0.8f, damage = 25 } }, weight = 60 },
             new EnemyAttack { id = 2, attackName = "Lightning Strike", totalAnimationDuration = 2.5f, hits = new List<Hit> { new Hit { timeOffset = 1.2f, damage = 40 } }, weight = 25 },
             new EnemyAttack { id = 3, attackName = "Static Discharge", totalAnimationDuration = 1.2f, hits = new List<Hit> { new Hit { timeOffset = 0.4f, damage = 15 } }, weight = 15 }
-        }}
+        }
+            }
         );
 
         foreach (var enemySprite in enemySpritesStatic)
         {
             Enemy targetEnemy = data.enemies.Find(e => e.id == enemySprite.id);
-            
+
             if (targetEnemy != null)
             {
                 targetEnemy.sprite = enemySprite.sprite;
@@ -140,11 +160,10 @@ public class InitializeGameJson : MonoBehaviour
         data.characterAnimations = characterAnimationsStatic;
         data.enemyAnimations = enemyAnimationsStatic;
         gameDataManager.currentGameData = data;
-        
+
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(savePath, json);
 
-        Debug.Log("JSON inicializován.");
         return data;
     }
 }
