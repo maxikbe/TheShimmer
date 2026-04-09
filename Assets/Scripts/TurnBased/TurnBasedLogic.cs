@@ -211,7 +211,7 @@ public class TurnBasedLogic : MonoBehaviour
         UpdateFaces();
     }
 
-    public void nextTurn()
+    /*/public void nextTurn()
     {
         if (turnOrder.Count == 0) return createTurnOrder();
 
@@ -220,7 +220,7 @@ public class TurnBasedLogic : MonoBehaviour
         UpdateFaces();
 
         Debug.Log("Current Turn: " + currentTurn);
-    }
+    }/*/
 
 
     void getDefaultPositions()
