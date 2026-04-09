@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c1f24a77be7bba743b77393143eabe35
+guid: eebfb574e1b27ab42be445a3435bae3a
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -102,7 +102,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 0
+  platformSettingsDirtyTick: 639113703917773762
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -127,19 +127,19 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: gramophoneProp
+  - name: mapSprite
     originalName: 
-    pivot: {x: 0.5, y: 0}
-    alignment: 7
+    pivot: {x: 0.50699306, y: -0.07692308}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 40
-      height: 56
-    spriteID: 8351dcb96036fcd48895bf59656b18ba
+      width: 143
+      height: 104
+    spriteID: c99ee08792dd35c47a4ae037f189b54e
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -153,33 +153,57 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 3971180319
+      value0: 1423544985
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: gramophoneProp
+    name: mapSprite
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: gramophoneProp
+    - name: mapSprite
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 0
-        y: 0
-        width: 40
-        height: 56
-      spriteId: 8351dcb96036fcd48895bf59656b18ba
+        x: 7
+        y: 8
+        width: 143
+        height: 104
+      spriteId: c99ee08792dd35c47a4ae037f189b54e
     linkedCells: []
     tileCells: []
     tileSetIndex: 0
     parentIndex: -1
   tileSets: []
-  platformSettings: []
+  platformSettings:
+  - name: DefaultTexturePlatform
+    overridden: 0
+    ignorePlatformSupport: 0
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
+  - name: Standalone
+    overridden: 0
+    ignorePlatformSupport: 0
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 40, y: 56}
-  previousTextureSize: {x: 64, y: 64}
+  canvasSize: {x: 159, y: 120}
+  previousTextureSize: {x: 256, y: 128}

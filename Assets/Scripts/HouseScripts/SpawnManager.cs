@@ -19,7 +19,6 @@ public class SpawnManager : MonoBehaviour
                 {
                     transitionPanel.SetActive(true);
                     transitionAnimator.Play("TransitionAnimation", -1, 0f);
-                    Debug.Log(123);
                 }
             }
         }
