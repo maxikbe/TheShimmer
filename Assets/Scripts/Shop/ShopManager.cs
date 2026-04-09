@@ -3,17 +3,28 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
-using Unity.AppUI.UI;
 
 public class ShopManager : MonoBehaviour
 {
     public static ShopManager Instance;
+
+    public enum CartMode { None, Buying, Selling }
+    [HideInInspector] public CartMode currentCartMode = CartMode.None;
 
     [Header("Základní UI")]
     public GameObject shopPanel;
     public Transform playerInventoryContainer;
     public Transform merchantInventoryContainer;
     public GameObject itemSlotPrefab;
+    public UnityEngine.UI.Button cartToggleButton;
+    public UnityEngine.UI.Button shopCloseButton;
+
+    [Header("Košík UI (Novinka!)")]
+    public GameObject cartWindow; // Cele okno kosiku co se schovava
+    public Transform cartContainer; // Misto kam se sází itemy v košíku
+    public TextMeshProUGUI cartTotalValueText; // Suma ve velkem okne
+    public TextMeshProUGUI cartMiniTotalText; // Suma pod ikonkou
+    public UnityEngine.UI.Button removeAllItemsButton;
 
     [Header("Tooltip (Spodní lišta)")]
     public GameObject tooltipPanel;
@@ -30,12 +41,13 @@ public class ShopManager : MonoBehaviour
     public Image inspectIcon;
 
     [Header("Databáze všech Itemů")]
-    // pristup ke vsem itemum, abychom zjistovali ikonu a dalsi veci
-    public Database itemDatabase; // tahame primo z database scriptablew objektu
+    public Database itemDatabase; // Tahame primo ze Scriptable Object databaze
 
     private Merchant currentMerchant;
-    private ShopItemSlot hoveredSlot; // ví na cem mys prebyva
+    private ShopItemSlot hoveredSlot;
 
+    private List<ShopItemSlot> cartItems = new List<ShopItemSlot>(); // Pamatuje si, co je v kosiku
+    private int cartTotalSum = 0;
     private Color priceColor;
     
     private void Awake()
@@ -44,21 +56,33 @@ public class ShopManager : MonoBehaviour
         else Destroy(gameObject);
         
         priceColor = tooltipPrice.color;
+        
+        if (cartToggleButton != null)
+        {
+            cartToggleButton.onClick.AddListener(ToggleCartWindow);
+        }
+
+        if (shopCloseButton != null)
+        {
+            shopCloseButton.onClick.AddListener(CloseShop);
+        }
+
+        if (removeAllItemsButton  != null)
+        {
+            removeAllItemsButton.onClick.AddListener(RemoveAllItemsFromCart);
+        }
     }
 
     void Update()
     {
-        // pokud je otevreny slot a jsem najety na necem
         if (shopPanel.activeSelf && hoveredSlot != null)
         {
-            // F nebo prave tlacitko
             if (Input.GetKeyDown(KeyCode.F) || Input.GetMouseButtonDown(1))
             {
                 ShowInspectWindow(hoveredSlot);
             }
         }
 
-        // zavreni pres esc nebo klikntuti kdekoliv nebo znova F
         if (inspectPanel.activeSelf && (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.F)))
         {
             inspectPanel.SetActive(false);
@@ -69,48 +93,129 @@ public class ShopManager : MonoBehaviour
     {
         currentMerchant = merchant;
         shopPanel.SetActive(true);
+        cartWindow.SetActive(false); // Defaultně kosik schovame
         RefreshShopUI();
     }
 
     public void CloseShop()
     {
+        // Pred zavrenim vycistime kosik a vratime veci tam, kam patri
+        RemoveAllItemsFromCart();
+
         shopPanel.SetActive(false);
         tooltipPanel.SetActive(false);
         inspectPanel.SetActive(false);
+        cartWindow.SetActive(false);
         currentMerchant = null;
     }
 
+    public void RemoveAllItemsFromCart()
+    {
+        foreach(var item in new List<ShopItemSlot>(cartItems))
+        {
+            RemoveFromCart(item);
+        }
+    }
+
+    // --- FUNKCE PRO TLAČÍTKO KOŠÍKU ---
+    public void ToggleCartWindow()
+    {
+        if(cartWindow != null)
+        {
+            merchantInventoryContainer.gameObject.SetActive(!merchantInventoryContainer.gameObject.activeSelf);
+            playerInventoryContainer.gameObject.SetActive(!playerInventoryContainer.gameObject.activeSelf);
+            cartWindow.SetActive(!cartWindow.activeSelf);
+        }
+    }
+
+    // --- LOGIKA KOŠÍKU ---
+    public void OnSlotClicked(ShopItemSlot slot)
+    {
+        // Nepustí neprodejný item do košíku
+        if (slot.isOwnedByPlayer && !slot.canSell) 
+        {
+            Debug.Log("Toto je quest item, neprodávej ho!");
+            return;
+        }
+
+        // Nastavíme mód podle prvního kliknutí
+        if (currentCartMode == CartMode.None)
+        {
+            currentCartMode = slot.isOwnedByPlayer ? CartMode.Selling : CartMode.Buying;
+        }
+        else
+        {
+            // Ochrana proti míchání prodeje a nákupu
+            if ((currentCartMode == CartMode.Selling && !slot.isOwnedByPlayer) ||
+                (currentCartMode == CartMode.Buying && slot.isOwnedByPlayer))
+            {
+                Debug.LogWarning("Nemůžeš najednou kupovat a prodávat! Vyprázdni košík.");
+                return;
+            }
+        }
+
+        // Přesouvání sem a tam
+        if (!cartItems.Contains(slot))
+        {
+            cartItems.Add(slot);
+            slot.transform.SetParent(cartContainer); // Fyzicky hodi tlacitko do kosiku
+            UpdateCartSum();
+        }
+        else
+        {
+            RemoveFromCart(slot); // Kdyz na nej kliknes v kosiku, vrati ho zpatky
+        }
+    }
+
+    private void RemoveFromCart(ShopItemSlot slot)
+    {
+        cartItems.Remove(slot);
+        
+        // Vratime do spravneho okna podle toho, ci to je
+        Transform originalParent = slot.isOwnedByPlayer ? playerInventoryContainer : merchantInventoryContainer;
+        slot.transform.SetParent(originalParent);
+        
+        UpdateCartSum();
+    }
+
+    private void UpdateCartSum()
+    {
+        cartTotalSum = 0;
+        foreach (var item in cartItems)
+        {
+            cartTotalSum += item.myPrice;
+        }
+
+        // Updatneme oba texty (ve velkem okne i ten maly pod ikonkou)
+        if(cartTotalValueText != null) cartTotalValueText.text = $"Suma: {cartTotalSum} G";
+        if(cartMiniTotalText != null) cartMiniTotalText.text = $"{cartTotalSum} G";
+
+        if (cartItems.Count == 0) currentCartMode = CartMode.None; // Reset modu kdyz je prazdno
+    }
+
+    // --- VYKRESLOVÁNÍ OBCHODU ---
     public void RefreshShopUI()
     {
-        // maze tlacitka
         foreach (Transform child in playerInventoryContainer) Destroy(child.gameObject);
         foreach (Transform child in merchantInventoryContainer) Destroy(child.gameObject);
 
-        // vykresluje obchodnikuv invent
         foreach (ItemSaveData itemData in currentMerchant.currentInventory)
         {
             Item staticData = itemDatabase.GetItemByID(itemData.id);
             if (staticData == null) continue;
 
-            // vypocitava nakupni cenu pres prirazku obchodnika
             int buyPrice = Mathf.RoundToInt(staticData.basePrice * currentMerchant.sellModifier);
             CreateItemSlot(itemData, staticData, buyPrice, false, merchantInventoryContainer);
         }
 
-        
-        // vykresluje muj batoh 
         foreach (ItemSaveData itemData in gameDataManager.currentGameData.OwnedItems)
         {
             Item staticData = itemDatabase.GetItemByID(itemData.id);
-            
-            // uz neignoruje quest itemi, proste jedeme dal
             if (staticData == null) continue; 
 
-            // vypocitava nakupniu cenu
             int sellPrice = Mathf.RoundToInt(staticData.basePrice * currentMerchant.buyModifier);
             CreateItemSlot(itemData, staticData, sellPrice, true, playerInventoryContainer);
         }
-        
     }
 
     private void CreateItemSlot(ItemSaveData data, Item staticData, int price, bool isPlayer, Transform container)
@@ -129,22 +234,18 @@ public class ShopManager : MonoBehaviour
         tooltipName.text = slot.myItemStaticData.itemName;
         tooltipType.text = "Typ: " + slot.myItemStaticData.itemType.ToString();
         
-        // logika pro prodejnost
         if (!slot.canSell && slot.isOwnedByPlayer)
         {
             tooltipPrice.text = "Neprodejné";
-            tooltipPrice.color = Color.red; // prepise barvu na cervenou
+            tooltipPrice.color = Color.red; 
         }
         else
         {
             tooltipPrice.text = "Cena: " + slot.myPrice.ToString() + " G";
-            tooltipPrice.color = priceColor; // vrati zpet bilou
+            tooltipPrice.color = priceColor; 
         }
         
-        if (slot.myItemStaticData.icon != null) 
-        {
-            tooltipIcon.sprite = slot.myItemStaticData.icon;
-        }
+        if (slot.myItemStaticData.icon != null) tooltipIcon.sprite = slot.myItemStaticData.icon;
     }
 
     public void HideTooltip()
@@ -163,7 +264,6 @@ public class ShopManager : MonoBehaviour
         inspectDescription.text = data.description;
         if (data.icon != null) inspectIcon.sprite = data.icon;
 
-        // formatovani podle typu itemu
         string statsText = $"Level: {slot.myItemData.level}\n\n";
         
         if (data.itemType == ItemType.Weapon)
