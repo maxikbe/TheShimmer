@@ -20,6 +20,8 @@ MonoBehaviour:
   description: sadfasdfasdfasdfsad
   isResearched: 1
   isUsable: 1
+  canBeSold: 1
+  basePrice: 61
   maxStack: 0
   isDefaultItem: 1
   defaultAmount: 5
@@ -27,6 +29,7 @@ MonoBehaviour:
   itemType: 4
   weaponType: 0
   isTurnedBaseWeapon: 0
+  firstCharID: 0
   isMagical: 0
   Damage: 0
   FireRate: 0

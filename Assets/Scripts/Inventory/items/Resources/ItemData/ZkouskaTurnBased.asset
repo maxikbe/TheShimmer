@@ -20,6 +20,8 @@ MonoBehaviour:
   description: GUUUUN
   isResearched: 1
   isUsable: 1
+  canBeSold: 1
+  basePrice: 67
   maxStack: 0
   isDefaultItem: 1
   defaultAmount: 1

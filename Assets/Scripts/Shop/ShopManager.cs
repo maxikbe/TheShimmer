@@ -106,6 +106,8 @@ public class ShopManager : MonoBehaviour
         tooltipPanel.SetActive(false);
         inspectPanel.SetActive(false);
         cartWindow.SetActive(false);
+        merchantInventoryContainer.gameObject.SetActive(true);
+        playerInventoryContainer.gameObject.SetActive(true);
         currentMerchant = null;
     }
 
