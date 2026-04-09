@@ -13,6 +13,9 @@ public class Item : ScriptableObject
     public string description;
     public bool isResearched;
     public bool isUsable;
+    public bool isTurnedBaseItem;
+
+
     //Upravy Dominika kvůli shop systému
     public bool canBeSold = true;
     public int basePrice;
@@ -48,9 +51,16 @@ public class Item : ScriptableObject
     public ArmorType armorType;
     public float Armor;
     public int weight;
+
+    // TurnBasedItem
+
+    public TurnBaseItemType turnBaseItemType;
+    public int turnBaseItemEffectAmount;
+    public int turnBaseItemDuration;
 }
 
 public enum ItemType { Consumable, Healing, Armor, Resource, Weapon }
 public enum ArmorType { Head, Chest, Legs, Feet, Hands, Shield }
 public enum WeaponType { Melee, Ranged, Magic }
 public enum MagicalElement { Fire, Water, Earth, Air, Light, Dark, Alien, Star }
+public enum TurnBaseItemType {Healing, Buff, Debuff, Mana, Weakening}

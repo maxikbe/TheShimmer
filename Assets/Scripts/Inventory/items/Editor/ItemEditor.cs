@@ -5,15 +5,13 @@ using UnityEditor;
 [CanEditMultipleObjects]
 public class ItemEditor : Editor
 {
-    // Serializované vlastnosti
     SerializedProperty isDefaultItem, defaultAmount, defaultLevel, allowedCharacterIDs;
     SerializedProperty itemName, description, itemType, icon, prefab;
-    SerializedProperty isResearched, isUsable, maxStack;
+    SerializedProperty isResearched, isUsable, maxStack, isTurnedBaseItem;
     SerializedProperty canBeSold, basePrice;
 
     void OnEnable()
     {
-        // Propojíme proměnné z Item.cs s editorem
         isDefaultItem = serializedObject.FindProperty("isDefaultItem");
         defaultAmount = serializedObject.FindProperty("defaultAmount");
         defaultLevel = serializedObject.FindProperty("defaultLevel");
@@ -28,6 +26,7 @@ public class ItemEditor : Editor
         isResearched = serializedObject.FindProperty("isResearched");
         isUsable = serializedObject.FindProperty("isUsable");
         maxStack = serializedObject.FindProperty("maxStack");
+        isTurnedBaseItem = serializedObject.FindProperty("isTurnedBaseItem");
         
         canBeSold = serializedObject.FindProperty("canBeSold");
         basePrice = serializedObject.FindProperty("basePrice");
@@ -38,36 +37,28 @@ public class ItemEditor : Editor
         serializedObject.Update();
         Item item = (Item)target;
 
-        // --- SEKCE PRO SAVE DATA ---
         EditorGUILayout.Space();
         GUIStyle headerStyle = new GUIStyle(EditorStyles.boldLabel);
-        headerStyle.normal.textColor = new Color(0.2f, 0.7f, 0.2f); // Zelený text
+        headerStyle.normal.textColor = new Color(0.2f, 0.7f, 0.2f);
         
         EditorGUILayout.LabelField("VÝCHOZÍ STAV PRO SAVE (JSON)", headerStyle);
-        
         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
         EditorGUILayout.PropertyField(isDefaultItem, new GUIContent("Získat při startu?"));
         EditorGUILayout.PropertyField(defaultAmount, new GUIContent("Počáteční množství"));
         EditorGUILayout.PropertyField(defaultLevel, new GUIContent("Počáteční level"));
-        
         EditorGUILayout.Space(2);
-        // Vložení listu ID postav přímo do zelené sekce
         EditorGUILayout.PropertyField(allowedCharacterIDs, new GUIContent("Povolené ID postav", "Seznam ID postav, které mohou tento předmět použít"), true);
         EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
-        // --- ZÁKLADNÍ NASTAVENÍ ---
         EditorGUILayout.LabelField("STATICKÁ DATA PŘEDMĚTU", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(itemName, new GUIContent("Název"));
         EditorGUILayout.PropertyField(description, new GUIContent("Popis"));
         EditorGUILayout.PropertyField(itemType, new GUIContent("Typ předmětu"));
-        
-        // Pro obchodníky
         EditorGUILayout.PropertyField(canBeSold, new GUIContent("Lze prodat obchodníkovi?"));
 
-        // Pokud je povolen prodej
         if (canBeSold.boolValue)
         {
             EditorGUILayout.PropertyField(basePrice, new GUIContent("Základní cena (Coiny)"));
@@ -77,10 +68,15 @@ public class ItemEditor : Editor
         EditorGUILayout.PropertyField(isResearched, new GUIContent("Je vyzkoumaný?"));
         EditorGUILayout.PropertyField(isUsable, new GUIContent("Je použitelný?"));
         EditorGUILayout.PropertyField(maxStack, new GUIContent("Max Stack"));
+        EditorGUILayout.PropertyField(isTurnedBaseItem, new GUIContent("Je Turn-Based předmět?"));
+
+        if (isTurnedBaseItem.boolValue)
+        {
+            DrawTurnBasedItemSettings(item);
+        }
 
         EditorGUILayout.Space();
 
-        // --- SPECIFICKÉ NASTAVENÍ PODLE TYPU ---
         switch ((ItemType)itemType.enumValueIndex)
         {
             case ItemType.Weapon:
@@ -96,8 +92,6 @@ public class ItemEditor : Editor
         }
 
         EditorGUILayout.Space();
-
-        // --- VIZUÁL ---
         EditorGUILayout.LabelField("VIZUÁL A DATA", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(icon, new GUIContent("Ikona"));
         EditorGUILayout.PropertyField(prefab, new GUIContent("Prefab"));
@@ -105,14 +99,23 @@ public class ItemEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 
+    private void DrawTurnBasedItemSettings(Item item)
+    {
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("TURN-BASED VLASTNOSTI", EditorStyles.boldLabel);
+        item.turnBaseItemType = (TurnBaseItemType)EditorGUILayout.EnumPopup("Typ efektu", item.turnBaseItemType);
+        item.turnBaseItemEffectAmount = EditorGUILayout.IntField("Síla efektu", item.turnBaseItemEffectAmount);
+        item.turnBaseItemDuration = EditorGUILayout.IntField("Trvání (tahy)", item.turnBaseItemDuration);
+        EditorGUILayout.EndVertical();
+    }
+
     private void DrawWeaponSettings(Item item)
     {
         EditorGUILayout.LabelField("NASTAVENÍ ZBRANĚ", EditorStyles.boldLabel);
         item.weaponType = (WeaponType)EditorGUILayout.EnumPopup("Základní typ", item.weaponType);
-        item.isTurnedBaseWeapon = EditorGUILayout.Toggle("Je zbraní pro Turn Based Combat?", item.isTurnedBaseWeapon);
-        item.firstCharID = EditorGUILayout.IntField("Který char má tuto zbraň defaultně? (pro každého hráče 1, takže prosím neopakujte to, 0 je že nikdo)", item.firstCharID);
+        item.isTurnedBaseWeapon = EditorGUILayout.Toggle("Zbraň pro Turn-Based?", item.isTurnedBaseWeapon);
+        item.firstCharID = EditorGUILayout.IntField("Defaultní majitel (ID)", item.firstCharID);
         item.Damage = EditorGUILayout.FloatField("Poškození", item.Damage);
-        
         item.isMagical = EditorGUILayout.Toggle("Je Magická?", item.isMagical);
         if (item.isMagical)
             item.magicalElement = (MagicalElement)EditorGUILayout.EnumPopup("Element", item.magicalElement);

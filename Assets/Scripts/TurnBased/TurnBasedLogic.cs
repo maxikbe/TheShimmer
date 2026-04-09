@@ -63,7 +63,7 @@ public class TurnBasedLogic : MonoBehaviour
     private List<Enemy> enemies;
     private List<Enemy> currentEnemy;
     public List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 1 };
-    private int currentBackgroundPictureID = 2;
+    private int currentBackgroundPictureID = 1;
     private int EnemyID;
     private int currentTurn;
     private List<TurnType> turnOrder = new List<TurnType>();
@@ -211,76 +211,23 @@ public class TurnBasedLogic : MonoBehaviour
         UpdateFaces();
     }
 
-    void UpdateTurnOrder(int idWhoDied, bool isEnemy)
+    public void nextTurn()
     {
-        TurnType turnToRemove = TurnType.Player1; 
+        if (turnOrder.Count == 0) return createTurnOrder();
 
-        if (isEnemy)
-        {
-            if (idWhoDied == 1) turnToRemove = TurnType.Enemy;
-            else if (idWhoDied == 2) turnToRemove = TurnType.Enemy2;
-            else if (idWhoDied == 3) turnToRemove = TurnType.Enemy3;
-        }
-        else
-        {
-            if (idWhoDied == 1) turnToRemove = TurnType.Player1;
-            else if (idWhoDied == 2) turnToRemove = TurnType.Player2;
-            else if (idWhoDied == 3) turnToRemove = TurnType.Player3;
-            else if (idWhoDied == 4) turnToRemove = TurnType.Player4;
-            else if (idWhoDied == 5) turnToRemove = TurnType.Player5;
-        }
-
-        turnOrder.RemoveAll(t => t == turnToRemove);
+        TurnType currentTurn = turnOrder[0];
+        turnOrder.RemoveAt(0);
         UpdateFaces();
+
+        Debug.Log("Current Turn: " + currentTurn);
     }
 
-    void UpdateFaces()
-    {
-        for (int i = 0; i < FaceHolders.Count; i++)
-        {
-            if (i >= turnOrder.Count)
-            {
-                FaceHolders[i].gameObject.SetActive(false);
-                continue;
-            }
-
-            FaceHolders[i].gameObject.SetActive(true);
-            TurnType turn = turnOrder[i];
-            
-            bool lookingForEnemy = false;
-            int targetID = 0;
-            if (turn == TurnType.Enemy || turn == TurnType.Enemy2 || turn == TurnType.Enemy3)
-            {
-                lookingForEnemy = true;
-                int enemyIdx = (int)turn; 
-                if (enemyIdx < currentEnemy.Count) targetID = currentEnemy[enemyIdx].id;
-            }
-            else 
-            {
-                lookingForEnemy = false;
-                if (turn == TurnType.Player1) targetID = 1;
-                else if (turn == TurnType.Player2) targetID = 2;
-                else if (turn == TurnType.Player3) targetID = 3;
-                else if (turn == TurnType.Player4) targetID = 4;
-                else if (turn == TurnType.Player5) targetID = 5;
-            }
-
-            FacesSprite foundFace = Faces.FirstOrDefault(f => f.isEnemy == lookingForEnemy && f.ID == targetID);
-
-            if (foundFace.sprite != null)
-            {
-                FaceHolders[i].sprite = foundFace.sprite;
-            }
-        }
-    }
 
     void getDefaultPositions()
     {
         defaultEnemyPositions = enemyPosition.Select(pos => pos.transform.position).ToList();
         defaultPlayerPositons = playerPosition.Select(pos => pos.transform.position).ToList();
     }
-
- 
 
     Vector3 getAnimationPositions(int enemyPositionIndex, int playerPositionIndex, bool isPlayerAttacking)
     {
@@ -343,6 +290,71 @@ public class TurnBasedLogic : MonoBehaviour
     {
         
     }
+
+
+    // UI FUNCTIONS
+    void UpdateTurnOrder(int idWhoDied, bool isEnemy)
+    {
+        TurnType turnToRemove = TurnType.Player1; 
+
+        if (isEnemy)
+        {
+            if (idWhoDied == 1) turnToRemove = TurnType.Enemy;
+            else if (idWhoDied == 2) turnToRemove = TurnType.Enemy2;
+            else if (idWhoDied == 3) turnToRemove = TurnType.Enemy3;
+        }
+        else
+        {
+            if (idWhoDied == 1) turnToRemove = TurnType.Player1;
+            else if (idWhoDied == 2) turnToRemove = TurnType.Player2;
+            else if (idWhoDied == 3) turnToRemove = TurnType.Player3;
+            else if (idWhoDied == 4) turnToRemove = TurnType.Player4;
+            else if (idWhoDied == 5) turnToRemove = TurnType.Player5;
+        }
+
+        turnOrder.RemoveAll(t => t == turnToRemove);
+        UpdateFaces();
+    }
+
+    void UpdateFaces()
+    {
+        for (int i = 0; i < FaceHolders.Count; i++)
+        {
+            if (i >= turnOrder.Count)
+            {
+                FaceHolders[i].gameObject.SetActive(false);
+                continue;
+            }
+
+            FaceHolders[i].gameObject.SetActive(true);
+            TurnType turn = turnOrder[i];
+            
+            bool lookingForEnemy = false;
+            int targetID = 0;
+            if (turn == TurnType.Enemy || turn == TurnType.Enemy2 || turn == TurnType.Enemy3)
+            {
+                lookingForEnemy = true;
+                int enemyIdx = (int)turn; 
+                if (enemyIdx < currentEnemy.Count) targetID = currentEnemy[enemyIdx].id;
+            }
+            else 
+            {
+                lookingForEnemy = false;
+                if (turn == TurnType.Player1) targetID = 1;
+                else if (turn == TurnType.Player2) targetID = 2;
+                else if (turn == TurnType.Player3) targetID = 3;
+                else if (turn == TurnType.Player4) targetID = 4;
+                else if (turn == TurnType.Player5) targetID = 5;
+            }
+
+            FacesSprite foundFace = Faces.FirstOrDefault(f => f.isEnemy == lookingForEnemy && f.ID == targetID);
+
+            if (foundFace.sprite != null)
+            {
+                FaceHolders[i].sprite = foundFace.sprite;
+            }
+        }
+    }
     void updateEnemyHealthBar()
     {
         int maxHealth = 0;
@@ -367,6 +379,36 @@ public class TurnBasedLogic : MonoBehaviour
             }
             i++;
         }
+    }
+
+    void handleSkillOpening()
+    {
+        
+    }
+
+    void handleSkillClosing()
+    {
+        
+    }
+
+    void handleItemOpening()
+    {
+        
+    }
+
+    void handleItemClosing()
+    {
+        
+    }
+
+    void handleChooseEnemy()
+    {
+        
+    }
+
+    void handleChooseCharacter()
+    {
+        
     }
     
 }
