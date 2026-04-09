@@ -9,5 +9,5 @@ public class GameData
     public List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();
     public List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
     public List<SkillSaveData> Skills = new List<SkillSaveData>();
-
+    public List<MerchantReputation> merchantReputations = new List<MerchantReputation>();
 }

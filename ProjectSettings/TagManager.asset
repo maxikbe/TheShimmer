@@ -41,6 +41,12 @@ TagManager:
   - name: BackGround
     uniqueID: 2646042921
     locked: 0
+  - name: Building
+    uniqueID: 3633078859
+    locked: 0
+  - name: Furniture
+    uniqueID: 3393122513
+    locked: 0
   - name: GenerationMap
     uniqueID: 1881948473
     locked: 0
