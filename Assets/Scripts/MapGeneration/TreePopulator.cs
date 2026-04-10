@@ -17,21 +17,19 @@ public class TreePopulator : MonoBehaviour
     
     [Header("Spacing & Shape")]
     public float spawnRadius = 1.5f; 
-    public float minDistanceBetweenTrees = 0.25f; // Lower = denser
+    public float minDistanceBetweenTrees = 0.25f;
     public float verticalSquish = 0.6f;
 
     [Header("Visual Variance")]
     public Vector2 scaleRange = new Vector2(0.8f, 1.3f);
     public float baseScale = 1f;
 
-    // Fast Lookup: Stores positions organized by Tile Coordinate
     private Dictionary<Vector2Int, List<Vector3>> spatialGrid = new Dictionary<Vector2Int, List<Vector3>>();
 
     void Start() => GenerateForests();
 
     public void GenerateForests()
     {
-        // Cleanup
         foreach (Transform child in treeContainer) { Destroy(child.gameObject); }
         spatialGrid.Clear();
 
@@ -64,7 +62,6 @@ public class TreePopulator : MonoBehaviour
             0
         );
 
-        // FAST CHECK: Only check this tile and the 8 neighbors
         if (IsTooClose(spawnPos, tilePos)) return;
 
         PlaceTree(spawnPos, tilePos);
@@ -72,7 +69,6 @@ public class TreePopulator : MonoBehaviour
 
     private bool IsTooClose(Vector3 pos, Vector3Int centerTile)
     {
-        // Check a 3x3 grid of tiles around the current one
         for (int x = -1; x <= 1; x++)
         {
             for (int y = -1; y <= 1; y++)
@@ -82,7 +78,6 @@ public class TreePopulator : MonoBehaviour
                 {
                     foreach (Vector3 existingPos in spatialGrid[checkTile])
                     {
-                        // Use SqrMagnitude for speed (avoids Square Root calculation)
                         if ((pos - existingPos).sqrMagnitude < minDistanceBetweenTrees * minDistanceBetweenTrees)
                             return true;
                     }
@@ -96,16 +91,13 @@ public class TreePopulator : MonoBehaviour
     {
         if (treePrefabs.Count == 0) return;
 
-        // Logic for Z-Sorting and Shader compatibility
         Vector3 sortedPos = new Vector3(pos.x, pos.y, pos.y);
         GameObject tree = Instantiate(treePrefabs[Random.Range(0, treePrefabs.Count)], sortedPos, Quaternion.identity, treeContainer);
 
-        // Randomize
         float randomScale = baseScale * Random.Range(scaleRange.x, scaleRange.y);
         tree.transform.localScale = new Vector3(randomScale, randomScale, 1f);
         if(Random.value > 0.5f) tree.transform.localScale = new Vector3(-tree.transform.localScale.x, tree.transform.localScale.y, 1f);
 
-        // Register in Spatial Grid
         Vector2Int gridKey = new Vector2Int(tilePos.x, tilePos.y);
         if (!spatialGrid.ContainsKey(gridKey)) spatialGrid[gridKey] = new List<Vector3>();
         spatialGrid[gridKey].Add(pos);
