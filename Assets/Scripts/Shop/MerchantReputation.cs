@@ -3,6 +3,6 @@ using UnityEngine;
 [System.Serializable]
 public class MerchantReputation
 {
-    public string merchantID; // Např. "Kovar_Zlin"
+    public string merchantID;
     public float reputationValue; // 0 až 100
 }
