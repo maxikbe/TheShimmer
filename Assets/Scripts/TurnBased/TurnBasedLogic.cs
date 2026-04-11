@@ -63,9 +63,12 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private SkillDatabase _skillDatabaseReference;
     private static Database itemDatabase;
     private static SkillDatabase skillDatabase;
+    private List<Skills> currentCharacterSkills;
     private List<Character> characters;
     private Character currentCharacter;
     private bool isPlayerTurn;
+    private bool isPlayerChoosing = false;
+    private int currentSkillID;
     private List<Enemy> enemies;
     private List<Enemy> currentEnemy;
     public List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 1 };
@@ -94,7 +97,10 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private SpriteRenderer BackgroundPicture; 
     [SerializeField] private GameObject chooseMenu;
     [SerializeField] private GameObject chooserThingsMenu;
+    [SerializeField] private GameObject ChooseAttackUI;
     [SerializeField] private GameObject button;
+    [SerializeField] private List<GameObject> arrowsCharacters = new List<GameObject>();
+    [SerializeField] private List<GameObject> arrowsEnemies = new List<GameObject>();
 
     // DEFAULT
     void Start()
@@ -112,7 +118,8 @@ public class TurnBasedLogic : MonoBehaviour
        // if (Input.GetKey(keySpecial)) PlayerAttackEnemy(0, 0);
         //if (Input.GetKey(keyNormal)) EnemyAttackPlayer(0, 0);
        // Debug.Log("Current Turn Order: " + string.Join(", ", turnOrder.Select(t => t.ToString())));
-
+        if (Input.GetKeyDown(keyAccept)) ChooseMenu();
+        if (Input.GetKeyDown(KeyCode.F)) nextTurn();
     }
 
     // CAMERAS
@@ -261,7 +268,7 @@ public class TurnBasedLogic : MonoBehaviour
         TurnType currentTurn = turnOrder[0];
         turnOrder.RemoveAt(0);
         UpdateFaces();
-
+        Debug.Log("Current Turn: " + currentTurn);
         if (turnOrder[0] != TurnType.Player1 && turnOrder[0] != TurnType.Player2 && turnOrder[0] != TurnType.Player3 && turnOrder[0] != TurnType.Player4 && turnOrder[0] != TurnType.Player5) return;
         currentCharacter = characters.FirstOrDefault(c => 
             (turnOrder[0] == TurnType.Player1 && c.id == 1) ||
@@ -270,8 +277,8 @@ public class TurnBasedLogic : MonoBehaviour
             (turnOrder[0] == TurnType.Player4 && c.id == 4) ||
             (turnOrder[0] == TurnType.Player5 && c.id == 5) 
         );
-
-        Debug.Log("Current Turn: " + currentTurn);
+        Debug.Log("Current Character: " + currentCharacter.name);
+        
     }
 
 
@@ -338,8 +345,47 @@ public class TurnBasedLogic : MonoBehaviour
         MoveEnemyBackToPosition(enemyPositionIndex);
     }
 
-    void HandlePlayerAttack()
+    void handlePlayerAttack()
     {
+        
+    }
+
+    void handleSelection(bool isChoosingEnemy)
+    {
+        isPlayerChoosing = true;
+        int currentArrow = 0;
+        handleSkillClosing();
+        handleItemClosing();
+        if (isChoosingEnemy)
+        {
+            arrowsEnemies[currentArrow].SetActive(true);  
+            while (isPlayerChoosing)
+            {
+                if(Input.GetKeyDown(keyDown)) 
+                {
+                    currentArrow = (currentArrow + 1) % arrowsEnemies.Count;
+                }
+                if (Input.GetKeyDown(keyUp))
+                {
+                    currentArrow = (currentArrow - 1 + arrowsEnemies.Count) % arrowsEnemies.Count;
+                }
+                if(Input.GetKeyDown(keyAccept))
+                {
+                    handlePlayerAttack();
+                }
+                if (Input.GetKeyDown(keyBack))
+                {
+                    isPlayerChoosing = false;
+                    arrowsEnemies[currentArrow].SetActive(false);
+                }
+            }        
+        }
+        else
+        {
+            arrowsCharacters[0].SetActive(true);
+            Debug.Log("Choosing character...");
+        }
+        
         
     }
 
@@ -416,10 +462,32 @@ public class TurnBasedLogic : MonoBehaviour
         else chooseMenu.SetActive(true);
     }
 
-    public void handleSkillOpening(int characterID)
+    public void handleSkillOpening()
     {
         chooserThingsMenu.SetActive(true);
-        
+        if (currentCharacter != null && skillDatabase != null)
+        {
+            currentCharacterSkills = skillDatabase.GetAllSkills()
+                .Where(s => s.characterID == currentCharacter.id)
+                .ToList();
+            
+            Debug.Log("Current character skills: " + string.Join(", ", currentCharacterSkills.Select(s => s.name)));
+
+            foreach (var skill in currentCharacterSkills)
+            {
+                GameObject skillButton = Instantiate(button, chooserThingsMenu.transform);
+                
+                skillButton.GetComponentInChildren<TextMeshProUGUI>().text = skill.name;
+                // Add listeners to the button here to handle skill selection
+                Button skillButtonBtn = skillButton.GetComponent<Button>();
+                skillButtonBtn.onClick.AddListener(() =>{
+                    if (skill.type == skillType.Damage) handleSelection(false);   
+                    else handleSelection(true);
+                    currentSkillID = skill.id;
+                });
+            }
+        }
+
     }
 
     public void handleSkillClosing()
@@ -427,10 +495,9 @@ public class TurnBasedLogic : MonoBehaviour
         
     }
 
-    public void handleItemOpening(int characterID)
+    public void handleItemOpening()
     {
         chooserThingsMenu.SetActive(true);
-        
         
     }
 
@@ -449,4 +516,13 @@ public class TurnBasedLogic : MonoBehaviour
         
     }
     
+    public void openChooseAttackUI()
+    {
+        ChooseAttackUI.SetActive(true);
+    }
+
+    public void closeChooseAttackUI()
+    {
+        ChooseAttackUI.SetActive(false);
+    }
 }
