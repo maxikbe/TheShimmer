@@ -1,14 +1,14 @@
 using UnityEngine;
+using System.Collections; 
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine.UI;
 using TMPro;
 using NUnit.Framework;
+using UnityEngine.Rendering.Universal;
 
 //using System.Diagnostics;
-
-
 
 [System.Serializable] 
 public struct CameraInfo
@@ -16,6 +16,7 @@ public struct CameraInfo
     public int ID;
     public int IDofCamera;
     public Camera targetCamera;
+    public float zoomMultiplier;
 }
 
 [System.Serializable] 
@@ -73,8 +74,11 @@ public class TurnBasedLogic : MonoBehaviour
     private List<Enemy> currentEnemy;
     public List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 1 };
     private int currentBackgroundPictureID = 1;
+    private int currentArrow = 0;
+    private bool isChoosingEnemy = false;
     private int EnemyID;
     private int currentTurn;
+    private int currentTypeAttack;
     private List<TurnType> turnOrder = new List<TurnType>();
 
     private int maxVisibleTurns = 5;
@@ -120,22 +124,75 @@ public class TurnBasedLogic : MonoBehaviour
        // Debug.Log("Current Turn Order: " + string.Join(", ", turnOrder.Select(t => t.ToString())));
         if (Input.GetKeyDown(keyAccept)) ChooseMenu();
         if (Input.GetKeyDown(KeyCode.F)) nextTurn();
+        if (Input.GetKeyDown(KeyCode.Z)) SetActiveCamera(8);
+        if (Input.GetKeyDown(keyDown) && isChoosingEnemy && isPlayerChoosing)
+        {
+            currentArrow = (currentArrow + 1) % arrowsEnemies.Count;
+            ShowArrow(arrowsEnemies, currentArrow);
+        }
+        if (Input.GetKeyDown(keyUp) && isChoosingEnemy && isPlayerChoosing)
+        {
+            currentArrow = (currentArrow - 1 + arrowsEnemies.Count) % arrowsEnemies.Count;
+            ShowArrow(arrowsEnemies, currentArrow);
+        }
+        if(Input.GetKeyDown(keyAccept) && isChoosingEnemy && isPlayerChoosing) handlePlayerAttack();
+        if (Input.GetKeyDown(keyBack) && isChoosingEnemy && isPlayerChoosing)
+        {
+            handleSelectionBack();
+        }
     }
 
     // CAMERAS
     [SerializeField] private List<CameraInfo> camerasInfo = new List<CameraInfo>();
     private Camera currentActiveCamera;
-
+    public float transitionDuration = 0.5f; 
+    public float zoomStartFOV = 80f;        
+    public float zoomEndFOV = 60f;
+    private int defaultPPU;
+    private Coroutine activeAnimation;
+    private Dictionary<Camera, Vector3> originalPositions = new Dictionary<Camera, Vector3>();
     void SetActiveCamera(int cameraID)
     {
-        foreach (var camInfo in camerasInfo) camInfo.targetCamera.enabled = false;
-
         var target = camerasInfo.FirstOrDefault(c => c.IDofCamera == cameraID);
-        if (target.targetCamera != null)
+        if (target.targetCamera == null)
         {
-            target.targetCamera.enabled = true;
-            currentActiveCamera = target.targetCamera;
+            Debug.LogWarning($"Kamera s ID {cameraID} nenalezena!");
+            return;
         }
+
+        if (activeAnimation != null) StopCoroutine(activeAnimation);
+        activeAnimation = StartCoroutine(AnimateToCamera(target.targetCamera, target.zoomMultiplier));
+    }
+
+    System.Collections.IEnumerator AnimateToCamera(Camera targetCam, float zoomMultiplier)
+    {
+        Camera mainCam = camerasInfo.FirstOrDefault(c => c.IDofCamera == 0).targetCamera;
+        var ppCam = mainCam.GetComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>();
+
+        Vector3 startPos = mainCam.transform.position;
+        Quaternion startRot = mainCam.transform.rotation;
+        int startPPU = ppCam.assetsPPU;
+
+        Vector3 endPos = targetCam.transform.position;      
+        Quaternion endRot = targetCam.transform.rotation;    
+        int endPPU = zoomMultiplier > 0 ? Mathf.RoundToInt(defaultPPU * zoomMultiplier)  : defaultPPU;
+
+        float elapsed = 0f;
+        while (elapsed < transitionDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0, 1, elapsed / transitionDuration);
+
+            mainCam.transform.position = Vector3.Lerp(startPos, endPos, t);
+            mainCam.transform.rotation = Quaternion.Lerp(startRot, endRot, t);
+            ppCam.assetsPPU = Mathf.RoundToInt(Mathf.Lerp(startPPU, endPPU, t));
+
+            yield return null;
+        }
+
+        mainCam.transform.position = endPos;
+        mainCam.transform.rotation = endRot;
+        ppCam.assetsPPU = endPPU;
     }
 
     void SwitchToOverviewCamera()
@@ -162,6 +219,17 @@ public class TurnBasedLogic : MonoBehaviour
         createTurnOrder();
         updateEnemyHealthBar();
         updateCharacterBars();
+        foreach (var info in camerasInfo)
+        {
+            if (info.targetCamera != null)
+            {
+                originalPositions[info.targetCamera] = info.targetCamera.transform.position;
+            }
+        }
+        var ppCam = camerasInfo.FirstOrDefault(c => c.IDofCamera == 0).targetCamera
+            .GetComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>();
+        defaultPPU = ppCam.assetsPPU;
+        SetActiveCamera(0);
         EnemyName.text = currentEnemy[0].name;
         BackgroundPicture.sprite = BackgroundPictures[currentBackgroundPictureID].sprite;
     }
@@ -277,8 +345,9 @@ public class TurnBasedLogic : MonoBehaviour
             (turnOrder[0] == TurnType.Player4 && c.id == 4) ||
             (turnOrder[0] == TurnType.Player5 && c.id == 5) 
         );
+        SwitchToPlayerCamera(currentCharacter.id);
+        ChooseMenu();
         Debug.Log("Current Character: " + currentCharacter.name);
-        
     }
 
 
@@ -347,46 +416,51 @@ public class TurnBasedLogic : MonoBehaviour
 
     void handlePlayerAttack()
     {
+        HideArrow();
+
+        switch (currentTypeAttack)
+        {
+            case 1:
+                Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
+                
+                break;
+            default:
+                break;
+        }
         
     }
 
-    void handleSelection(bool isChoosingEnemy)
+    void handleSelection(bool isChoosingEnemyInput, int currentTypeAttackInput)
     {
         isPlayerChoosing = true;
-        int currentArrow = 0;
-        handleSkillClosing();
-        handleItemClosing();
-        if (isChoosingEnemy)
+        currentArrow = 0;
+        currentTypeAttack = currentTypeAttackInput;
+        handleSkillItemClosing();
+        ChooseMenu();
+        SetActiveCamera(8);
+        if (isChoosingEnemyInput)
         {
-            arrowsEnemies[currentArrow].SetActive(true);  
-            while (isPlayerChoosing)
-            {
-                if(Input.GetKeyDown(keyDown)) 
-                {
-                    currentArrow = (currentArrow + 1) % arrowsEnemies.Count;
-                }
-                if (Input.GetKeyDown(keyUp))
-                {
-                    currentArrow = (currentArrow - 1 + arrowsEnemies.Count) % arrowsEnemies.Count;
-                }
-                if(Input.GetKeyDown(keyAccept))
-                {
-                    handlePlayerAttack();
-                }
-                if (Input.GetKeyDown(keyBack))
-                {
-                    isPlayerChoosing = false;
-                    arrowsEnemies[currentArrow].SetActive(false);
-                }
-            }        
+            isChoosingEnemy = true;
+            arrowsEnemies[currentArrow].SetActive(true);         
         }
         else
         {
+            isChoosingEnemy = false;
             arrowsCharacters[0].SetActive(true);
             Debug.Log("Choosing character...");
         }
-        
-        
+    }
+
+    void handleSelectionBack()
+    {
+        isPlayerChoosing = false;
+        isChoosingEnemy = false;
+        arrowsEnemies.ForEach(a => a.SetActive(false));
+        arrowsCharacters.ForEach(a => a.SetActive(false));
+        SwitchToPlayerCamera(currentCharacter.id);
+        ChooseMenu();
+        handleSkillOpening();
+        HideArrow();
     }
 
 
@@ -464,6 +538,7 @@ public class TurnBasedLogic : MonoBehaviour
 
     public void handleSkillOpening()
     {
+        handleSkillItemClosing();
         chooserThingsMenu.SetActive(true);
         if (currentCharacter != null && skillDatabase != null)
         {
@@ -476,13 +551,11 @@ public class TurnBasedLogic : MonoBehaviour
             foreach (var skill in currentCharacterSkills)
             {
                 GameObject skillButton = Instantiate(button, chooserThingsMenu.transform);
-                
                 skillButton.GetComponentInChildren<TextMeshProUGUI>().text = skill.name;
-                // Add listeners to the button here to handle skill selection
                 Button skillButtonBtn = skillButton.GetComponent<Button>();
                 skillButtonBtn.onClick.AddListener(() =>{
-                    if (skill.type == skillType.Damage) handleSelection(false);   
-                    else handleSelection(true);
+                    if (skill.type == skillType.Damage) handleSelection(true, 1);   
+                    else handleSelection(false, 1);
                     currentSkillID = skill.id;
                 });
             }
@@ -490,30 +563,31 @@ public class TurnBasedLogic : MonoBehaviour
 
     }
 
-    public void handleSkillClosing()
+    public void handleSkillItemClosing()
     {
+        foreach (Transform child in chooserThingsMenu.transform)
+        {
+            Destroy(child.gameObject); 
+        }
+    }
+
+    private void ShowArrow(List<GameObject> arrows, int index)
+    {
+        foreach (var arrow in arrows)
+            arrow.SetActive(false);
         
+        arrows[index].SetActive(true);
+    }
+
+    private void HideArrow()
+    {
+        arrowsEnemies.ForEach(a => a.SetActive(false));
+        arrowsCharacters.ForEach(a => a.SetActive(false));
     }
 
     public void handleItemOpening()
     {
-        chooserThingsMenu.SetActive(true);
-        
-    }
-
-    public void handleItemClosing()
-    {
-        
-    }
-
-    public void handleChooseEnemy()
-    {
-        
-    }
-
-    public void handleChooseCharacter()
-    {
-        
+        chooserThingsMenu.SetActive(true);   
     }
     
     public void openChooseAttackUI()

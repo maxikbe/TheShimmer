@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 193bd8f41614b8c4c8cb3b1221b6c1d6, type: 3}
-  m_Name: Lena01
+  m_Name: Lena01 6
   m_EditorClassIdentifier: Assembly-CSharp::Skills
-  id: 0
-  characterID: 1
+  id: 6
+  characterID: 2
   name: Default
   description: hiou b
   type: 0
