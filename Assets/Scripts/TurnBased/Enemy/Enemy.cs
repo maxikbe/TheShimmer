@@ -33,6 +33,7 @@ public class Enemy
     public string name;
     public int health;
     public int maxHealth;
+    public bool isDead;
     public Sprite sprite;
     public List<EnemyAttack> attacks = new List<EnemyAttack>();
 

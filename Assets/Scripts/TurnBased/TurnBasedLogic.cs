@@ -105,6 +105,8 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private GameObject button;
     [SerializeField] private List<GameObject> arrowsCharacters = new List<GameObject>();
     [SerializeField] private List<GameObject> arrowsEnemies = new List<GameObject>();
+    [SerializeField] private List<GameObject> enemyUIs = new List<GameObject>();
+    [SerializeField] private List<GameObject> characterUIs = new List<GameObject>();
 
     // DEFAULT
     void Start()
@@ -122,7 +124,6 @@ public class TurnBasedLogic : MonoBehaviour
        // if (Input.GetKey(keySpecial)) PlayerAttackEnemy(0, 0);
         //if (Input.GetKey(keyNormal)) EnemyAttackPlayer(0, 0);
        // Debug.Log("Current Turn Order: " + string.Join(", ", turnOrder.Select(t => t.ToString())));
-        if (Input.GetKeyDown(keyAccept)) ChooseMenu();
         if (Input.GetKeyDown(KeyCode.F)) nextTurn();
         if (Input.GetKeyDown(KeyCode.Z)) SetActiveCamera(8);
         if (Input.GetKeyDown(keyDown) && isChoosingEnemy && isPlayerChoosing)
@@ -240,7 +241,29 @@ public class TurnBasedLogic : MonoBehaviour
         Debug.Log("Enemies IDs: " + string.Join(", ", enemies.Select(e => e.id)));
         Debug.Log("Enemies what is fighting: " + string.Join(", ", whatEnemiesIsFighting));
         currentEnemy = whatEnemiesIsFighting
-            .Select(id => enemies.FirstOrDefault(e => e.id == id))
+            .Select((id, index) => {
+                Enemy original = enemies.FirstOrDefault(en => en.id == id);
+                if (original == null) return null;
+                return new Enemy {
+                    id = original.id,
+                    name = original.name,
+                    health = original.health,
+                    maxHealth = original.maxHealth,
+                    isDead = original.isDead,
+                    sprite = original.sprite,
+                    attacks = original.attacks.Select(a => new EnemyAttack {
+                        id = a.id,
+                        attackName = a.attackName,
+                        totalAnimationDuration = a.totalAnimationDuration,
+                        weight = a.weight,
+                        hits = a.hits.Select(h => new Hit {
+                            timeOffset = h.timeOffset,
+                            damage = h.damage
+                        }).ToList(),
+                        animations = a.animations 
+                    }).ToList()
+                };
+            })
             .Where(e => e != null)
             .ToList();
         Debug.Log("Current enemy: " + string.Join(", ", currentEnemy.Select(e => e.name)));
@@ -417,21 +440,90 @@ public class TurnBasedLogic : MonoBehaviour
     void handlePlayerAttack()
     {
         HideArrow();
-
+        Debug.Log("Current Arrow: " + currentArrow);
         switch (currentTypeAttack)
         {
-            case 1:
-                Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
-                
+            case 0:
+            {
+                var targetEnemy = currentEnemy[currentArrow];
+                targetEnemy.health -= currentCharacter.attack;
+                characters[currentCharacter.id].mana += 5;
+                if (characters[currentCharacter.id].mana > 10) characters[currentCharacter.id].mana = 10;
+                Debug.Log("CHAR MANA " + characters[currentCharacter.id].mana );
+                if (targetEnemy.health <= 0) { targetEnemy.isDead = true; UpdateTurnOrder(targetEnemy.id, true); }
+                updateEnemyHealthBar();
+                updateCharacterBars();
                 break;
+            }
+            case 1:
+            {
+                Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
+                switch (currentSkill.type)
+                {
+                    case skillType.Damage:
+                    {
+                        var targetEnemy = currentEnemy[currentArrow];
+                        Debug.Log($"{targetEnemy.name} health: {targetEnemy.health}");
+                        targetEnemy.health -= currentSkill.amount;
+                        Debug.Log($"{targetEnemy.name} health: {targetEnemy.health}\nTotal enemies: {currentEnemy.Count}");
+
+                        if (targetEnemy.health <= 0)
+                        {
+                            targetEnemy.isDead = true;
+                            UpdateTurnOrder(targetEnemy.id, true);
+                        }
+                        updateEnemyHealthBar();
+                        break;
+                    }
+                    case skillType.Heal:
+                        currentCharacter.health += currentSkill.amount;
+                        updateCharacterBars();
+                        break;
+
+                    case skillType.Mana:
+                        currentCharacter.mana += currentSkill.amount;
+                        updateCharacterBars();
+                        break;
+
+                    case skillType.Buff:
+                        Debug.Log("Buff");
+                        break;
+
+                    default:
+                        Debug.Log("Unknown skill type");
+                        break;
+                }
+                break;
+            }
             default:
                 break;
         }
-        
+        isPlayerChoosing = false;
+        isChoosingEnemy = false;
+        HideArrow();
+        nextTurn();
+    }
+    public void basicAttack()
+    {
+        Debug.Log("Basic attack");
+        isPlayerChoosing = true;
+        isChoosingEnemy = true;
+        arrowsEnemies[currentArrow].SetActive(true);         
+        currentTypeAttack = 0;
+        handleSkillItemClosing();
+        ChooseMenu();
+        SetActiveCamera(8);
     }
 
+    
     void handleSelection(bool isChoosingEnemyInput, int currentTypeAttackInput)
     {
+        Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
+        if (currentSkill.manaCost > currentCharacter.mana)
+        {
+            Debug.Log("Not enough mana!");
+            return;
+        }
         isPlayerChoosing = true;
         currentArrow = 0;
         currentTypeAttack = currentTypeAttackInput;
@@ -513,6 +605,7 @@ public class TurnBasedLogic : MonoBehaviour
         {
             maxHealth += currentEnemy[i].maxHealth;
             currentHealth += currentEnemy[i].health;
+            Debug.Log("Current health: " + currentEnemy[i].health);
         }
         EnemyHealthBar.fillAmount = currentHealth / (float)maxHealth;
     }
@@ -522,11 +615,10 @@ public class TurnBasedLogic : MonoBehaviour
         int i = 0;
         foreach (characterBars bars in characterBars)
         {
-            if (bars.ID == characters[i].id)
-            {
-                bars.healthBar.fillAmount = characters[i].health / (float)characters[i].maxHealth;
-                bars.manaBar.fillAmount = characters[i].mana / 10;
-            }
+        
+            bars.healthBar.fillAmount = characters[i].health / (float)characters[i].maxHealth;
+            bars.manaBar.fillAmount = characters[i].mana / 10;
+            Debug.Log("CHAR MANA " + characters[i].mana);
             i++;
         }
     }

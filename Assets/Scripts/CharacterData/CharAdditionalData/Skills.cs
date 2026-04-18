@@ -12,6 +12,7 @@ public class Skills : ScriptableObject
     public int skillLevel;
     public int pointsToResearch;
     public int animationID;
+    public int manaCost;
 }
 
 public enum skillType { Damage, Heal, Buff, Mana}

@@ -12,7 +12,7 @@ public class KeyBoardSetting : MonoBehaviour
     public static KeyCode chooseSpecialSpell = KeyCode.Q; 
     public static KeyCode chooseNormalSpell = KeyCode.W;   
     public static KeyCode chooseItem = KeyCode.E;
-    public static KeyCode doAccept = KeyCode.Space;
+    public static KeyCode doAccept = KeyCode.Return;
     public static KeyCode doBack = KeyCode.Backspace;
     public static KeyCode swapUp = KeyCode.W;
     public static KeyCode swapDown = KeyCode.S;

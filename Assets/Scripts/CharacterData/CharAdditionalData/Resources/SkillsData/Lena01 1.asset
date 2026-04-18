@@ -21,3 +21,4 @@ MonoBehaviour:
   skillLevel: 1
   pointsToResearch: 1
   animationID: 0
+  manaCost: 2
