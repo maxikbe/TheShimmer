@@ -1,16 +1,12 @@
 using UnityEngine;
-using System.Collections; 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine.UI;
 using TMPro;
-using NUnit.Framework;
 using UnityEngine.Rendering.Universal;
 
-//using System.Diagnostics;
-
-[System.Serializable] 
+[System.Serializable]
 public struct CameraInfo
 {
     public int ID;
@@ -19,7 +15,7 @@ public struct CameraInfo
     public float zoomMultiplier;
 }
 
-[System.Serializable] 
+[System.Serializable]
 public struct FacesSprite
 {
     public bool isEnemy;
@@ -27,7 +23,7 @@ public struct FacesSprite
     public Sprite sprite;
 }
 
-[System.Serializable] 
+[System.Serializable]
 public struct characterBars
 {
     public int ID;
@@ -45,173 +41,209 @@ public struct BackgroundPicture
 
 public class TurnBasedLogic : MonoBehaviour
 {
-    //turn Based ShortCuts
-    private KeyCode keySpecial = KeyBoardSetting.chooseSpecialSpell;
-    private KeyCode keyNormal = KeyBoardSetting.chooseNormalSpell;
-    private KeyCode keyItem = KeyBoardSetting.chooseItem;
-    private KeyCode keyAccept = KeyBoardSetting.doAccept;
-    private KeyCode keyBack = KeyBoardSetting.doBack;
-    private KeyCode keyUp = KeyBoardSetting.swapUp;
-    private KeyCode keyDown = KeyBoardSetting.swapDown;
-    private KeyCode keyLeft = KeyBoardSetting.swapLeft;
-    private KeyCode keyRight = KeyBoardSetting.swapRight;
-    private KeyCode keyAliveUp = KeyBoardSetting.swapAliveUp;
-    private KeyCode keyAliveDown = KeyBoardSetting.swapAliveDown;
+    // ─── Klávesové zkratky ───────────────────────────────────────────
+    private KeyCode keySpecial   = KeyBoardSetting.chooseSpecialSpell; // Q
+    private KeyCode keyNormal    = KeyBoardSetting.chooseNormalSpell;  // W
+    private KeyCode keyItem      = KeyBoardSetting.chooseItem;         // E
+    private KeyCode keyAccept    = KeyBoardSetting.doAccept;           // Return
+    private KeyCode keyBack      = KeyBoardSetting.doBack;             // Backspace
+    private KeyCode keyUp        = KeyBoardSetting.swapUp;             // W
+    private KeyCode keyDown      = KeyBoardSetting.swapDown;           // S
+    private KeyCode keyLeft      = KeyBoardSetting.swapLeft;           // A
+    private KeyCode keyRight     = KeyBoardSetting.swapRight;          // D
+    private KeyCode keyAliveUp   = KeyBoardSetting.swapAliveUp;        // Tab
+    private KeyCode keyAliveDown = KeyBoardSetting.swapAliveDown;      // LeftShift
+    private KeyCode keyJump      = KeyBoardSetting.jump;               // Space
+    private KeyCode keyDodge     = KeyBoardSetting.dodge;              // D
+    private KeyCode keyParry     = KeyBoardSetting.parry;              // F
 
-    // VARIABLES
-    GameData data = new GameData(); 
-    [SerializeField] private Database _databaseReference;
+    // ─── Data ────────────────────────────────────────────────────────
+    GameData data = new GameData();
+    [SerializeField] private Database      _databaseReference;
     [SerializeField] private SkillDatabase _skillDatabaseReference;
-    private static Database itemDatabase;
+    private static Database      itemDatabase;
     private static SkillDatabase skillDatabase;
-    private List<Skills> currentCharacterSkills;
+
+    private List<Skills>    currentCharacterSkills;
     private List<Character> characters;
-    private Character currentCharacter;
-    private bool isPlayerTurn;
-    private bool isPlayerChoosing = false;
-    private int currentSkillID;
-    private List<Enemy> enemies;
-    private List<Enemy> currentEnemy;
+    private Character       currentCharacter;
+    private List<Enemy>     enemies;
+    private List<Enemy>     currentEnemy;
+
     public List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 1 };
-    private int currentBackgroundPictureID = 1;
-    private int currentArrow = 0;
-    private bool isChoosingEnemy = false;
-    private int EnemyID;
-    private int currentTurn;
-    private int currentTypeAttack;
+
+    private int  currentBackgroundPictureID = 1;
+    private int  currentArrow               = 0;
+    private bool isChoosingEnemy            = false;
+    private bool isPlayerChoosing           = false;
+    private bool isBattleOver               = false;
+    private bool isAnimating                = false;
+    private int  currentTypeAttack;
+    private int  currentSkillID;
+
     private List<TurnType> turnOrder = new List<TurnType>();
 
-    private int maxVisibleTurns = 5;
-    enum TurnType{ Enemy, Enemy2, Enemy3, Player1, Player2, Player3, Player4, Player5 }
+    enum TurnType { Enemy, Enemy2, Enemy3, Player1, Player2, Player3, Player4, Player5 }
 
-    [SerializeField] private List<GameObject> enemyPosition = new List<GameObject>();
-    [SerializeField] private  List<GameObject> playerPosition = new List<GameObject>();
-    private List<Vector3> defaultPlayerPositons = new List<Vector3>();
-    private List<Vector3> defaultEnemyPositions = new List<Vector3>();
-    [SerializeField] private List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();    
-    [SerializeField] private List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
+    // ─── Parry / Dodge stav ──────────────────────────────────────────
+    private bool      isWaitingForParryOrDodge = false;
+    private dodgeType currentHitDodgeType;
+    private bool      lastHitWasDodged;
+    private bool      lastHitWasParried;
+    private int       totalHitsInAttack;
+    private int       dodgedHitsCount;
 
-    // UI
-    [SerializeField] private List<Image> FaceHolders = new List<Image>();
-    [SerializeField] private List<FacesSprite> Faces = new List<FacesSprite>();
-    [SerializeField] private TextMeshProUGUI EnemyName;
-    [SerializeField] private Image EnemyHealthBar;
-    [SerializeField] private List<characterBars> characterBars = new List<characterBars>();
+    // ─── Pozice ──────────────────────────────────────────────────────
+    [SerializeField] private List<GameObject> enemyPosition  = new List<GameObject>();
+    [SerializeField] private List<GameObject> playerPosition = new List<GameObject>();
+    private List<Vector3> defaultPlayerPositions = new List<Vector3>();
+    private List<Vector3> defaultEnemyPositions  = new List<Vector3>();
+
+    // ─── Animace ─────────────────────────────────────────────────────
+    [SerializeField] private List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();
+    [SerializeField] private List<EnemyAnimationData>     enemyAnimations     = new List<EnemyAnimationData>();
+
+    // ─── UI ──────────────────────────────────────────────────────────
+    [SerializeField] private List<Image>             FaceHolders       = new List<Image>();
+    [SerializeField] private List<FacesSprite>       Faces             = new List<FacesSprite>();
+    [SerializeField] private TextMeshProUGUI         EnemyName;
+    [SerializeField] private Image                   EnemyHealthBar;
+    [SerializeField] private List<characterBars>     characterBars     = new List<characterBars>();
     [SerializeField] private List<BackgroundPicture> BackgroundPictures = new List<BackgroundPicture>();
-    [SerializeField] private SpriteRenderer BackgroundPicture; 
-    [SerializeField] private GameObject chooseMenu;
-    [SerializeField] private GameObject chooserThingsMenu;
-    [SerializeField] private GameObject ChooseAttackUI;
-    [SerializeField] private GameObject button;
-    [SerializeField] private List<GameObject> arrowsCharacters = new List<GameObject>();
-    [SerializeField] private List<GameObject> arrowsEnemies = new List<GameObject>();
-    [SerializeField] private List<GameObject> enemyUIs = new List<GameObject>();
-    [SerializeField] private List<GameObject> characterUIs = new List<GameObject>();
+    [SerializeField] private SpriteRenderer          BackgroundPicture;
+    [SerializeField] private GameObject              chooseMenu;
+    [SerializeField] private GameObject              chooserThingsMenu;
+    [SerializeField] private GameObject              ChooseAttackUI;
+    [SerializeField] private GameObject              button;
+    [SerializeField] private List<GameObject>        arrowsCharacters  = new List<GameObject>();
+    [SerializeField] private List<GameObject>        arrowsEnemies     = new List<GameObject>();
+    [SerializeField] private List<GameObject>        enemyUIs          = new List<GameObject>();
+    [SerializeField] private List<GameObject>        characterUIs      = new List<GameObject>();
 
-    // DEFAULT
+    // ─── Volitelné panely ────────────────────────────────────────────
+    [SerializeField] private GameObject          gameOverPanel;
+    [SerializeField] private GameObject          victoryPanel;
+
+    // Přiřaď v Inspectoru – zobrazuje "DODGE!" / "PARRY!" / prompt klávesy
+    [SerializeField] private TextMeshProUGUI parryDodgePromptText;
+
+    // ─── Kamery ──────────────────────────────────────────────────────
+    [SerializeField] private List<CameraInfo> camerasInfo = new List<CameraInfo>();
+    private Camera    currentActiveCamera;
+    public  float     transitionDuration = 0.5f;
+    public  float     zoomStartFOV       = 80f;
+    public  float     zoomEndFOV         = 60f;
+    private int       defaultPPU;
+    private Coroutine activeAnimation;
+    private Dictionary<Camera, Vector3> originalPositions = new Dictionary<Camera, Vector3>();
+
+    // =================================================================
+    //  START / UPDATE
+    // =================================================================
+
     void Start()
     {
-        characters = gameDataManager.currentGameData.characters;
-        enemies = gameDataManager.currentGameData.enemies;
-        itemDatabase = _databaseReference;
+        characters    = gameDataManager.currentGameData.characters;
+        enemies       = gameDataManager.currentGameData.enemies;
+        itemDatabase  = _databaseReference;
         skillDatabase = _skillDatabaseReference;
-        Debug.Log("Characters loaded: " + string.Join(", ", characters.Select(c => c.name)));   
+
+        Debug.Log("Characters loaded: " + string.Join(", ", characters.Select(c => c.name)));
         inicializeTurnBasedGame();
     }
 
     void Update()
     {
-       // if (Input.GetKey(keySpecial)) PlayerAttackEnemy(0, 0);
-        //if (Input.GetKey(keyNormal)) EnemyAttackPlayer(0, 0);
-       // Debug.Log("Current Turn Order: " + string.Join(", ", turnOrder.Select(t => t.ToString())));
-        if (Input.GetKeyDown(KeyCode.F)) nextTurn();
-        if (Input.GetKeyDown(KeyCode.Z)) SetActiveCamera(8);
-        if (Input.GetKeyDown(keyDown) && isChoosingEnemy && isPlayerChoosing)
-        {
-            currentArrow = (currentArrow + 1) % arrowsEnemies.Count;
-            ShowArrow(arrowsEnemies, currentArrow);
-        }
-        if (Input.GetKeyDown(keyUp) && isChoosingEnemy && isPlayerChoosing)
-        {
-            currentArrow = (currentArrow - 1 + arrowsEnemies.Count) % arrowsEnemies.Count;
-            ShowArrow(arrowsEnemies, currentArrow);
-        }
-        if(Input.GetKeyDown(keyAccept) && isChoosingEnemy && isPlayerChoosing) handlePlayerAttack();
-        if (Input.GetKeyDown(keyBack) && isChoosingEnemy && isPlayerChoosing)
-        {
-            handleSelectionBack();
-        }
-    }
+        if(Input.GetKeyDown(KeyCode.F1)) nextTurn();
+        if (isBattleOver) return;
 
-    // CAMERAS
-    [SerializeField] private List<CameraInfo> camerasInfo = new List<CameraInfo>();
-    private Camera currentActiveCamera;
-    public float transitionDuration = 0.5f; 
-    public float zoomStartFOV = 80f;        
-    public float zoomEndFOV = 60f;
-    private int defaultPPU;
-    private Coroutine activeAnimation;
-    private Dictionary<Camera, Vector3> originalPositions = new Dictionary<Camera, Vector3>();
-    void SetActiveCamera(int cameraID)
-    {
-        var target = camerasInfo.FirstOrDefault(c => c.IDofCamera == cameraID);
-        if (target.targetCamera == null)
+        // ── Parry / Dodge – čteme vstup i během isAnimating ──────────
+        if (isWaitingForParryOrDodge)
         {
-            Debug.LogWarning($"Kamera s ID {cameraID} nenalezena!");
-            return;
+            if (Input.GetKeyDown(keyParry))
+            {
+                lastHitWasParried        = true;
+                lastHitWasDodged         = false;
+                isWaitingForParryOrDodge = false;
+                ShowParryDodgeText("PARRY!");
+            }
+            else if (currentHitDodgeType == dodgeType.normal && Input.GetKeyDown(keyDodge))
+            {
+                lastHitWasDodged         = true;
+                lastHitWasParried        = false;
+                isWaitingForParryOrDodge = false;
+                ShowParryDodgeText("DODGE!");
+                
+            }
+            else if (currentHitDodgeType == dodgeType.jump && Input.GetKeyDown(keyJump))
+            {
+                lastHitWasDodged         = true;
+                lastHitWasParried        = false;
+                isWaitingForParryOrDodge = false;
+                ShowParryDodgeText("JUMP DODGE!");
+            }
+            return; // blokuj ostatní vstup dokud hráč nerozhodne
         }
 
-        if (activeAnimation != null) StopCoroutine(activeAnimation);
-        activeAnimation = StartCoroutine(AnimateToCamera(target.targetCamera, target.zoomMultiplier));
-    }
+        if (isAnimating) return;
 
-    System.Collections.IEnumerator AnimateToCamera(Camera targetCam, float zoomMultiplier)
-    {
-        Camera mainCam = camerasInfo.FirstOrDefault(c => c.IDofCamera == 0).targetCamera;
-        var ppCam = mainCam.GetComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>();
-
-        Vector3 startPos = mainCam.transform.position;
-        Quaternion startRot = mainCam.transform.rotation;
-        int startPPU = ppCam.assetsPPU;
-
-        Vector3 endPos = targetCam.transform.position;      
-        Quaternion endRot = targetCam.transform.rotation;    
-        int endPPU = zoomMultiplier > 0 ? Mathf.RoundToInt(defaultPPU * zoomMultiplier)  : defaultPPU;
-
-        float elapsed = 0f;
-        while (elapsed < transitionDuration)
+        // ── Výběr nepřítele ───────────────────────────────────────────
+        if (isPlayerChoosing && isChoosingEnemy)
         {
-            elapsed += Time.deltaTime;
-            float t = Mathf.SmoothStep(0, 1, elapsed / transitionDuration);
-
-            mainCam.transform.position = Vector3.Lerp(startPos, endPos, t);
-            mainCam.transform.rotation = Quaternion.Lerp(startRot, endRot, t);
-            ppCam.assetsPPU = Mathf.RoundToInt(Mathf.Lerp(startPPU, endPPU, t));
-
-            yield return null;
+            if (Input.GetKeyDown(keyDown))   CycleEnemyArrow(1);
+            if (Input.GetKeyDown(keyUp))     CycleEnemyArrow(-1);
+            if (Input.GetKeyDown(keyAccept)) StartCoroutine(HandlePlayerAttackCoroutine());
+            if (Input.GetKeyDown(keyBack))   handleSelectionBack();
         }
-
-        mainCam.transform.position = endPos;
-        mainCam.transform.rotation = endRot;
-        ppCam.assetsPPU = endPPU;
+        // ── Výběr vlastní postavy ─────────────────────────────────────
+        else if (isPlayerChoosing && !isChoosingEnemy)
+        {
+            if (Input.GetKeyDown(keyDown))   CycleCharacterArrow(1);
+            if (Input.GetKeyDown(keyUp))     CycleCharacterArrow(-1);
+            if (Input.GetKeyDown(keyAccept)) StartCoroutine(HandlePlayerSelfTargetCoroutine());
+            if (Input.GetKeyDown(keyBack))   handleSelectionBack();
+        }
     }
 
-    void SwitchToOverviewCamera()
+    // ─── Cyklování šipek (přeskakuje mrtvé) ──────────────────────────
+
+    void CycleEnemyArrow(int dir)
     {
-        SetActiveCamera(0);
+        List<int> alive = currentEnemy
+            .Select((e, i) => new { e, i })
+            .Where(x => !x.e.isDead)
+            .Select(x => x.i)
+            .ToList();
+
+        if (alive.Count == 0) return;
+
+        int pos = alive.IndexOf(currentArrow);
+        if (pos < 0) pos = 0;
+        pos          = (pos + dir + alive.Count) % alive.Count;
+        currentArrow = alive[pos];
+        ShowArrowEnemySafe(currentArrow);
     }
 
-    void SwitchToPlayerCamera(int playerID)
+    void CycleCharacterArrow(int dir)
     {
-        SetActiveCamera(playerID);
+        List<int> alive = characters
+            .Select((c, i) => new { c, i })
+            .Where(x => !x.c.isDead)
+            .Select(x => x.i)
+            .ToList();
+
+        if (alive.Count == 0) return;
+
+        int pos = alive.IndexOf(currentArrow);
+        if (pos < 0) pos = 0;
+        pos          = (pos + dir + alive.Count) % alive.Count;
+        currentArrow = alive[pos];
+        ShowArrow(arrowsCharacters, currentArrow);
     }
 
-    void SwitchToEnemyCamera(int enemyID)
-    {
-        SetActiveCamera(enemyID);
-    }
-
-    // CODE
+    // =================================================================
+    //  INICIALIZACE
+    // =================================================================
 
     void inicializeTurnBasedGame()
     {
@@ -220,80 +252,95 @@ public class TurnBasedLogic : MonoBehaviour
         createTurnOrder();
         updateEnemyHealthBar();
         updateCharacterBars();
+        RefreshAllUIs();
+
         foreach (var info in camerasInfo)
-        {
             if (info.targetCamera != null)
-            {
                 originalPositions[info.targetCamera] = info.targetCamera.transform.position;
-            }
-        }
-        var ppCam = camerasInfo.FirstOrDefault(c => c.IDofCamera == 0).targetCamera
-            .GetComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>();
+
+        var ppCam = camerasInfo.FirstOrDefault(c => c.IDofCamera == 0)
+                               .targetCamera
+                               .GetComponent<PixelPerfectCamera>();
         defaultPPU = ppCam.assetsPPU;
+
         SetActiveCamera(0);
-        EnemyName.text = currentEnemy[0].name;
-        BackgroundPicture.sprite = BackgroundPictures[currentBackgroundPictureID].sprite;
+        EnemyName.text = currentEnemy.Count > 0 ? currentEnemy[0].name : "";
+        BackgroundPicture.sprite = BackgroundPictures
+            .FirstOrDefault(b => b.ID == currentBackgroundPictureID).sprite;
+
+        if (gameOverPanel        != null) gameOverPanel.SetActive(false);
+        if (victoryPanel         != null) victoryPanel.SetActive(false);
+        if (parryDodgePromptText != null) parryDodgePromptText.gameObject.SetActive(false);
     }
 
     void onTurnbasedStart()
     {
-        Debug.Log("Enemies: " + string.Join(", ", enemies.Select(e => e.name)));
-        Debug.Log("Enemies IDs: " + string.Join(", ", enemies.Select(e => e.id)));
-        Debug.Log("Enemies what is fighting: " + string.Join(", ", whatEnemiesIsFighting));
         currentEnemy = whatEnemiesIsFighting
-            .Select((id, index) => {
+            .Select(id =>
+            {
                 Enemy original = enemies.FirstOrDefault(en => en.id == id);
                 if (original == null) return null;
-                return new Enemy {
-                    id = original.id,
-                    name = original.name,
-                    health = original.health,
+                return new Enemy
+                {
+                    id        = original.id,
+                    name      = original.name,
+                    health    = original.health,
                     maxHealth = original.maxHealth,
-                    isDead = original.isDead,
-                    sprite = original.sprite,
-                    attacks = original.attacks.Select(a => new EnemyAttack {
-                        id = a.id,
-                        attackName = a.attackName,
+                    isDead    = original.isDead,
+                    sprite    = original.sprite,
+                    attacks   = original.attacks.Select(a => new EnemyAttack
+                    {
+                        id                     = a.id,
+                        attackName             = a.attackName,
                         totalAnimationDuration = a.totalAnimationDuration,
-                        weight = a.weight,
-                        hits = a.hits.Select(h => new Hit {
-                            timeOffset = h.timeOffset,
-                            damage = h.damage
+                        weight                 = a.weight,
+                        hits = a.hits.Select(h => new Hit
+                        {
+                            timeOffset      = h.timeOffset,
+                            damage          = h.damage,
+                            dodgeTimePlayer = h.dodgeTimePlayer,
+                            dodgeType       = h.dodgeType
                         }).ToList(),
-                        animations = a.animations 
+                        animations = a.animations
                     }).ToList()
                 };
             })
             .Where(e => e != null)
             .ToList();
+
         Debug.Log("Current enemy: " + string.Join(", ", currentEnemy.Select(e => e.name)));
     }
+
+    // =================================================================
+    //  TURN ORDER
+    // =================================================================
+
     void createTurnOrder()
     {
         turnOrder.Clear();
-        
+
         List<TurnType> enemyPool = new List<TurnType>();
         for (int i = 0; i < currentEnemy.Count; i++)
         {
-            if (i == 0) enemyPool.Add(TurnType.Enemy);
+            if      (i == 0) enemyPool.Add(TurnType.Enemy);
             else if (i == 1) enemyPool.Add(TurnType.Enemy2);
             else if (i == 2) enemyPool.Add(TurnType.Enemy3);
         }
 
         List<TurnType> playerPool = characters
             .Where(c => !c.isDead)
-            .Select(c => {
+            .Select(c =>
+            {
                 if (c.id == 1) return TurnType.Player1;
                 if (c.id == 2) return TurnType.Player2;
                 if (c.id == 3) return TurnType.Player3;
                 if (c.id == 4) return TurnType.Player4;
                 return TurnType.Player5;
-            })
-            .ToList();
+            }).ToList();
 
         if (enemyPool.Count == 0 && playerPool.Count == 0) return;
 
-        int enemyIndex = 0;
+        int enemyIndex  = 0;
         int playerIndex = 0;
 
         while (turnOrder.Count < 500)
@@ -303,12 +350,11 @@ public class TurnBasedLogic : MonoBehaviour
                 turnOrder.Add(enemyPool[enemyIndex]);
                 enemyIndex = (enemyIndex + 1) % enemyPool.Count;
             }
-
             if (turnOrder.Count >= 500) break;
 
             if (playerPool.Count > 0)
             {
-                int playersToAdd = Random.Range(2, 5); 
+                int playersToAdd = Random.Range(2, 5);
                 for (int i = 0; i < playersToAdd; i++)
                 {
                     if (turnOrder.Count >= 500) break;
@@ -317,31 +363,26 @@ public class TurnBasedLogic : MonoBehaviour
                 }
             }
         }
+
         UpdateFaces();
-        if (turnOrder[0] != TurnType.Player1 && turnOrder[0] != TurnType.Player2 && turnOrder[0] != TurnType.Player3 && turnOrder[0] != TurnType.Player4 && turnOrder[0] != TurnType.Player5) { isPlayerTurn = false; return;}
-        else isPlayerTurn = true;
-        currentCharacter = characters.FirstOrDefault(c => 
-            (turnOrder[0] == TurnType.Player1 && c.id == 1) ||
-            (turnOrder[0] == TurnType.Player2 && c.id == 2) ||
-            (turnOrder[0] == TurnType.Player3 && c.id == 3) ||
-            (turnOrder[0] == TurnType.Player4 && c.id == 4) ||
-            (turnOrder[0] == TurnType.Player5 && c.id == 5) 
-        );
+
+        if (IsPlayerTurn(turnOrder[0]))
+            currentCharacter = GetCharacterForTurn(turnOrder[0]);
     }
 
     void UpdateTurnOrder(int idWhoDied, bool isEnemy)
     {
-        TurnType turnToRemove = TurnType.Player1; 
+        TurnType turnToRemove = TurnType.Player1;
 
         if (isEnemy)
         {
-            if (idWhoDied == 1) turnToRemove = TurnType.Enemy;
+            if      (idWhoDied == 1) turnToRemove = TurnType.Enemy;
             else if (idWhoDied == 2) turnToRemove = TurnType.Enemy2;
             else if (idWhoDied == 3) turnToRemove = TurnType.Enemy3;
         }
         else
         {
-            if (idWhoDied == 1) turnToRemove = TurnType.Player1;
+            if      (idWhoDied == 1) turnToRemove = TurnType.Player1;
             else if (idWhoDied == 2) turnToRemove = TurnType.Player2;
             else if (idWhoDied == 3) turnToRemove = TurnType.Player3;
             else if (idWhoDied == 4) turnToRemove = TurnType.Player4;
@@ -352,343 +393,786 @@ public class TurnBasedLogic : MonoBehaviour
         UpdateFaces();
     }
 
+    bool IsPlayerTurn(TurnType t) =>
+        t == TurnType.Player1 || t == TurnType.Player2 || t == TurnType.Player3 ||
+        t == TurnType.Player4 || t == TurnType.Player5;
+
+    Character GetCharacterForTurn(TurnType t) =>
+        characters.FirstOrDefault(c =>
+            (t == TurnType.Player1 && c.id == 1) ||
+            (t == TurnType.Player2 && c.id == 2) ||
+            (t == TurnType.Player3 && c.id == 3) ||
+            (t == TurnType.Player4 && c.id == 4) ||
+            (t == TurnType.Player5 && c.id == 5));
+
+    int GetEnemyIndex(TurnType t)
+    {
+        if (t == TurnType.Enemy)  return 0;
+        if (t == TurnType.Enemy2) return 1;
+        if (t == TurnType.Enemy3) return 2;
+        return -1;
+    }
+
+    int GetFirstAliveEnemyIndex()
+    {
+        for (int i = 0; i < currentEnemy.Count; i++)
+            if (!currentEnemy[i].isDead) return i;
+        return 0;
+    }
+
+    // =================================================================
+    //  NEXT TURN
+    // =================================================================
+
     public void nextTurn()
     {
+        if (isBattleOver || isAnimating) return;
         if (turnOrder.Count == 0) return;
 
-        TurnType currentTurn = turnOrder[0];
+        if (chooseMenu.activeSelf) chooseMenu.SetActive(false);
+        isPlayerChoosing = false;
+        isChoosingEnemy  = false;
+        HideArrow();
+        handleSkillItemClosing();
+
         turnOrder.RemoveAt(0);
         UpdateFaces();
-        Debug.Log("Current Turn: " + currentTurn);
-        if (turnOrder[0] != TurnType.Player1 && turnOrder[0] != TurnType.Player2 && turnOrder[0] != TurnType.Player3 && turnOrder[0] != TurnType.Player4 && turnOrder[0] != TurnType.Player5) return;
-        currentCharacter = characters.FirstOrDefault(c => 
-            (turnOrder[0] == TurnType.Player1 && c.id == 1) ||
-            (turnOrder[0] == TurnType.Player2 && c.id == 2) ||
-            (turnOrder[0] == TurnType.Player3 && c.id == 3) ||
-            (turnOrder[0] == TurnType.Player4 && c.id == 4) ||
-            (turnOrder[0] == TurnType.Player5 && c.id == 5) 
-        );
-        SwitchToPlayerCamera(currentCharacter.id);
-        ChooseMenu();
-        Debug.Log("Current Character: " + currentCharacter.name);
-    }
 
+        if (turnOrder.Count == 0) { createTurnOrder(); return; }
 
-    void getDefaultPositions()
-    {
-        defaultEnemyPositions = enemyPosition.Select(pos => pos.transform.position).ToList();
-        defaultPlayerPositons = playerPosition.Select(pos => pos.transform.position).ToList();
-    }
+        TurnType next = turnOrder[0];
 
-    Vector3 getAnimationPositions(int enemyPositionIndex, int playerPositionIndex, bool isPlayerAttacking)
-    {
-        if(isPlayerAttacking)
+        if (IsPlayerTurn(next))
         {
-            Vector3 enemyPos = defaultEnemyPositions[enemyPositionIndex];
-            Vector3 playerPos = defaultPlayerPositons[playerPositionIndex];
+            currentCharacter = GetCharacterForTurn(next);
+            if (currentCharacter == null || currentCharacter.isDead) { nextTurn(); return; }
 
-            return Vector3.Lerp(playerPos, enemyPos, 0.65f);
+            Debug.Log("Hráčův tah: " + currentCharacter.name);
+            SwitchToPlayerCamera(currentCharacter.id);
+            StartCoroutine(ShowChooseMenuDelayed(0.35f));
         }
         else
         {
-            Vector3 enemyPos = defaultEnemyPositions[enemyPositionIndex];
-            Vector3 playerPos = defaultPlayerPositons[playerPositionIndex];
-            
-            return Vector3.Lerp(enemyPos, playerPos, 0.65f);
+            int enemyIndex = GetEnemyIndex(next);
+            if (enemyIndex < 0 || enemyIndex >= currentEnemy.Count || currentEnemy[enemyIndex].isDead)
+            {
+                nextTurn();
+                return;
+            }
+            StartCoroutine(EnemyTurnCoroutine(enemyIndex));
         }
     }
 
-    void MovePlayerBackToPosition(int playerPositionIndex)
+    IEnumerator ShowChooseMenuDelayed(float delay)
     {
-        Vector3 targetPosition = defaultPlayerPositons[playerPositionIndex];
+        yield return new WaitForSeconds(delay);
+        chooseMenu.SetActive(true);
     }
 
-    void MoveEnemyBackToPosition(int enemyPositionIndex)
+    // =================================================================
+    //  ENEMY AI  +  PARRY / DODGE
+    // =================================================================
+
+    IEnumerator EnemyTurnCoroutine(int enemyIndex)
     {
-        Vector3 targetPosition = defaultEnemyPositions[enemyPositionIndex];
+        isAnimating = true;
+
+        Enemy enemy = currentEnemy[enemyIndex];
+        Debug.Log("Nepřítelův tah: " + enemy.name);
+
+        List<Character> alivePlayers = characters.Where(c => !c.isDead).ToList();
+        if (alivePlayers.Count == 0) { isAnimating = false; TriggerGameOver(); yield break; }
+
+        Character target      = alivePlayers[Random.Range(0, alivePlayers.Count)];
+        int       playerIndex = characters.IndexOf(target);
+
+        EnemyAttack chosenAttack = ChooseEnemyAttack(enemy);
+        if (chosenAttack == null) { isAnimating = false; nextTurn(); yield break; }
+
+        Debug.Log($"{enemy.name} útočí '{chosenAttack.attackName}' na {target.name}");
+
+        // Kamera 8 – přehledový pohled, počkej na přechod
+        yield return StartCoroutine(SwitchToCameraAndWait(8));
+
+        // Pohyb nepřítele dopředu
+        yield return StartCoroutine(MoveObject(
+            enemyPosition[enemyIndex],
+            defaultEnemyPositions[enemyIndex],
+            getAnimationPositions(enemyIndex, playerIndex, false),
+            0.25f));
+
+        // ── Hity s parry/dodge oknem ──────────────────────────────────
+        List<Hit> sortedHits = chosenAttack.hits.OrderBy(h => h.timeOffset).ToList();
+        totalHitsInAttack = sortedHits.Count;
+        dodgedHitsCount   = 0;
+        float lastOffset  = 0f;
+
+        foreach (Hit hit in sortedHits)
+        {
+            float waitTime = hit.timeOffset - lastOffset;
+            if (waitTime > 0f) yield return new WaitForSeconds(waitTime);
+            lastOffset = hit.timeOffset;
+
+            // Otevři okno pro vstup
+            lastHitWasDodged         = false;
+            lastHitWasParried        = false;
+            currentHitDodgeType      = hit.dodgeType;
+            isWaitingForParryOrDodge = true;
+
+            string prompt = hit.dodgeType == dodgeType.jump
+                ? $"[{keyJump}] JUMP  |  [{keyParry}] PARRY"
+                : $"[{keyDodge}] DODGE  |  [{keyParry}] PARRY";
+            ShowParryDodgeText(prompt);
+
+            // Čekej na vstup nebo vypršení okna
+            float elapsed = 0f;
+            while (isWaitingForParryOrDodge && elapsed < hit.dodgeTimePlayer)
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            isWaitingForParryOrDodge = false;
+            HideParryDodgeText();
+
+            // ── Vyhodnoť výsledek hitu ────────────────────────────────
+            if (lastHitWasParried)
+            {
+                // Parry: žádný damage, hráč vrátí polovinu zpět
+                int reflectDmg = Mathf.Max(1, hit.damage / 2);
+                enemy.health -= reflectDmg;
+                if (enemy.health < 0) enemy.health = 0;
+                updateEnemyHealthBar();
+                Debug.Log($"PARRY! {target.name} vrátil {reflectDmg} damage na {enemy.name}");
+                ShowParryDodgeText($"PARRY! +{reflectDmg}");
+                yield return new WaitForSeconds(0.5f);
+                HideParryDodgeText();
+            }
+            else if (lastHitWasDodged)
+            {
+                // Dodge: žádný damage, zaznamenej pro perfect dodge
+                dodgedHitsCount++;
+                Debug.Log($"DODGE! ({dodgedHitsCount}/{totalHitsInAttack})");
+            }
+            else
+            {
+                // Zásah: aplikuj damage
+                target.health -= hit.damage;
+                if (target.health < 0) target.health = 0;
+                updateCharacterBars();
+                Debug.Log($"HIT! {target.name} -{hit.damage} HP → {target.health}/{target.maxHealth}");
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        // ── Perfect dodge: vykryl VŠECHNY hity → vrátí celkový damage ─
+        if (dodgedHitsCount == totalHitsInAttack && totalHitsInAttack > 0)
+        {
+            int totalDmg = chosenAttack.hits.Sum(h => h.damage);
+            enemy.health -= totalDmg;
+            if (enemy.health < 0) enemy.health = 0;
+            updateEnemyHealthBar();
+            Debug.Log($"PERFECT DODGE! {target.name} vrátil {totalDmg} damage na {enemy.name}!");
+            ShowParryDodgeText($"PERFECT DODGE!\n+{totalDmg}");
+            yield return new WaitForSeconds(0.9f);
+            HideParryDodgeText();
+        }
+
+        // ── Zkontroluj smrt nepřítele (od parry / perfect dodge) ──────
+        if (enemy.health <= 0)
+        {
+            enemy.isDead = true;
+            UpdateTurnOrder(enemy.id, true);
+            HandleEnemyDeath(enemyIndex);
+            Debug.Log(enemy.name + " zemřel od counter-attacku!");
+        }
+
+        // ── Zkontroluj smrt hráče ──────────────────────────────────────
+        if (target.health <= 0)
+        {
+            UpdateTurnOrder(target.id, false);
+            HandlePlayerDeath(playerIndex);
+            Debug.Log(target.name + " zemřel!");
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        // Vrať nepřítele zpět
+        yield return StartCoroutine(MoveObject(
+            enemyPosition[enemyIndex],
+            enemyPosition[enemyIndex].transform.position,
+            defaultEnemyPositions[enemyIndex],
+            0.2f));
+
+        isAnimating = false;
+        CheckBattleEnd();
+        if (!isBattleOver) nextTurn();
     }
 
-    void PlayerAttackEnemy(int playerPositionIndex, int enemyPositionIndex)
+    EnemyAttack ChooseEnemyAttack(Enemy enemy)
     {
-        // Move player to attack position
+        if (enemy.attacks == null || enemy.attacks.Count == 0) return null;
+        float totalWeight = enemy.attacks.Sum(a => a.weight);
+        if (totalWeight <= 0f) return enemy.attacks[0];
 
-        Vector3 targetPosition = getAnimationPositions(enemyPositionIndex, playerPositionIndex, true);
-        playerPosition[playerPositionIndex].transform.position = targetPosition;
-
-        // Trigger attack animation here and apply damage to enemy
-
-
-        // After animation, move player back
-
-        //MovePlayerBackToPosition(playerPositionIndex);
+        float roll       = Random.Range(0f, totalWeight);
+        float cumulative = 0f;
+        foreach (EnemyAttack attack in enemy.attacks)
+        {
+            cumulative += attack.weight;
+            if (roll < cumulative) return attack;
+        }
+        return enemy.attacks[0];
     }
 
-    void EnemyAttackPlayer(int enemyPositionIndex, int playerPositionIndex)
+    // =================================================================
+    //  SMRT – skrytí UI, šipek a spritu
+    // =================================================================
+
+    // Zavolá se když nepřítel zemře – skryje jeho UI, šipku a game object
+    void HandleEnemyDeath(int enemyIndex)
     {
-        // Move enemy to attack position
+        if (enemyIndex < enemyUIs.Count      && enemyUIs[enemyIndex]      != null)
+            enemyUIs[enemyIndex].SetActive(false);
 
-        Vector3 targetPosition = getAnimationPositions(enemyPositionIndex, playerPositionIndex, false);
-        enemyPosition[enemyPositionIndex].transform.position = targetPosition;
+        if (enemyIndex < arrowsEnemies.Count && arrowsEnemies[enemyIndex] != null)
+            arrowsEnemies[enemyIndex].SetActive(false);
 
-        // Trigger attack animation here and apply damage to player
+        if (enemyIndex < enemyPosition.Count && enemyPosition[enemyIndex] != null)
+            enemyPosition[enemyIndex].SetActive(false);
 
-        // After animation, move enemy back
+        // Pokud šipka ukazuje na mrtvého, přesuň ji na prvního živého
+        if (isChoosingEnemy && currentArrow == enemyIndex)
+        {
+            List<int> alive = currentEnemy
+                .Select((e, i) => new { e, i })
+                .Where(x => !x.e.isDead)
+                .Select(x => x.i)
+                .ToList();
 
-        MoveEnemyBackToPosition(enemyPositionIndex);
+            if (alive.Count > 0)
+            {
+                currentArrow = alive[0];
+                ShowArrowEnemySafe(currentArrow);
+            }
+            else
+            {
+                HideArrow();
+            }
+        }
     }
 
-    void handlePlayerAttack()
+    // Zavolá se když hráč zemře – skryje jeho UI, šipku a game object
+    void HandlePlayerDeath(int playerIndex)
     {
+        if (playerIndex < characterUIs.Count   && characterUIs[playerIndex]   != null)
+            characterUIs[playerIndex].SetActive(false);
+
+        if (playerIndex < arrowsCharacters.Count && arrowsCharacters[playerIndex] != null)
+            arrowsCharacters[playerIndex].SetActive(false);
+
+        if (playerIndex < playerPosition.Count && playerPosition[playerIndex] != null)
+            playerPosition[playerIndex].SetActive(false);
+    }
+
+    // Zobrazí šipku na nepřítele jen pokud je živý
+    void ShowArrowEnemySafe(int index)
+    {
+        for (int i = 0; i < arrowsEnemies.Count; i++)
+        {
+            bool show = i == index && i < currentEnemy.Count && !currentEnemy[i].isDead;
+            arrowsEnemies[i].SetActive(show);
+        }
+    }
+
+    // Při startu nastaví viditelnost UI podle stavu živosti
+    void RefreshAllUIs()
+    {
+        for (int i = 0; i < currentEnemy.Count; i++)
+        {
+            bool alive = !currentEnemy[i].isDead;
+            if (i < enemyUIs.Count      && enemyUIs[i]      != null) enemyUIs[i].SetActive(alive);
+            if (i < enemyPosition.Count && enemyPosition[i]  != null) enemyPosition[i].SetActive(alive);
+        }
+        for (int i = 0; i < characters.Count; i++)
+        {
+            bool alive = !characters[i].isDead;
+            if (i < characterUIs.Count   && characterUIs[i]   != null) characterUIs[i].SetActive(alive);
+            if (i < playerPosition.Count && playerPosition[i]  != null) playerPosition[i].SetActive(alive);
+        }
+    }
+
+    // =================================================================
+    //  PLAYER ATTACK
+    // =================================================================
+
+    public void basicAttack()
+    {
+        if (isAnimating) return;
+        currentTypeAttack = 0;
+        isPlayerChoosing  = true;
+        isChoosingEnemy   = true;
+        currentArrow      = GetFirstAliveEnemyIndex();
+        handleSkillItemClosing();
+        if (chooseMenu.activeSelf) chooseMenu.SetActive(false);
+        SetActiveCamera(8);
+        ShowArrowEnemySafe(currentArrow);
+    }
+
+    IEnumerator HandlePlayerAttackCoroutine()
+    {
+        if (isAnimating) yield break;
+        isAnimating = true;
+
         HideArrow();
-        Debug.Log("Current Arrow: " + currentArrow);
+        isPlayerChoosing = false;
+        isChoosingEnemy  = false;
+
+        int targetEnemyIndex = currentArrow;
+
         switch (currentTypeAttack)
         {
+            // ── Základní útok ─────────────────────────────────────────
             case 0:
             {
-                var targetEnemy = currentEnemy[currentArrow];
-                targetEnemy.health -= currentCharacter.attack;
-                characters[currentCharacter.id].mana += 5;
-                if (characters[currentCharacter.id].mana > 10) characters[currentCharacter.id].mana = 10;
-                Debug.Log("CHAR MANA " + characters[currentCharacter.id].mana );
-                if (targetEnemy.health <= 0) { targetEnemy.isDead = true; UpdateTurnOrder(targetEnemy.id, true); }
+                Enemy targetEnemy = currentEnemy[targetEnemyIndex];
+                int   playerIndex = characters.IndexOf(currentCharacter);
+
+                yield return StartCoroutine(SwitchToCameraAndWait(8));
+
+                yield return StartCoroutine(MoveObject(
+                    playerPosition[playerIndex],
+                    defaultPlayerPositions[playerIndex],
+                    getAnimationPositions(targetEnemyIndex, playerIndex, true),
+                    0.25f));
+
+                yield return new WaitForSeconds(0.1f);
+
+                int damage    = currentCharacter.attack;
+                targetEnemy.health -= damage;
+                if (targetEnemy.health < 0) targetEnemy.health = 0;
+
+                int charIndex = characters.IndexOf(currentCharacter);
+                characters[charIndex].mana = (int)Mathf.Min(characters[charIndex].mana + 5, 10);
+
                 updateEnemyHealthBar();
                 updateCharacterBars();
-                break;
-            }
-            case 1:
-            {
-                Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
-                switch (currentSkill.type)
+                Debug.Log($"{currentCharacter.name} udeřil {targetEnemy.name} za {damage}. HP: {targetEnemy.health}");
+
+                yield return new WaitForSeconds(0.15f);
+
+                yield return StartCoroutine(MoveObject(
+                    playerPosition[playerIndex],
+                    playerPosition[playerIndex].transform.position,
+                    defaultPlayerPositions[playerIndex],
+                    0.2f));
+
+                if (targetEnemy.health <= 0)
                 {
-                    case skillType.Damage:
-                    {
-                        var targetEnemy = currentEnemy[currentArrow];
-                        Debug.Log($"{targetEnemy.name} health: {targetEnemy.health}");
-                        targetEnemy.health -= currentSkill.amount;
-                        Debug.Log($"{targetEnemy.name} health: {targetEnemy.health}\nTotal enemies: {currentEnemy.Count}");
-
-                        if (targetEnemy.health <= 0)
-                        {
-                            targetEnemy.isDead = true;
-                            UpdateTurnOrder(targetEnemy.id, true);
-                        }
-                        updateEnemyHealthBar();
-                        break;
-                    }
-                    case skillType.Heal:
-                        currentCharacter.health += currentSkill.amount;
-                        updateCharacterBars();
-                        break;
-
-                    case skillType.Mana:
-                        currentCharacter.mana += currentSkill.amount;
-                        updateCharacterBars();
-                        break;
-
-                    case skillType.Buff:
-                        Debug.Log("Buff");
-                        break;
-
-                    default:
-                        Debug.Log("Unknown skill type");
-                        break;
+                    targetEnemy.isDead = true;
+                    UpdateTurnOrder(targetEnemy.id, true);
+                    HandleEnemyDeath(targetEnemyIndex);
+                    Debug.Log(targetEnemy.name + " poražen!");
                 }
                 break;
             }
-            default:
+
+            // ── Skill útok na nepřítele ───────────────────────────────
+            case 1:
+            {
+                Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
+                Enemy  targetEnemy  = currentEnemy[targetEnemyIndex];
+                int    charIndex    = characters.IndexOf(currentCharacter);
+                int    playerIndex  = charIndex;
+
+                characters[charIndex].mana -= currentSkill.manaCost;
+                if (characters[charIndex].mana < 0) characters[charIndex].mana = 0;
+                updateCharacterBars();
+
+                yield return StartCoroutine(SwitchToCameraAndWait(8));
+
+                yield return StartCoroutine(MoveObject(
+                    playerPosition[playerIndex],
+                    defaultPlayerPositions[playerIndex],
+                    getAnimationPositions(targetEnemyIndex, playerIndex, true),
+                    0.25f));
+
+                yield return new WaitForSeconds(0.1f);
+
+                targetEnemy.health -= currentSkill.amount;
+                if (targetEnemy.health < 0) targetEnemy.health = 0;
+                updateEnemyHealthBar();
+                Debug.Log($"{currentCharacter.name} použil {currentSkill.name} na {targetEnemy.name} za {currentSkill.amount}");
+
+                yield return new WaitForSeconds(0.15f);
+
+                yield return StartCoroutine(MoveObject(
+                    playerPosition[playerIndex],
+                    playerPosition[playerIndex].transform.position,
+                    defaultPlayerPositions[playerIndex],
+                    0.2f));
+
+                if (targetEnemy.health <= 0)
+                {
+                    targetEnemy.isDead = true;
+                    UpdateTurnOrder(targetEnemy.id, true);
+                    HandleEnemyDeath(targetEnemyIndex);
+                    Debug.Log(targetEnemy.name + " poražen!");
+                }
                 break;
+            }
         }
-        isPlayerChoosing = false;
-        isChoosingEnemy = false;
-        HideArrow();
-        nextTurn();
-    }
-    public void basicAttack()
-    {
-        Debug.Log("Basic attack");
-        isPlayerChoosing = true;
-        isChoosingEnemy = true;
-        arrowsEnemies[currentArrow].SetActive(true);         
-        currentTypeAttack = 0;
-        handleSkillItemClosing();
-        ChooseMenu();
-        SetActiveCamera(8);
+
+        isAnimating = false;
+        CheckBattleEnd();
+        if (!isBattleOver) nextTurn();
     }
 
-    
+    IEnumerator HandlePlayerSelfTargetCoroutine()
+    {
+        if (isAnimating) yield break;
+        isAnimating = true;
+
+        HideArrow();
+        isPlayerChoosing = false;
+        isChoosingEnemy  = false;
+
+        Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
+        int    charIndex    = characters.IndexOf(currentCharacter);
+
+        characters[charIndex].mana -= currentSkill.manaCost;
+        if (characters[charIndex].mana < 0) characters[charIndex].mana = 0;
+
+        SwitchToPlayerCamera(currentCharacter.id);
+        yield return new WaitForSeconds(0.3f);
+
+        switch (currentSkill.type)
+        {
+            case skillType.Heal:
+                characters[charIndex].health = (int)Mathf.Min(
+                    characters[charIndex].health + currentSkill.amount,
+                    characters[charIndex].maxHealth);
+                Debug.Log($"{currentCharacter.name} se vyléčil o {currentSkill.amount} HP");
+                break;
+
+            case skillType.Mana:
+                characters[charIndex].mana = (int)Mathf.Min(
+                    characters[charIndex].mana + currentSkill.amount, 10);
+                Debug.Log($"{currentCharacter.name} obnovil {currentSkill.amount} many");
+                break;
+
+            case skillType.Buff:
+                Debug.Log($"{currentCharacter.name} použil buff: {currentSkill.name}");
+                break;
+
+            default:
+                Debug.Log("Neznámý typ skillu: " + currentSkill.type);
+                break;
+        }
+
+        updateCharacterBars();
+        yield return new WaitForSeconds(0.2f);
+
+        isAnimating = false;
+        CheckBattleEnd();
+        if (!isBattleOver) nextTurn();
+    }
+
+    // =================================================================
+    //  VÝBĚR SKILLU / ITEMU
+    // =================================================================
+
     void handleSelection(bool isChoosingEnemyInput, int currentTypeAttackInput)
     {
+        if (isAnimating) return;
+
         Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
         if (currentSkill.manaCost > currentCharacter.mana)
         {
-            Debug.Log("Not enough mana!");
+            Debug.Log("Nedostatek many!");
             return;
         }
-        isPlayerChoosing = true;
-        currentArrow = 0;
+
+        isPlayerChoosing  = true;
         currentTypeAttack = currentTypeAttackInput;
         handleSkillItemClosing();
-        ChooseMenu();
+        if (chooseMenu.activeSelf) chooseMenu.SetActive(false);
         SetActiveCamera(8);
+
         if (isChoosingEnemyInput)
         {
             isChoosingEnemy = true;
-            arrowsEnemies[currentArrow].SetActive(true);         
+            currentArrow    = GetFirstAliveEnemyIndex();
+            ShowArrowEnemySafe(currentArrow);
         }
         else
         {
             isChoosingEnemy = false;
-            arrowsCharacters[0].SetActive(true);
-            Debug.Log("Choosing character...");
+            currentArrow    = Mathf.Max(0, characters.FindIndex(c => !c.isDead));
+            ShowArrow(arrowsCharacters, currentArrow);
         }
     }
 
     void handleSelectionBack()
     {
         isPlayerChoosing = false;
-        isChoosingEnemy = false;
-        arrowsEnemies.ForEach(a => a.SetActive(false));
-        arrowsCharacters.ForEach(a => a.SetActive(false));
-        SwitchToPlayerCamera(currentCharacter.id);
-        ChooseMenu();
-        handleSkillOpening();
+        isChoosingEnemy  = false;
         HideArrow();
-    }
-
-
-    // UI FUNCTIONS
-
-    void UpdateFaces()
-    {
-        for (int i = 0; i < FaceHolders.Count; i++)
-        {
-            if (i >= turnOrder.Count)
-            {
-                FaceHolders[i].gameObject.SetActive(false);
-                continue;
-            }
-
-            FaceHolders[i].gameObject.SetActive(true);
-            TurnType turn = turnOrder[i];
-            
-            bool lookingForEnemy = false;
-            int targetID = 0;
-            if (turn == TurnType.Enemy || turn == TurnType.Enemy2 || turn == TurnType.Enemy3)
-            {
-                lookingForEnemy = true;
-                int enemyIdx = (int)turn; 
-                if (enemyIdx < currentEnemy.Count) targetID = currentEnemy[enemyIdx].id;
-            }
-            else 
-            {
-                lookingForEnemy = false;
-                if (turn == TurnType.Player1) targetID = 1;
-                else if (turn == TurnType.Player2) targetID = 2;
-                else if (turn == TurnType.Player3) targetID = 3;
-                else if (turn == TurnType.Player4) targetID = 4;
-                else if (turn == TurnType.Player5) targetID = 5;
-            }
-
-            FacesSprite foundFace = Faces.FirstOrDefault(f => f.isEnemy == lookingForEnemy && f.ID == targetID);
-
-            if (foundFace.sprite != null)
-            {
-                FaceHolders[i].sprite = foundFace.sprite;
-            }
-        }
-    }
-    void updateEnemyHealthBar()
-    {
-        int maxHealth = 0;
-        int currentHealth = 0;
-        for (int i = 0; i < currentEnemy.Count; i++)
-        {
-            maxHealth += currentEnemy[i].maxHealth;
-            currentHealth += currentEnemy[i].health;
-            Debug.Log("Current health: " + currentEnemy[i].health);
-        }
-        EnemyHealthBar.fillAmount = currentHealth / (float)maxHealth;
-    }
-    
-    void updateCharacterBars()
-    {
-        int i = 0;
-        foreach (characterBars bars in characterBars)
-        {
-        
-            bars.healthBar.fillAmount = characters[i].health / (float)characters[i].maxHealth;
-            bars.manaBar.fillAmount = characters[i].mana / 10;
-            Debug.Log("CHAR MANA " + characters[i].mana);
-            i++;
-        }
-    }
-    private void ChooseMenu()
-    {
-        if(chooseMenu.activeSelf) chooseMenu.SetActive(false);
-        else chooseMenu.SetActive(true);
+        SwitchToPlayerCamera(currentCharacter.id);
+        if (!chooseMenu.activeSelf) chooseMenu.SetActive(true);
+        handleSkillOpening();
     }
 
     public void handleSkillOpening()
     {
         handleSkillItemClosing();
         chooserThingsMenu.SetActive(true);
-        if (currentCharacter != null && skillDatabase != null)
+
+        if (currentCharacter == null || skillDatabase == null) return;
+
+        currentCharacterSkills = skillDatabase.GetAllSkills()
+            .Where(s => s.characterID == currentCharacter.id)
+            .ToList();
+
+        foreach (var skill in currentCharacterSkills)
         {
-            currentCharacterSkills = skillDatabase.GetAllSkills()
-                .Where(s => s.characterID == currentCharacter.id)
-                .ToList();
-            
-            Debug.Log("Current character skills: " + string.Join(", ", currentCharacterSkills.Select(s => s.name)));
+            Skills capturedSkill = skill;
+            GameObject skillButton = Instantiate(button, chooserThingsMenu.transform);
+            skillButton.GetComponentInChildren<TextMeshProUGUI>().text =
+                $"{capturedSkill.name} ({capturedSkill.manaCost} MP)";
 
-            foreach (var skill in currentCharacterSkills)
+            Button btn = skillButton.GetComponent<Button>();
+            btn.interactable = capturedSkill.manaCost <= currentCharacter.mana;
+
+            btn.onClick.AddListener(() =>
             {
-                GameObject skillButton = Instantiate(button, chooserThingsMenu.transform);
-                skillButton.GetComponentInChildren<TextMeshProUGUI>().text = skill.name;
-                Button skillButtonBtn = skillButton.GetComponent<Button>();
-                skillButtonBtn.onClick.AddListener(() =>{
-                    if (skill.type == skillType.Damage) handleSelection(true, 1);   
-                    else handleSelection(false, 1);
-                    currentSkillID = skill.id;
-                });
-            }
+                currentSkillID = capturedSkill.id;
+                handleSelection(capturedSkill.type == skillType.Damage, 1);
+            });
         }
+    }
 
+    public void handleItemOpening()
+    {
+        handleSkillItemClosing();
+        chooserThingsMenu.SetActive(true);
+        Debug.Log("Item menu otevřeno – doplň seznam itemů ze své Database");
     }
 
     public void handleSkillItemClosing()
     {
         foreach (Transform child in chooserThingsMenu.transform)
+            Destroy(child.gameObject);
+        chooserThingsMenu.SetActive(false);
+    }
+
+    // =================================================================
+    //  PARRY / DODGE UI
+    // =================================================================
+
+    void ShowParryDodgeText(string msg)
+    {
+        if (parryDodgePromptText == null) return;
+        parryDodgePromptText.text = msg;
+        parryDodgePromptText.gameObject.SetActive(true);
+    }
+
+    void HideParryDodgeText()
+    {
+        if (parryDodgePromptText == null) return;
+        parryDodgePromptText.gameObject.SetActive(false);
+    }
+
+    // =================================================================
+    //  POZICE & POHYB
+    // =================================================================
+
+    void getDefaultPositions()
+    {
+        defaultEnemyPositions  = enemyPosition .Select(p => p.transform.position).ToList();
+        defaultPlayerPositions = playerPosition.Select(p => p.transform.position).ToList();
+    }
+
+    Vector3 getAnimationPositions(int enemyPositionIndex, int playerPositionIndex, bool isPlayerAttacking)
+    {
+        Vector3 enemyPos  = defaultEnemyPositions [enemyPositionIndex];
+        Vector3 playerPos = defaultPlayerPositions[playerPositionIndex];
+        return isPlayerAttacking
+            ? Vector3.Lerp(playerPos, enemyPos,  0.65f)
+            : Vector3.Lerp(enemyPos,  playerPos, 0.65f);
+    }
+
+    IEnumerator SwitchToCameraAndWait(int cameraID)
+    {
+        SetActiveCamera(cameraID);
+        yield return new WaitForSeconds(transitionDuration);
+    }
+
+    IEnumerator MoveObject(GameObject obj, Vector3 from, Vector3 to, float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
         {
-            Destroy(child.gameObject); 
+            elapsed += Time.deltaTime;
+            obj.transform.position = Vector3.Lerp(from, to, Mathf.SmoothStep(0f, 1f, elapsed / duration));
+            yield return null;
+        }
+        obj.transform.position = to;
+    }
+
+    // =================================================================
+    //  KONEC BOJE
+    // =================================================================
+
+    void CheckBattleEnd()
+    {
+        if (currentEnemy.All(e => e.isDead)) { TriggerVictory();  return; }
+        if (characters.All(c => c.isDead))   { TriggerGameOver(); }
+    }
+
+    void TriggerVictory()
+    {
+        if (isBattleOver) return;
+        isBattleOver = true;
+        StopAllCoroutines();
+        Debug.Log("=== VÍTĚZSTVÍ! ===");
+        if (victoryPanel  != null) victoryPanel.SetActive(true);
+        // SceneManager.LoadScene("VictoryScene");
+    }
+
+    void TriggerGameOver()
+    {
+        if (isBattleOver) return;
+        isBattleOver = true;
+        StopAllCoroutines();
+        Debug.Log("=== GAME OVER ===");
+        if (gameOverPanel != null) gameOverPanel.SetActive(true);
+        // SceneManager.LoadScene("GameOverScene");
+    }
+
+    // =================================================================
+    //  KAMERY
+    // =================================================================
+
+    void SetActiveCamera(int cameraID)
+    {
+        var target = camerasInfo.FirstOrDefault(c => c.IDofCamera == cameraID);
+        if (target.targetCamera == null)
+        {
+            Debug.LogWarning($"Kamera s ID {cameraID} nenalezena!");
+            return;
+        }
+        if (activeAnimation != null) StopCoroutine(activeAnimation);
+        activeAnimation = StartCoroutine(AnimateToCamera(target.targetCamera, target.zoomMultiplier));
+    }
+
+    IEnumerator AnimateToCamera(Camera targetCam, float zoomMultiplier)
+    {
+        Camera mainCam = camerasInfo.FirstOrDefault(c => c.IDofCamera == 0).targetCamera;
+        var    ppCam   = mainCam.GetComponent<PixelPerfectCamera>();
+
+        Vector3    startPos = mainCam.transform.position;
+        Quaternion startRot = mainCam.transform.rotation;
+        int        startPPU = ppCam.assetsPPU;
+        Vector3    endPos   = targetCam.transform.position;
+        Quaternion endRot   = targetCam.transform.rotation;
+        int        endPPU   = zoomMultiplier > 0
+            ? Mathf.RoundToInt(defaultPPU * zoomMultiplier)
+            : defaultPPU;
+
+        float elapsed = 0f;
+        while (elapsed < transitionDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / transitionDuration);
+            mainCam.transform.position = Vector3.Lerp(startPos, endPos, t);
+            mainCam.transform.rotation = Quaternion.Lerp(startRot, endRot, t);
+            ppCam.assetsPPU = Mathf.RoundToInt(Mathf.Lerp(startPPU, endPPU, t));
+            yield return null;
+        }
+
+        mainCam.transform.position = endPos;
+        mainCam.transform.rotation = endRot;
+        ppCam.assetsPPU            = endPPU;
+    }
+
+    void SwitchToOverviewCamera()            => SetActiveCamera(0);
+    void SwitchToPlayerCamera(int playerID)  => SetActiveCamera(playerID);
+    void SwitchToEnemyCamera(int enemyCamID) => SetActiveCamera(enemyCamID);
+
+    // =================================================================
+    //  UI
+    // =================================================================
+
+    void UpdateFaces()
+    {
+        for (int i = 0; i < FaceHolders.Count; i++)
+        {
+            if (i >= turnOrder.Count) { FaceHolders[i].gameObject.SetActive(false); continue; }
+
+            FaceHolders[i].gameObject.SetActive(true);
+            TurnType turn          = turnOrder[i];
+            bool     lookingEnemy  = !IsPlayerTurn(turn);
+            int      targetID      = 0;
+
+            if (lookingEnemy)
+            {
+                int idx = GetEnemyIndex(turn);
+                if (idx >= 0 && idx < currentEnemy.Count) targetID = currentEnemy[idx].id;
+            }
+            else
+            {
+                if      (turn == TurnType.Player1) targetID = 1;
+                else if (turn == TurnType.Player2) targetID = 2;
+                else if (turn == TurnType.Player3) targetID = 3;
+                else if (turn == TurnType.Player4) targetID = 4;
+                else if (turn == TurnType.Player5) targetID = 5;
+            }
+
+            FacesSprite found = Faces.FirstOrDefault(f => f.isEnemy == lookingEnemy && f.ID == targetID);
+            if (found.sprite != null) FaceHolders[i].sprite = found.sprite;
         }
     }
 
+    void updateEnemyHealthBar()
+    {
+        int maxHealth = 0, currentHealth = 0;
+        foreach (var e in currentEnemy)
+        {
+            maxHealth     += e.maxHealth;
+            currentHealth += Mathf.Max(e.health, 0);
+        }
+        if (maxHealth > 0) EnemyHealthBar.fillAmount = currentHealth / (float)maxHealth;
+    }
+
+    void updateCharacterBars()
+    {
+        for (int i = 0; i < characterBars.Count && i < characters.Count; i++)
+        {
+            var bars = characterBars[i];
+            var ch   = characters[i];
+            if (bars.healthBar != null)
+                bars.healthBar.fillAmount = Mathf.Clamp01(ch.health / (float)ch.maxHealth);
+            if (bars.manaBar != null)
+                bars.manaBar.fillAmount = Mathf.Clamp01(ch.mana / 10f);
+        }
+    }
+
+    private void ChooseMenu() => chooseMenu.SetActive(!chooseMenu.activeSelf);
+
     private void ShowArrow(List<GameObject> arrows, int index)
     {
-        foreach (var arrow in arrows)
-            arrow.SetActive(false);
-        
-        arrows[index].SetActive(true);
+        for (int i = 0; i < arrows.Count; i++)
+            arrows[i].SetActive(i == index);
     }
 
     private void HideArrow()
     {
-        arrowsEnemies.ForEach(a => a.SetActive(false));
+        arrowsEnemies   .ForEach(a => a.SetActive(false));
         arrowsCharacters.ForEach(a => a.SetActive(false));
     }
 
-    public void handleItemOpening()
-    {
-        chooserThingsMenu.SetActive(true);   
-    }
-    
-    public void openChooseAttackUI()
-    {
-        ChooseAttackUI.SetActive(true);
-    }
-
-    public void closeChooseAttackUI()
-    {
-        ChooseAttackUI.SetActive(false);
-    }
+    public void openChooseAttackUI()  => ChooseAttackUI.SetActive(true);
+    public void closeChooseAttackUI() => ChooseAttackUI.SetActive(false);
 }

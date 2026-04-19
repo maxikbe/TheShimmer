@@ -13,6 +13,8 @@ public class Hit
 {
     public float timeOffset; 
     public int damage;       
+    public float dodgeTimePlayer;
+    public dodgeType dodgeType;
 }
 
 [System.Serializable]
@@ -38,4 +40,11 @@ public class Enemy
     public List<EnemyAttack> attacks = new List<EnemyAttack>();
 
     public EnemyAttack GetRandomAttack() => attacks[Random.Range(0, attacks.Count)];
+}
+
+public enum dodgeType 
+{
+
+    normal,
+    jump
 }

@@ -138,12 +138,102 @@ public class InitializeGameJson : MonoBehaviour
                 id = 1,
                 name = "Speaker",
                 maxHealth = 150,
-                health = 100,
+                health = 150,
                 attacks = new List<EnemyAttack> {
-            new EnemyAttack { id = 1, attackName = "Thunderous Word", totalAnimationDuration = 1.8f, hits = new List<Hit> { new Hit { timeOffset = 0.8f, damage = 25 } }, weight = 60 },
-            new EnemyAttack { id = 2, attackName = "Lightning Strike", totalAnimationDuration = 2.5f, hits = new List<Hit> { new Hit { timeOffset = 1.2f, damage = 40 } }, weight = 25 },
-            new EnemyAttack { id = 3, attackName = "Static Discharge", totalAnimationDuration = 1.2f, hits = new List<Hit> { new Hit { timeOffset = 0.4f, damage = 15 } }, weight = 15 }
-        }
+                    new EnemyAttack { 
+                        id = 1, attackName = "Thunderous Word", totalAnimationDuration = 1.8f, 
+                        hits = new List<Hit> { new Hit { timeOffset = 0.8f, damage = 25, dodgeTimePlayer = 0.4f, dodgeType = dodgeType.normal } }, 
+                        weight = 60 
+                    },
+                    new EnemyAttack { 
+                        id = 2, attackName = "Static Discharge", totalAnimationDuration = 1.2f, 
+                        hits = new List<Hit> { new Hit { timeOffset = 0.4f, damage = 15, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.jump } }, 
+                        weight = 40 
+                    }
+                }
+            }
+        );
+
+        data.enemies.Add(
+            new Enemy
+            {
+                id = 2,
+                name = "Screaming Bear",
+                maxHealth = 400,
+                health = 400,
+                attacks = new List<EnemyAttack> {
+                    new EnemyAttack { 
+                        id = 1, attackName = "Desperate Shiver", totalAnimationDuration = 2.5f, 
+                        hits = new List<Hit> { new Hit { timeOffset = 1.5f, damage = 50, dodgeTimePlayer = 0.5f, dodgeType = dodgeType.normal } }, 
+                        weight = 70 
+                    },
+                    new EnemyAttack { 
+                        id = 2, attackName = "Bone-Chilling Roar", totalAnimationDuration = 2.0f, 
+                        hits = new List<Hit> { new Hit { timeOffset = 0.8f, damage = 20, dodgeTimePlayer = 0.6f, dodgeType = dodgeType.jump } }, 
+                        weight = 30 
+                    }
+                }
+            }
+        );
+
+        data.enemies.Add(
+            new Enemy
+            {
+                id = 3,
+                name = "The Crawler",
+                maxHealth = 600,
+                health = 600,
+                attacks = new List<EnemyAttack> {
+                    new EnemyAttack { 
+                        id = 1, attackName = "Lighthouse Bloom", totalAnimationDuration = 3.5f, 
+                        hits = new List<Hit> { new Hit { timeOffset = 2.5f, damage = 70, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.normal } }, 
+                        weight = 50 
+                    },
+                    new EnemyAttack { 
+                        id = 2, attackName = "Topographical Anomaly", totalAnimationDuration = 2.2f, 
+                        hits = new List<Hit> { new Hit { timeOffset = 1.0f, damage = 30, dodgeTimePlayer = 0.5f, dodgeType = dodgeType.jump } }, 
+                        weight = 50 
+                    }
+                }
+            }
+        );
+
+        data.enemies.Add(
+            new Enemy
+            {
+                id = 4,
+                name = "The Mimic",
+                maxHealth = 200,
+                health = 200,
+                attacks = new List<EnemyAttack> {
+                    new EnemyAttack { 
+                        id = 1, attackName = "Perfect Reflection", totalAnimationDuration = 1.5f, 
+                        hits = new List<Hit> { new Hit { timeOffset = 0.7f, damage = 40, dodgeTimePlayer = 0.2f, dodgeType = dodgeType.normal } }, 
+                        weight = 100 
+                    }
+                }
+            }
+        );
+
+        data.enemies.Add(
+            new Enemy
+            {
+                id = 5,
+                name = "Shimmer Alligator",
+                maxHealth = 250,
+                health = 250,
+                attacks = new List<EnemyAttack> {
+                    new EnemyAttack { 
+                        id = 1, attackName = "Lunge", totalAnimationDuration = 1.3f, 
+                        hits = new List<Hit> { new Hit { timeOffset = 0.4f, damage = 35, dodgeTimePlayer = 0.4f, dodgeType = dodgeType.normal } }, 
+                        weight = 80 
+                    },
+                    new EnemyAttack { 
+                        id = 2, attackName = "Tail Whip", totalAnimationDuration = 1.6f, 
+                        hits = new List<Hit> { new Hit { timeOffset = 0.8f, damage = 25, dodgeTimePlayer = 0.5f, dodgeType = dodgeType.jump } }, 
+                        weight = 20 
+                    }
+                }
             }
         );
 
