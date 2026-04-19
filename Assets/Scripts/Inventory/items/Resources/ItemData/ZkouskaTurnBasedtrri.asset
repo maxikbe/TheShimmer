@@ -10,28 +10,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
-  m_Name: ZkouskaTurnBased2
+  m_Name: ZkouskaTurnBasedtrri
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 3
-  itemName: ZkouskaGun1
-  allowedCharacterIDs: 0100000002000000
-  icon: {fileID: -3446211083875711296, guid: 9bd13ab6e5b664791b4d97963a428d61, type: 3}
+  id: 8
+  itemName: unity
+  allowedCharacterIDs: 03000000
+  icon: {fileID: 5154528035920495182, guid: 22972f141944b1c4e95bd241b375750d, type: 3}
   prefab: {fileID: 0}
-  description: GUUUUN
+  description: "UNITY JE PROSTE SUP\xDAER APKA JUCHUHUCHUCHCUH"
   isResearched: 1
   isUsable: 1
+  isTurnedBaseItem: 0
   canBeSold: 1
-  basePrice: 66
+  basePrice: 0
   maxStack: 0
-  isDefaultItem: 1
+  isDefaultItem: 0
   defaultAmount: 1
   defaultLevel: 1
   itemType: 4
-  weaponType: 1
+  weaponType: 0
   isTurnedBaseWeapon: 1
-  firstCharID: 1
+  firstCharID: 3
   isMagical: 0
-  Damage: 0
+  Damage: 15
   FireRate: 0
   Range: 0
   ReloadTime: 0
@@ -47,3 +48,6 @@ MonoBehaviour:
   armorType: 0
   Armor: 0
   weight: 0
+  turnBaseItemType: 0
+  turnBaseItemEffectAmount: 0
+  turnBaseItemDuration: 0
