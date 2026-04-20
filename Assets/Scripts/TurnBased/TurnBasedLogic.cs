@@ -61,15 +61,33 @@ public class TurnBasedLogic : MonoBehaviour
 
     [SerializeField] private Database _databaseReference;
     [SerializeField] private SkillDatabase _skillDatabaseReference;
+    [SerializeField] private PerksDatabase _perksDatabaseReference;
     [SerializeField] private GameObject starterUI;
     private static Database itemDatabase;
     private static SkillDatabase skillDatabase;
+    private static PerksDatabase perksDatabase;
+
+    // ─── CRIT SETTINGS ────────────────────────────────────────────────────────
+    [Header("Crit Settings")]
+    [SerializeField] private float baseCritChance = 0.05f;          // 5% base
+    [SerializeField] private float critDamageMultiplier = 2f;        // 2× damage
+    [SerializeField] private Color critTextColor = new Color(1f, 0.4f, 0f); // orange
+    [SerializeField] private TextMeshProUGUI critIndicatorText;      // "CRITICAL!" label
+    [SerializeField] private float critIndicatorDuration = 0.8f;
+    [SerializeField] private AudioClip critSoundEffect;
+    [SerializeField] private AudioSource audioSource;
+    // ──────────────────────────────────────────────────────────────────────────
 
     private List<Skills> currentCharacterSkills;
     private List<Character> characters;
     private Character currentCharacter;
     private List<Enemy> enemies;
     private List<Enemy> currentEnemy;
+
+    // Per-character perk-derived stats (applied once at battle start)
+    private Dictionary<int, float> characterCritBonus    = new Dictionary<int, float>();
+    private Dictionary<int, int>   characterDamageBonus  = new Dictionary<int, int>();
+    private Dictionary<int, int>   characterArmorBonus   = new Dictionary<int, int>();
 
     public List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 1 };
 
@@ -101,7 +119,7 @@ public class TurnBasedLogic : MonoBehaviour
 
     [SerializeField] private List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();
     [SerializeField] private List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
-    
+
     [SerializeField] private Animator playerAnimator;
     [SerializeField] private string parryAnimationTrigger = "Parry";
     [SerializeField] private string dodgeAnimationTrigger = "Dodge";
@@ -127,8 +145,8 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private GameObject victoryPanel;
 
     [SerializeField] private TextMeshProUGUI parryDodgePromptText;
-    
-    // ─── INFO UI (Hover detaily předmětů a skillů) ───────────────────
+
+    [SerializeField] private GameObject infoUI;
     [SerializeField] private TextMeshProUGUI infoNameText;
     [SerializeField] private TextMeshProUGUI infoDescriptionText;
 
@@ -140,6 +158,130 @@ public class TurnBasedLogic : MonoBehaviour
     private int defaultPPU;
     private Coroutine activeAnimation;
     private Dictionary<Camera, Vector3> originalPositions = new Dictionary<Camera, Vector3>();
+
+    // =========================================================================
+    //  PERK APPLICATION
+    // =========================================================================
+
+    /// <summary>
+    /// Reads all perks owned by the player from Resources and applies their
+    /// stat bonuses to the relevant characters.
+    /// </summary>
+    void ApplyPerksToCharacters()
+    {
+        characterCritBonus.Clear();
+        characterDamageBonus.Clear();
+        characterArmorBonus.Clear();
+
+        if (gameDataManager.currentGameData == null) return;
+
+        Perks[] allPerks = Resources.LoadAll<Perks>("PerksData");
+
+        foreach (Character ch in characters)
+        {
+            // Collect only the three perks this character has equipped
+            List<int> equippedIDs = new List<int>();
+            if (ch.pickePerkID1 != 0) equippedIDs.Add(ch.pickePerkID1);
+            if (ch.pickePerkID2 != 0) equippedIDs.Add(ch.pickePerkID2);
+            if (ch.pickePerkID3 != 0) equippedIDs.Add(ch.pickePerkID3);
+
+            foreach (int perkID in equippedIDs)
+            {
+                Perks perk = System.Array.Find(allPerks, p => p.id == perkID);
+                if (perk == null) continue;
+                ApplySinglePerk(ch, perk);
+            }
+
+            Debug.Log($"[Perks] {ch.name}: equipped perk IDs [{string.Join(", ", equippedIDs)}]");
+        }
+    }
+
+    void ApplySinglePerk(Character ch, Perks perk)
+    {
+        switch (perk.perkType)
+        {
+            case perkType.healthAdder:
+                ch.maxHealth += perk.addingAmount * perk.levelOfPerk;
+                ch.health    += perk.addingAmount * perk.levelOfPerk;
+                break;
+
+            case perkType.damageAdder:
+                if (!characterDamageBonus.ContainsKey(ch.id)) characterDamageBonus[ch.id] = 0;
+                characterDamageBonus[ch.id] += perk.addingAmount * perk.levelOfPerk;
+                break;
+
+            case perkType.critAdder:
+                // addingAmount is treated as integer percentage points (e.g. 5 → +5%)
+                if (!characterCritBonus.ContainsKey(ch.id)) characterCritBonus[ch.id] = 0f;
+                characterCritBonus[ch.id] += (perk.addingAmount * perk.levelOfPerk) / 100f;
+                break;
+
+            case perkType.speedAdder:
+                ch.speed += perk.addingAmount * perk.levelOfPerk;
+                break;
+
+            case perkType.armorAdder:
+                if (!characterArmorBonus.ContainsKey(ch.id)) characterArmorBonus[ch.id] = 0;
+                characterArmorBonus[ch.id] += perk.addingAmount * perk.levelOfPerk;
+                break;
+        }
+    }
+
+    // =========================================================================
+    //  CRIT HELPERS
+    // =========================================================================
+
+    /// <summary>Returns total crit chance for a character (base + perk bonus).</summary>
+    float GetCritChance(Character ch)
+    {
+        float bonus = characterCritBonus.ContainsKey(ch.id) ? characterCritBonus[ch.id] : 0f;
+        return Mathf.Clamp01(baseCritChance + bonus);
+    }
+
+    /// <summary>Rolls for a critical hit. Returns true if crit.</summary>
+    bool RollCrit(Character ch)
+    {
+        return Random.value < GetCritChance(ch);
+    }
+
+    /// <summary>Applies crit multiplier and shows the crit indicator.</summary>
+    int ApplyCrit(int damage)
+    {
+        return Mathf.RoundToInt(damage * critDamageMultiplier);
+    }
+
+    IEnumerator ShowCritIndicator()
+    {
+        if (critIndicatorText != null)
+        {
+            critIndicatorText.text = "CRITICAL!";
+            critIndicatorText.color = critTextColor;
+            critIndicatorText.gameObject.SetActive(true);
+
+            if (audioSource != null && critSoundEffect != null)
+                audioSource.PlayOneShot(critSoundEffect);
+
+            yield return new WaitForSeconds(critIndicatorDuration);
+            critIndicatorText.gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>Returns total damage bonus from damage-adder perks.</summary>
+    int GetDamageBonus(Character ch)
+    {
+        return characterDamageBonus.ContainsKey(ch.id) ? characterDamageBonus[ch.id] : 0;
+    }
+
+    /// <summary>Reduces incoming damage by armor perk bonus (minimum 1).</summary>
+    int ReduceByArmor(Character ch, int incomingDamage)
+    {
+        int armor = characterArmorBonus.ContainsKey(ch.id) ? characterArmorBonus[ch.id] : 0;
+        return Mathf.Max(1, incomingDamage - armor);
+    }
+
+    // =========================================================================
+    //  LIFECYCLE
+    // =========================================================================
 
     public void StartTurnBasedGame()
     {
@@ -177,18 +319,23 @@ public class TurnBasedLogic : MonoBehaviour
     void Start()
     {
         characters = gameDataManager.currentGameData.characters;
-        enemies = gameDataManager.currentGameData.enemies;
-        itemDatabase = _databaseReference;
+        enemies    = gameDataManager.currentGameData.enemies;
+        itemDatabase  = _databaseReference;
         skillDatabase = _skillDatabaseReference;
+        perksDatabase = _perksDatabaseReference;
 
         Debug.Log("Characters loaded: " + string.Join(", ", characters.Select(c => c.name)));
+
+        // Apply perk bonuses before anything else
+        ApplyPerksToCharacters();
+
         inicializeTurnBasedGame();
         HideInfo();
     }
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.F1)) nextTurn();
+        if (Input.GetKeyDown(KeyCode.F1)) nextTurn();
         if (isBattleOver) return;
 
         if (isWaitingForParryOrDodge)
@@ -196,44 +343,48 @@ public class TurnBasedLogic : MonoBehaviour
             if (Input.GetKeyDown(keyParry))
             {
                 lastHitWasParried = true;
-                lastHitWasDodged = false;
+                lastHitWasDodged  = false;
                 isWaitingForParryOrDodge = false;
                 ShowParryDodgeText("PARRY!");
             }
             else if (currentHitDodgeType == dodgeType.normal && Input.GetKeyDown(keyDodge))
             {
-                lastHitWasDodged = true;
+                lastHitWasDodged  = true;
                 lastHitWasParried = false;
                 isWaitingForParryOrDodge = false;
                 ShowParryDodgeText("DODGE!");
             }
             else if (currentHitDodgeType == dodgeType.jump && Input.GetKeyDown(keyJump))
             {
-                lastHitWasDodged = true;
+                lastHitWasDodged  = true;
                 lastHitWasParried = false;
                 isWaitingForParryOrDodge = false;
                 ShowParryDodgeText("JUMP DODGE!");
             }
-            return; 
+            return;
         }
 
         if (isAnimating) return;
 
         if (isPlayerChoosing && isChoosingEnemy)
         {
-            if (Input.GetKeyDown(keyDown)) CycleEnemyArrow(1);
-            if (Input.GetKeyDown(keyUp)) CycleEnemyArrow(-1);
+            if (Input.GetKeyDown(keyDown))   CycleEnemyArrow(1);
+            if (Input.GetKeyDown(keyUp))     CycleEnemyArrow(-1);
             if (Input.GetKeyDown(keyAccept)) StartCoroutine(HandlePlayerAttackCoroutine());
-            if (Input.GetKeyDown(keyBack)) handleSelectionBack();
+            if (Input.GetKeyDown(keyBack))   handleSelectionBack();
         }
         else if (isPlayerChoosing && !isChoosingEnemy)
         {
-            if (Input.GetKeyDown(keyDown)) CycleCharacterArrow(1);
-            if (Input.GetKeyDown(keyUp)) CycleCharacterArrow(-1);
+            if (Input.GetKeyDown(keyDown))   CycleCharacterArrow(1);
+            if (Input.GetKeyDown(keyUp))     CycleCharacterArrow(-1);
             if (Input.GetKeyDown(keyAccept)) StartCoroutine(HandlePlayerSelfTargetCoroutine());
-            if (Input.GetKeyDown(keyBack)) handleSelectionBack();
+            if (Input.GetKeyDown(keyBack))   handleSelectionBack();
         }
     }
+
+    // =========================================================================
+    //  ARROW NAVIGATION
+    // =========================================================================
 
     void CycleEnemyArrow(int dir)
     {
@@ -269,6 +420,10 @@ public class TurnBasedLogic : MonoBehaviour
         ShowArrow(arrowsCharacters, currentArrow);
     }
 
+    // =========================================================================
+    //  INITIALIZATION
+    // =========================================================================
+
     void inicializeTurnBasedGame()
     {
         onTurnbasedStart();
@@ -292,9 +447,10 @@ public class TurnBasedLogic : MonoBehaviour
         BackgroundPicture.sprite = BackgroundPictures
             .FirstOrDefault(b => b.ID == currentBackgroundPictureID).sprite;
 
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (victoryPanel != null) victoryPanel.SetActive(false);
+        if (gameOverPanel    != null) gameOverPanel.SetActive(false);
+        if (victoryPanel     != null) victoryPanel.SetActive(false);
         if (parryDodgePromptText != null) parryDodgePromptText.gameObject.SetActive(false);
+        if (critIndicatorText    != null) critIndicatorText.gameObject.SetActive(false);
     }
 
     void onTurnbasedStart()
@@ -306,24 +462,24 @@ public class TurnBasedLogic : MonoBehaviour
                 if (original == null) return null;
                 return new Enemy
                 {
-                    id = original.id,
-                    name = original.name,
-                    health = original.health,
-                    maxHealth = original.maxHealth,
-                    isDead = original.isDead,
-                    sprite = original.sprite,
-                    attacks = original.attacks.Select(a => new EnemyAttack
+                    id         = original.id,
+                    name       = original.name,
+                    health     = original.health,
+                    maxHealth  = original.maxHealth,
+                    isDead     = original.isDead,
+                    sprite     = original.sprite,
+                    attacks    = original.attacks.Select(a => new EnemyAttack
                     {
-                        id = a.id,
-                        attackName = a.attackName,
+                        id                    = a.id,
+                        attackName            = a.attackName,
                         totalAnimationDuration = a.totalAnimationDuration,
-                        weight = a.weight,
-                        hits = a.hits.Select(h => new Hit
+                        weight                = a.weight,
+                        hits                  = a.hits.Select(h => new Hit
                         {
-                            timeOffset = h.timeOffset,
-                            damage = h.damage,
+                            timeOffset      = h.timeOffset,
+                            damage          = h.damage,
                             dodgeTimePlayer = h.dodgeTimePlayer,
-                            dodgeType = h.dodgeType
+                            dodgeType       = h.dodgeType
                         }).ToList(),
                         animations = a.animations
                     }).ToList()
@@ -335,6 +491,10 @@ public class TurnBasedLogic : MonoBehaviour
         Debug.Log("Current enemy: " + string.Join(", ", currentEnemy.Select(e => e.name)));
     }
 
+    // =========================================================================
+    //  TURN ORDER
+    // =========================================================================
+
     void createTurnOrder()
     {
         turnOrder.Clear();
@@ -342,7 +502,7 @@ public class TurnBasedLogic : MonoBehaviour
         List<TurnType> enemyPool = new List<TurnType>();
         for (int i = 0; i < currentEnemy.Count; i++)
         {
-            if (i == 0) enemyPool.Add(TurnType.Enemy);
+            if      (i == 0) enemyPool.Add(TurnType.Enemy);
             else if (i == 1) enemyPool.Add(TurnType.Enemy2);
             else if (i == 2) enemyPool.Add(TurnType.Enemy3);
         }
@@ -360,15 +520,21 @@ public class TurnBasedLogic : MonoBehaviour
 
         if (enemyPool.Count == 0 && playerPool.Count == 0) return;
 
-        int enemyIndex = 0;
+        int enemyIndex  = 0;
         int playerIndex = 0;
 
         while (turnOrder.Count < 500)
         {
+            // Each enemy gets 2 turns before players go
             if (enemyPool.Count > 0)
             {
-                turnOrder.Add(enemyPool[enemyIndex]);
-                enemyIndex = (enemyIndex + 1) % enemyPool.Count;
+                int enemyTurnsPerRound = 2;
+                for (int e = 0; e < enemyTurnsPerRound; e++)
+                {
+                    if (turnOrder.Count >= 500) break;
+                    turnOrder.Add(enemyPool[enemyIndex]);
+                    enemyIndex = (enemyIndex + 1) % enemyPool.Count;
+                }
             }
             if (turnOrder.Count >= 500) break;
 
@@ -393,13 +559,13 @@ public class TurnBasedLogic : MonoBehaviour
 
         if (isEnemy)
         {
-            if (idWhoDied == 1) turnToRemove = TurnType.Enemy;
+            if      (idWhoDied == 1) turnToRemove = TurnType.Enemy;
             else if (idWhoDied == 2) turnToRemove = TurnType.Enemy2;
             else if (idWhoDied == 3) turnToRemove = TurnType.Enemy3;
         }
         else
         {
-            if (idWhoDied == 1) turnToRemove = TurnType.Player1;
+            if      (idWhoDied == 1) turnToRemove = TurnType.Player1;
             else if (idWhoDied == 2) turnToRemove = TurnType.Player2;
             else if (idWhoDied == 3) turnToRemove = TurnType.Player3;
             else if (idWhoDied == 4) turnToRemove = TurnType.Player4;
@@ -424,7 +590,7 @@ public class TurnBasedLogic : MonoBehaviour
 
     int GetEnemyIndex(TurnType t)
     {
-        if (t == TurnType.Enemy) return 0;
+        if (t == TurnType.Enemy)  return 0;
         if (t == TurnType.Enemy2) return 1;
         if (t == TurnType.Enemy3) return 2;
         return -1;
@@ -437,6 +603,10 @@ public class TurnBasedLogic : MonoBehaviour
         return 0;
     }
 
+    // =========================================================================
+    //  NEXT TURN / PLAY TURN
+    // =========================================================================
+
     public void nextTurn()
     {
         if (isBattleOver || isAnimating) return;
@@ -444,12 +614,11 @@ public class TurnBasedLogic : MonoBehaviour
 
         if (chooseMenu.activeSelf) chooseMenu.SetActive(false);
         isPlayerChoosing = false;
-        isChoosingEnemy = false;
+        isChoosingEnemy  = false;
         HideArrow();
         handleSkillItemClosing();
 
         turnOrder.RemoveAt(0);
-
         if (turnOrder.Count == 0) createTurnOrder();
 
         PlayCurrentTurn();
@@ -458,7 +627,7 @@ public class TurnBasedLogic : MonoBehaviour
     void PlayCurrentTurn()
     {
         if (turnOrder.Count == 0) return;
-        
+
         UpdateFaces();
         TurnType next = turnOrder[0];
 
@@ -489,6 +658,10 @@ public class TurnBasedLogic : MonoBehaviour
         chooseMenu.SetActive(true);
     }
 
+    // =========================================================================
+    //  ENEMY TURN
+    // =========================================================================
+
     IEnumerator EnemyTurnCoroutine(int enemyIndex)
     {
         isAnimating = true;
@@ -499,8 +672,8 @@ public class TurnBasedLogic : MonoBehaviour
         List<Character> alivePlayers = characters.Where(c => !c.isDead).ToList();
         if (alivePlayers.Count == 0) { isAnimating = false; TriggerGameOver(); yield break; }
 
-        Character target = alivePlayers[Random.Range(0, alivePlayers.Count)];
-        int playerIndex = characters.IndexOf(target);
+        Character target     = alivePlayers[Random.Range(0, alivePlayers.Count)];
+        int       playerIndex = characters.IndexOf(target);
 
         EnemyAttack chosenAttack = ChooseEnemyAttack(enemy);
         if (chosenAttack == null) { isAnimating = false; nextTurn(); yield break; }
@@ -508,7 +681,6 @@ public class TurnBasedLogic : MonoBehaviour
         Debug.Log($"{enemy.name} útočí '{chosenAttack.attackName}' na {target.name}");
 
         yield return StartCoroutine(SwitchToCameraAndWait(8));
-
         yield return StartCoroutine(MoveObject(
             enemyPosition[enemyIndex],
             defaultEnemyPositions[enemyIndex],
@@ -517,8 +689,8 @@ public class TurnBasedLogic : MonoBehaviour
 
         List<Hit> sortedHits = chosenAttack.hits.OrderBy(h => h.timeOffset).ToList();
         totalHitsInAttack = sortedHits.Count;
-        dodgedHitsCount = 0;
-        float lastOffset = 0f;
+        dodgedHitsCount   = 0;
+        float lastOffset  = 0f;
 
         foreach (Hit hit in sortedHits)
         {
@@ -526,7 +698,7 @@ public class TurnBasedLogic : MonoBehaviour
             if (waitTime > 0f) yield return new WaitForSeconds(waitTime);
             lastOffset = hit.timeOffset;
 
-            lastHitWasDodged = false;
+            lastHitWasDodged  = false;
             lastHitWasParried = false;
             currentHitDodgeType = hit.dodgeType;
             isWaitingForParryOrDodge = true;
@@ -538,7 +710,7 @@ public class TurnBasedLogic : MonoBehaviour
 
             float parryWindow = hit.dodgeTimePlayer;
             float dodgeWindow = hit.dodgeTimePlayer * 2f;
-            float elapsed = 0f;
+            float elapsed     = 0f;
 
             while (isWaitingForParryOrDodge && elapsed < dodgeWindow)
             {
@@ -550,9 +722,7 @@ public class TurnBasedLogic : MonoBehaviour
             HideParryDodgeText();
 
             if (lastHitWasParried && elapsed > parryWindow)
-            {
                 lastHitWasParried = false;
-            }
 
             if (lastHitWasParried)
             {
@@ -570,21 +740,23 @@ public class TurnBasedLogic : MonoBehaviour
             else if (lastHitWasDodged)
             {
                 if (playerAnimator != null) playerAnimator.SetTrigger(dodgeAnimationTrigger);
-
                 dodgedHitsCount++;
                 Debug.Log($"DODGE! ({dodgedHitsCount}/{totalHitsInAttack})");
             }
             else
             {
-                target.health -= hit.damage;
+                // Enemy hits land — reduced by armor perks
+                int finalDmg = ReduceByArmor(target, hit.damage);
+                target.health -= finalDmg;
                 if (target.health < 0) target.health = 0;
                 updateCharacterBars();
-                Debug.Log($"HIT! {target.name} -{hit.damage} HP → {target.health}/{target.maxHealth}");
+                Debug.Log($"HIT! {target.name} -{finalDmg} HP (armor reduced from {hit.damage}) → {target.health}/{target.maxHealth}");
             }
 
             yield return new WaitForSeconds(0.1f);
         }
 
+        // Perfect dodge — deal total damage back to enemy
         if (dodgedHitsCount == totalHitsInAttack && totalHitsInAttack > 0)
         {
             int totalDmg = chosenAttack.hits.Sum(h => h.damage);
@@ -613,7 +785,6 @@ public class TurnBasedLogic : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.2f);
-
         yield return StartCoroutine(MoveObject(
             enemyPosition[enemyIndex],
             enemyPosition[enemyIndex].transform.position,
@@ -631,7 +802,7 @@ public class TurnBasedLogic : MonoBehaviour
         float totalWeight = enemy.attacks.Sum(a => a.weight);
         if (totalWeight <= 0f) return enemy.attacks[0];
 
-        float roll = Random.Range(0f, totalWeight);
+        float roll       = Random.Range(0f, totalWeight);
         float cumulative = 0f;
         foreach (EnemyAttack attack in enemy.attacks)
         {
@@ -641,16 +812,15 @@ public class TurnBasedLogic : MonoBehaviour
         return enemy.attacks[0];
     }
 
+    // =========================================================================
+    //  DEATH HANDLERS
+    // =========================================================================
+
     void HandleEnemyDeath(int enemyIndex)
     {
-        if (enemyIndex < enemyUIs.Count && enemyUIs[enemyIndex] != null)
-            enemyUIs[enemyIndex].SetActive(false);
-
-        if (enemyIndex < arrowsEnemies.Count && arrowsEnemies[enemyIndex] != null)
-            arrowsEnemies[enemyIndex].SetActive(false);
-
-        if (enemyIndex < enemyPosition.Count && enemyPosition[enemyIndex] != null)
-            enemyPosition[enemyIndex].SetActive(false);
+        if (enemyIndex < enemyUIs.Count     && enemyUIs[enemyIndex]     != null) enemyUIs[enemyIndex].SetActive(false);
+        if (enemyIndex < arrowsEnemies.Count && arrowsEnemies[enemyIndex] != null) arrowsEnemies[enemyIndex].SetActive(false);
+        if (enemyIndex < enemyPosition.Count && enemyPosition[enemyIndex] != null) enemyPosition[enemyIndex].SetActive(false);
 
         if (isChoosingEnemy && currentArrow == enemyIndex)
         {
@@ -660,28 +830,16 @@ public class TurnBasedLogic : MonoBehaviour
                 .Select(x => x.i)
                 .ToList();
 
-            if (alive.Count > 0)
-            {
-                currentArrow = alive[0];
-                ShowArrowEnemySafe(currentArrow);
-            }
-            else
-            {
-                HideArrow();
-            }
+            if (alive.Count > 0) { currentArrow = alive[0]; ShowArrowEnemySafe(currentArrow); }
+            else HideArrow();
         }
     }
 
     void HandlePlayerDeath(int playerIndex)
     {
-        if (playerIndex < characterUIs.Count && characterUIs[playerIndex] != null)
-            characterUIs[playerIndex].SetActive(false);
-
-        if (playerIndex < arrowsCharacters.Count && arrowsCharacters[playerIndex] != null)
-            arrowsCharacters[playerIndex].SetActive(false);
-
-        if (playerIndex < playerPosition.Count && playerPosition[playerIndex] != null)
-            playerPosition[playerIndex].SetActive(false);
+        if (playerIndex < characterUIs.Count   && characterUIs[playerIndex]   != null) characterUIs[playerIndex].SetActive(false);
+        if (playerIndex < arrowsCharacters.Count && arrowsCharacters[playerIndex] != null) arrowsCharacters[playerIndex].SetActive(false);
+        if (playerIndex < playerPosition.Count  && playerPosition[playerIndex]  != null) playerPosition[playerIndex].SetActive(false);
     }
 
     void ShowArrowEnemySafe(int index)
@@ -698,16 +856,20 @@ public class TurnBasedLogic : MonoBehaviour
         for (int i = 0; i < currentEnemy.Count; i++)
         {
             bool alive = !currentEnemy[i].isDead;
-            if (i < enemyUIs.Count && enemyUIs[i] != null) enemyUIs[i].SetActive(alive);
+            if (i < enemyUIs.Count    && enemyUIs[i]    != null) enemyUIs[i].SetActive(alive);
             if (i < enemyPosition.Count && enemyPosition[i] != null) enemyPosition[i].SetActive(alive);
         }
         for (int i = 0; i < characters.Count; i++)
         {
             bool alive = !characters[i].isDead;
-            if (i < characterUIs.Count && characterUIs[i] != null) characterUIs[i].SetActive(alive);
-            if (i < playerPosition.Count && playerPosition[i] != null) playerPosition[i].SetActive(alive);
+            if (i < characterUIs.Count   && characterUIs[i]   != null) characterUIs[i].SetActive(alive);
+            if (i < playerPosition.Count  && playerPosition[i]  != null) playerPosition[i].SetActive(alive);
         }
     }
+
+    // =========================================================================
+    //  PLAYER ATTACK SELECTION
+    // =========================================================================
 
     public void basicAttack()
     {
@@ -730,13 +892,17 @@ public class TurnBasedLogic : MonoBehaviour
         }
 
         isPlayerChoosing = true;
-        isChoosingEnemy = true;
-        currentArrow = GetFirstAliveEnemyIndex();
+        isChoosingEnemy  = true;
+        currentArrow     = GetFirstAliveEnemyIndex();
         handleSkillItemClosing();
         if (chooseMenu.activeSelf) chooseMenu.SetActive(false);
         SetActiveCamera(8);
         ShowArrowEnemySafe(currentArrow);
     }
+
+    // =========================================================================
+    //  PLAYER ATTACK COROUTINE (with crit)
+    // =========================================================================
 
     IEnumerator HandlePlayerAttackCoroutine()
     {
@@ -745,19 +911,19 @@ public class TurnBasedLogic : MonoBehaviour
 
         HideArrow();
         isPlayerChoosing = false;
-        isChoosingEnemy = false;
+        isChoosingEnemy  = false;
 
         int targetEnemyIndex = currentArrow;
 
         switch (currentTypeAttack)
         {
+            // ── Basic attack ─────────────────────────────────────────────────
             case 0:
             {
                 Enemy targetEnemy = currentEnemy[targetEnemyIndex];
-                int playerIndex = characters.IndexOf(currentCharacter);
+                int   playerIndex = characters.IndexOf(currentCharacter);
 
                 yield return StartCoroutine(SwitchToCameraAndWait(8));
-
                 yield return StartCoroutine(MoveObject(
                     playerPosition[playerIndex],
                     defaultPlayerPositions[playerIndex],
@@ -766,13 +932,25 @@ public class TurnBasedLogic : MonoBehaviour
 
                 yield return new WaitForSeconds(0.1f);
 
+                // Base damage from weapon or character stat
                 int damage = currentCharacter.attack;
                 if (itemDatabase != null)
                 {
                     Item weapon = itemDatabase.GetItemByID(currentCharacter.pickedItemID);
                     if (weapon != null) damage = (int)weapon.Damage;
                 }
-                
+
+                // Add damage perk bonus
+                damage += GetDamageBonus(currentCharacter);
+
+                // Crit roll
+                bool isCrit = RollCrit(currentCharacter);
+                if (isCrit)
+                {
+                    damage = ApplyCrit(damage);
+                    yield return StartCoroutine(ShowCritIndicator());
+                }
+
                 targetEnemy.health -= damage;
                 if (targetEnemy.health < 0) targetEnemy.health = 0;
 
@@ -781,10 +959,9 @@ public class TurnBasedLogic : MonoBehaviour
 
                 updateEnemyHealthBar();
                 updateCharacterBars();
-                Debug.Log($"{currentCharacter.name} udeřil {targetEnemy.name} za {damage}. HP: {targetEnemy.health}");
+                Debug.Log($"{currentCharacter.name} udeřil {targetEnemy.name} za {damage}{(isCrit ? " (CRIT!)" : "")}. HP: {targetEnemy.health}");
 
                 yield return new WaitForSeconds(0.15f);
-
                 yield return StartCoroutine(MoveObject(
                     playerPosition[playerIndex],
                     playerPosition[playerIndex].transform.position,
@@ -801,19 +978,19 @@ public class TurnBasedLogic : MonoBehaviour
                 break;
             }
 
+            // ── Skill attack ─────────────────────────────────────────────────
             case 1:
             {
                 Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
-                Enemy targetEnemy = currentEnemy[targetEnemyIndex];
-                int charIndex = characters.IndexOf(currentCharacter);
-                int playerIndex = charIndex;
+                Enemy  targetEnemy  = currentEnemy[targetEnemyIndex];
+                int    charIndex    = characters.IndexOf(currentCharacter);
+                int    playerIndex  = charIndex;
 
                 characters[charIndex].mana -= currentSkill.manaCost;
                 if (characters[charIndex].mana < 0) characters[charIndex].mana = 0;
                 updateCharacterBars();
 
                 yield return StartCoroutine(SwitchToCameraAndWait(8));
-
                 yield return StartCoroutine(MoveObject(
                     playerPosition[playerIndex],
                     defaultPlayerPositions[playerIndex],
@@ -822,13 +999,21 @@ public class TurnBasedLogic : MonoBehaviour
 
                 yield return new WaitForSeconds(0.1f);
 
-                targetEnemy.health -= currentSkill.amount;
+                int skillDamage = currentSkill.amount + GetDamageBonus(currentCharacter);
+
+                bool isCrit = RollCrit(currentCharacter);
+                if (isCrit)
+                {
+                    skillDamage = ApplyCrit(skillDamage);
+                    yield return StartCoroutine(ShowCritIndicator());
+                }
+
+                targetEnemy.health -= skillDamage;
                 if (targetEnemy.health < 0) targetEnemy.health = 0;
                 updateEnemyHealthBar();
-                Debug.Log($"{currentCharacter.name} použil {currentSkill.name} na {targetEnemy.name} za {currentSkill.amount}");
+                Debug.Log($"{currentCharacter.name} použil {currentSkill.name} na {targetEnemy.name} za {skillDamage}{(isCrit ? " (CRIT!)" : "")}");
 
                 yield return new WaitForSeconds(0.15f);
-
                 yield return StartCoroutine(MoveObject(
                     playerPosition[playerIndex],
                     playerPosition[playerIndex].transform.position,
@@ -845,9 +1030,10 @@ public class TurnBasedLogic : MonoBehaviour
                 break;
             }
 
+            // ── Item attack ───────────────────────────────────────────────────
             case 2:
             {
-                Item currentItem = itemDatabase.GetItemByID(currentItemID);
+                Item  currentItem = itemDatabase.GetItemByID(currentItemID);
                 Enemy targetEnemy = currentEnemy[targetEnemyIndex];
 
                 SwitchToPlayerCamera(currentCharacter.id);
@@ -855,11 +1041,21 @@ public class TurnBasedLogic : MonoBehaviour
 
                 if (currentItem != null)
                 {
-                    if (currentItem.turnBaseItemType == TurnBaseItemType.Debuff || currentItem.turnBaseItemType == TurnBaseItemType.Weakening)
+                    if (currentItem.turnBaseItemType == TurnBaseItemType.Debuff ||
+                        currentItem.turnBaseItemType == TurnBaseItemType.Weakening)
                     {
-                        targetEnemy.health -= currentItem.turnBaseItemEffectAmount;
+                        int itemDamage = currentItem.turnBaseItemEffectAmount + GetDamageBonus(currentCharacter);
+
+                        bool isCrit = RollCrit(currentCharacter);
+                        if (isCrit)
+                        {
+                            itemDamage = ApplyCrit(itemDamage);
+                            yield return StartCoroutine(ShowCritIndicator());
+                        }
+
+                        targetEnemy.health -= itemDamage;
                         if (targetEnemy.health < 0) targetEnemy.health = 0;
-                        Debug.Log($"{currentCharacter.name} použil item {currentItem.itemName} na {targetEnemy.name} a dal {currentItem.turnBaseItemEffectAmount} damage/debuff");
+                        Debug.Log($"{currentCharacter.name} použil {currentItem.itemName} na {targetEnemy.name} za {itemDamage}{(isCrit ? " (CRIT!)" : "")}");
                     }
                 }
 
@@ -882,6 +1078,10 @@ public class TurnBasedLogic : MonoBehaviour
         if (!isBattleOver) nextTurn();
     }
 
+    // =========================================================================
+    //  PLAYER SELF-TARGET COROUTINE
+    // =========================================================================
+
     IEnumerator HandlePlayerSelfTargetCoroutine()
     {
         if (isAnimating) yield break;
@@ -889,11 +1089,11 @@ public class TurnBasedLogic : MonoBehaviour
 
         HideArrow();
         isPlayerChoosing = false;
-        isChoosingEnemy = false;
+        isChoosingEnemy  = false;
 
-        int targetIndex = currentArrow;
+        int       targetIndex     = currentArrow;
         Character targetCharacter = characters[targetIndex];
-        int charIndex = characters.IndexOf(currentCharacter);
+        int       charIndex       = characters.IndexOf(currentCharacter);
 
         SwitchToPlayerCamera(currentCharacter.id);
         yield return new WaitForSeconds(0.3f);
@@ -949,6 +1149,10 @@ public class TurnBasedLogic : MonoBehaviour
         if (!isBattleOver) nextTurn();
     }
 
+    // =========================================================================
+    //  SELECTION HELPERS
+    // =========================================================================
+
     void handleSelection(bool isChoosingEnemyInput, int currentTypeAttackInput)
     {
         if (isAnimating) return;
@@ -971,8 +1175,8 @@ public class TurnBasedLogic : MonoBehaviour
             if (alive.Count == 1)
             {
                 currentTypeAttack = currentTypeAttackInput;
-                isChoosingEnemy = true;
-                currentArrow = alive[0];
+                isChoosingEnemy   = true;
+                currentArrow      = alive[0];
                 handleSkillItemClosing();
                 if (chooseMenu.activeSelf) chooseMenu.SetActive(false);
                 StartCoroutine(HandlePlayerAttackCoroutine());
@@ -980,7 +1184,7 @@ public class TurnBasedLogic : MonoBehaviour
             }
         }
 
-        isPlayerChoosing = true;
+        isPlayerChoosing  = true;
         currentTypeAttack = currentTypeAttackInput;
         handleSkillItemClosing();
         if (chooseMenu.activeSelf) chooseMenu.SetActive(false);
@@ -989,13 +1193,13 @@ public class TurnBasedLogic : MonoBehaviour
         if (isChoosingEnemyInput)
         {
             isChoosingEnemy = true;
-            currentArrow = GetFirstAliveEnemyIndex();
+            currentArrow    = GetFirstAliveEnemyIndex();
             ShowArrowEnemySafe(currentArrow);
         }
         else
         {
             isChoosingEnemy = false;
-            currentArrow = Mathf.Max(0, characters.FindIndex(c => !c.isDead));
+            currentArrow    = Mathf.Max(0, characters.FindIndex(c => !c.isDead));
             ShowArrow(arrowsCharacters, currentArrow);
         }
     }
@@ -1003,7 +1207,7 @@ public class TurnBasedLogic : MonoBehaviour
     void handleSelectionBack()
     {
         isPlayerChoosing = false;
-        isChoosingEnemy = false;
+        isChoosingEnemy  = false;
         HideArrow();
         HideInfo();
         SwitchToPlayerCamera(currentCharacter.id);
@@ -1011,10 +1215,15 @@ public class TurnBasedLogic : MonoBehaviour
         handleSkillOpening();
     }
 
+    // =========================================================================
+    //  SKILL / ITEM MENUS
+    // =========================================================================
+
     public void handleSkillOpening()
     {
         handleSkillItemClosing();
         chooserThingsMenu.SetActive(true);
+        infoUI.SetActive(true);
 
         if (currentCharacter == null || skillDatabase == null) return;
 
@@ -1031,7 +1240,6 @@ public class TurnBasedLogic : MonoBehaviour
 
             Button btn = skillButton.GetComponent<Button>();
             btn.interactable = capturedSkill.manaCost <= currentCharacter.mana;
-
             btn.onClick.AddListener(() =>
             {
                 currentSkillID = capturedSkill.id;
@@ -1039,13 +1247,11 @@ public class TurnBasedLogic : MonoBehaviour
             });
 
             EventTrigger trigger = skillButton.AddComponent<EventTrigger>();
-            
             EventTrigger.Entry enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-            enter.callback.AddListener((data) => { ShowInfo(capturedSkill.name, "Typ: " + capturedSkill.type.ToString() + "\nMana: " + capturedSkill.manaCost); });
+            enter.callback.AddListener((d) => { ShowInfo(capturedSkill.name, "Typ: " + capturedSkill.type.ToString() + "\nMana: " + capturedSkill.manaCost); });
             trigger.triggers.Add(enter);
-
             EventTrigger.Entry exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-            exit.callback.AddListener((data) => { HideInfo(); });
+            exit.callback.AddListener((d) => { HideInfo(); });
             trigger.triggers.Add(exit);
         }
     }
@@ -1054,12 +1260,12 @@ public class TurnBasedLogic : MonoBehaviour
     {
         handleSkillItemClosing();
         chooserThingsMenu.SetActive(true);
+        infoUI.SetActive(true);
 
         if (itemDatabase == null) return;
 
-        List<Item> items = itemDatabase.GetAllItems();
-        List<Item> usableItems = items.Where(i => i.isTurnedBaseItem).ToList();
-        
+        List<Item> usableItems = itemDatabase.GetAllItems().Where(i => i.isTurnedBaseItem).ToList();
+
         foreach (var item in usableItems)
         {
             Item capturedItem = item;
@@ -1070,18 +1276,17 @@ public class TurnBasedLogic : MonoBehaviour
             btn.onClick.AddListener(() =>
             {
                 currentItemID = capturedItem.id;
-                bool targetsEnemy = (capturedItem.turnBaseItemType == TurnBaseItemType.Debuff || capturedItem.turnBaseItemType == TurnBaseItemType.Weakening);
+                bool targetsEnemy = (capturedItem.turnBaseItemType == TurnBaseItemType.Debuff ||
+                                     capturedItem.turnBaseItemType == TurnBaseItemType.Weakening);
                 handleSelection(targetsEnemy, 2);
             });
 
             EventTrigger trigger = itemButton.AddComponent<EventTrigger>();
-            
             EventTrigger.Entry enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-            enter.callback.AddListener((data) => { ShowInfo(capturedItem.itemName, capturedItem.description); });
+            enter.callback.AddListener((d) => { ShowInfo(capturedItem.itemName, capturedItem.description); });
             trigger.triggers.Add(enter);
-
             EventTrigger.Entry exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-            exit.callback.AddListener((data) => { HideInfo(); });
+            exit.callback.AddListener((d) => { HideInfo(); });
             trigger.triggers.Add(exit);
         }
     }
@@ -1091,18 +1296,19 @@ public class TurnBasedLogic : MonoBehaviour
         foreach (Transform child in chooserThingsMenu.transform)
             Destroy(child.gameObject);
         chooserThingsMenu.SetActive(false);
+        infoUI.SetActive(false);
         HideInfo();
     }
 
     void ShowInfo(string nameStr, string descStr)
     {
-        if (infoNameText != null) infoNameText.text = nameStr;
+        if (infoNameText        != null) infoNameText.text        = nameStr;
         if (infoDescriptionText != null) infoDescriptionText.text = descStr;
     }
 
     void HideInfo()
     {
-        if (infoNameText != null) infoNameText.text = "";
+        if (infoNameText        != null) infoNameText.text        = "";
         if (infoDescriptionText != null) infoDescriptionText.text = "";
     }
 
@@ -1119,15 +1325,19 @@ public class TurnBasedLogic : MonoBehaviour
         parryDodgePromptText.gameObject.SetActive(false);
     }
 
+    // =========================================================================
+    //  POSITIONS / CAMERA
+    // =========================================================================
+
     void getDefaultPositions()
     {
-        defaultEnemyPositions = enemyPosition.Select(p => p.transform.position).ToList();
+        defaultEnemyPositions  = enemyPosition.Select(p => p.transform.position).ToList();
         defaultPlayerPositions = playerPosition.Select(p => p.transform.position).ToList();
     }
 
     Vector3 getAnimationPositions(int enemyPositionIndex, int playerPositionIndex, bool isPlayerAttacking)
     {
-        Vector3 enemyPos = defaultEnemyPositions[enemyPositionIndex];
+        Vector3 enemyPos  = defaultEnemyPositions[enemyPositionIndex];
         Vector3 playerPos = defaultPlayerPositions[playerPositionIndex];
         return isPlayerAttacking
             ? Vector3.Lerp(playerPos, enemyPos, 0.65f)
@@ -1152,10 +1362,14 @@ public class TurnBasedLogic : MonoBehaviour
         obj.transform.position = to;
     }
 
+    // =========================================================================
+    //  BATTLE END
+    // =========================================================================
+
     void CheckBattleEnd()
     {
-        if (currentEnemy.All(e => e.isDead)) { TriggerVictory(); return; }
-        if (characters.All(c => c.isDead)) { TriggerGameOver(); }
+        if (currentEnemy.All(e => e.isDead))  { TriggerVictory(); return; }
+        if (characters.All(c => c.isDead))    { TriggerGameOver(); }
     }
 
     void TriggerVictory()
@@ -1176,6 +1390,10 @@ public class TurnBasedLogic : MonoBehaviour
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
     }
 
+    // =========================================================================
+    //  CAMERA SYSTEM
+    // =========================================================================
+
     void SetActiveCamera(int cameraID)
     {
         var target = camerasInfo.FirstOrDefault(c => c.IDofCamera == cameraID);
@@ -1191,14 +1409,14 @@ public class TurnBasedLogic : MonoBehaviour
     IEnumerator AnimateToCamera(Camera targetCam, float zoomMultiplier)
     {
         Camera mainCam = camerasInfo.FirstOrDefault(c => c.IDofCamera == 0).targetCamera;
-        var ppCam = mainCam.GetComponent<PixelPerfectCamera>();
+        var    ppCam   = mainCam.GetComponent<PixelPerfectCamera>();
 
-        Vector3 startPos = mainCam.transform.position;
-        Quaternion startRot = mainCam.transform.rotation;
-        int startPPU = ppCam.assetsPPU;
-        Vector3 endPos = targetCam.transform.position;
-        Quaternion endRot = targetCam.transform.rotation;
-        int endPPU = zoomMultiplier > 0
+        Vector3    startPos  = mainCam.transform.position;
+        Quaternion startRot  = mainCam.transform.rotation;
+        int        startPPU  = ppCam.assetsPPU;
+        Vector3    endPos    = targetCam.transform.position;
+        Quaternion endRot    = targetCam.transform.rotation;
+        int        endPPU    = zoomMultiplier > 0
             ? Mathf.RoundToInt(defaultPPU * zoomMultiplier)
             : defaultPPU;
 
@@ -1209,18 +1427,22 @@ public class TurnBasedLogic : MonoBehaviour
             float t = Mathf.SmoothStep(0f, 1f, elapsed / transitionDuration);
             mainCam.transform.position = Vector3.Lerp(startPos, endPos, t);
             mainCam.transform.rotation = Quaternion.Lerp(startRot, endRot, t);
-            ppCam.assetsPPU = Mathf.RoundToInt(Mathf.Lerp(startPPU, endPPU, t));
+            ppCam.assetsPPU            = Mathf.RoundToInt(Mathf.Lerp(startPPU, endPPU, t));
             yield return null;
         }
 
         mainCam.transform.position = endPos;
         mainCam.transform.rotation = endRot;
-        ppCam.assetsPPU = endPPU;
+        ppCam.assetsPPU            = endPPU;
     }
 
-    void SwitchToOverviewCamera() => SetActiveCamera(0);
+    void SwitchToOverviewCamera()          => SetActiveCamera(0);
     void SwitchToPlayerCamera(int playerID) => SetActiveCamera(playerID);
     void SwitchToEnemyCamera(int enemyCamID) => SetActiveCamera(enemyCamID);
+
+    // =========================================================================
+    //  UI HELPERS
+    // =========================================================================
 
     void UpdateFaces()
     {
@@ -1229,9 +1451,9 @@ public class TurnBasedLogic : MonoBehaviour
             if (i >= turnOrder.Count) { FaceHolders[i].gameObject.SetActive(false); continue; }
 
             FaceHolders[i].gameObject.SetActive(true);
-            TurnType turn = turnOrder[i];
-            bool lookingEnemy = !IsPlayerTurn(turn);
-            int targetID = 0;
+            TurnType turn        = turnOrder[i];
+            bool     lookingEnemy = !IsPlayerTurn(turn);
+            int      targetID    = 0;
 
             if (lookingEnemy)
             {
@@ -1240,7 +1462,7 @@ public class TurnBasedLogic : MonoBehaviour
             }
             else
             {
-                if (turn == TurnType.Player1) targetID = 1;
+                if      (turn == TurnType.Player1) targetID = 1;
                 else if (turn == TurnType.Player2) targetID = 2;
                 else if (turn == TurnType.Player3) targetID = 3;
                 else if (turn == TurnType.Player4) targetID = 4;
@@ -1257,7 +1479,7 @@ public class TurnBasedLogic : MonoBehaviour
         int maxHealth = 0, currentHealth = 0;
         foreach (var e in currentEnemy)
         {
-            maxHealth += e.maxHealth;
+            maxHealth     += e.maxHealth;
             currentHealth += Mathf.Max(e.health, 0);
         }
         if (maxHealth > 0) EnemyHealthBar.fillAmount = currentHealth / (float)maxHealth;
@@ -1268,11 +1490,9 @@ public class TurnBasedLogic : MonoBehaviour
         for (int i = 0; i < characterBars.Count && i < characters.Count; i++)
         {
             var bars = characterBars[i];
-            var ch = characters[i];
-            if (bars.healthBar != null)
-                bars.healthBar.fillAmount = Mathf.Clamp01(ch.health / (float)ch.maxHealth);
-            if (bars.manaBar != null)
-                bars.manaBar.fillAmount = Mathf.Clamp01(ch.mana / 10f);
+            var ch   = characters[i];
+            if (bars.healthBar != null) bars.healthBar.fillAmount = Mathf.Clamp01(ch.health / (float)ch.maxHealth);
+            if (bars.manaBar   != null) bars.manaBar.fillAmount   = Mathf.Clamp01(ch.mana / 10f);
         }
     }
 
@@ -1290,6 +1510,6 @@ public class TurnBasedLogic : MonoBehaviour
         arrowsCharacters.ForEach(a => a.SetActive(false));
     }
 
-    public void openChooseAttackUI() => ChooseAttackUI.SetActive(true);
+    public void openChooseAttackUI()  => ChooseAttackUI.SetActive(true);
     public void closeChooseAttackUI() => ChooseAttackUI.SetActive(false);
 }
