@@ -8,6 +8,14 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.EventSystems;
 
 [System.Serializable]
+public struct EnemeyInfo
+{
+    public int ID;
+    public string name;
+    public Sprite sprite;
+    public Sprite TurnBasedIcon;
+}
+[System.Serializable]
 public struct CameraInfo
 {
     public int ID;
@@ -67,16 +75,14 @@ public class TurnBasedLogic : MonoBehaviour
     private static SkillDatabase skillDatabase;
     private static PerksDatabase perksDatabase;
 
-    // ─── CRIT SETTINGS ────────────────────────────────────────────────────────
-    [Header("Crit Settings")]
-    [SerializeField] private float baseCritChance = 0.05f;          // 5% base
-    [SerializeField] private float critDamageMultiplier = 2f;        // 2× damage
-    [SerializeField] private Color critTextColor = new Color(1f, 0.4f, 0f); // orange
-    [SerializeField] private TextMeshProUGUI critIndicatorText;      // "CRITICAL!" label
+    [SerializeField] private float baseCritChance = 0.05f;          
+    [SerializeField] private float critDamageMultiplier = 2f;        
+    [SerializeField] private Color critTextColor = new Color(1f, 0.4f, 0f); 
+    [SerializeField] private TextMeshProUGUI critIndicatorText;     
     [SerializeField] private float critIndicatorDuration = 0.8f;
     [SerializeField] private AudioClip critSoundEffect;
     [SerializeField] private AudioSource audioSource;
-    // ──────────────────────────────────────────────────────────────────────────
+    
 
     private List<Skills> currentCharacterSkills;
     private List<Character> characters;
@@ -84,7 +90,6 @@ public class TurnBasedLogic : MonoBehaviour
     private List<Enemy> enemies;
     private List<Enemy> currentEnemy;
 
-    // Per-character perk-derived stats (applied once at battle start)
     private Dictionary<int, float> characterCritBonus    = new Dictionary<int, float>();
     private Dictionary<int, int>   characterDamageBonus  = new Dictionary<int, int>();
     private Dictionary<int, int>   characterArmorBonus   = new Dictionary<int, int>();
@@ -111,7 +116,7 @@ public class TurnBasedLogic : MonoBehaviour
     private bool lastHitWasParried;
     private int totalHitsInAttack;
     private int dodgedHitsCount;
-
+    [SerializeField] private List<EnemeyInfo> enemeyInfos = new List<EnemeyInfo>();
     [SerializeField] private List<GameObject> enemyPosition = new List<GameObject>();
     [SerializeField] private List<GameObject> playerPosition = new List<GameObject>();
     private List<Vector3> defaultPlayerPositions = new List<Vector3>();
@@ -150,6 +155,9 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private TextMeshProUGUI infoNameText;
     [SerializeField] private TextMeshProUGUI infoDescriptionText;
 
+    [SerializeField] private List<GameObject> startUIEnemys = new List<GameObject>();
+    [SerializeField] private List<TextMeshProUGUI> startUIEnemysText = new List<TextMeshProUGUI>();
+
     [SerializeField] private List<CameraInfo> camerasInfo = new List<CameraInfo>();
     private Camera currentActiveCamera;
     public float transitionDuration = 0.5f;
@@ -159,14 +167,6 @@ public class TurnBasedLogic : MonoBehaviour
     private Coroutine activeAnimation;
     private Dictionary<Camera, Vector3> originalPositions = new Dictionary<Camera, Vector3>();
 
-    // =========================================================================
-    //  PERK APPLICATION
-    // =========================================================================
-
-    /// <summary>
-    /// Reads all perks owned by the player from Resources and applies their
-    /// stat bonuses to the relevant characters.
-    /// </summary>
     void ApplyPerksToCharacters()
     {
         characterCritBonus.Clear();
@@ -179,7 +179,6 @@ public class TurnBasedLogic : MonoBehaviour
 
         foreach (Character ch in characters)
         {
-            // Collect only the three perks this character has equipped
             List<int> equippedIDs = new List<int>();
             if (ch.pickePerkID1 != 0) equippedIDs.Add(ch.pickePerkID1);
             if (ch.pickePerkID2 != 0) equippedIDs.Add(ch.pickePerkID2);
@@ -211,7 +210,6 @@ public class TurnBasedLogic : MonoBehaviour
                 break;
 
             case perkType.critAdder:
-                // addingAmount is treated as integer percentage points (e.g. 5 → +5%)
                 if (!characterCritBonus.ContainsKey(ch.id)) characterCritBonus[ch.id] = 0f;
                 characterCritBonus[ch.id] += (perk.addingAmount * perk.levelOfPerk) / 100f;
                 break;
@@ -227,24 +225,17 @@ public class TurnBasedLogic : MonoBehaviour
         }
     }
 
-    // =========================================================================
-    //  CRIT HELPERS
-    // =========================================================================
-
-    /// <summary>Returns total crit chance for a character (base + perk bonus).</summary>
     float GetCritChance(Character ch)
     {
         float bonus = characterCritBonus.ContainsKey(ch.id) ? characterCritBonus[ch.id] : 0f;
         return Mathf.Clamp01(baseCritChance + bonus);
     }
 
-    /// <summary>Rolls for a critical hit. Returns true if crit.</summary>
     bool RollCrit(Character ch)
     {
         return Random.value < GetCritChance(ch);
     }
 
-    /// <summary>Applies crit multiplier and shows the crit indicator.</summary>
     int ApplyCrit(int damage)
     {
         return Mathf.RoundToInt(damage * critDamageMultiplier);
@@ -266,22 +257,16 @@ public class TurnBasedLogic : MonoBehaviour
         }
     }
 
-    /// <summary>Returns total damage bonus from damage-adder perks.</summary>
     int GetDamageBonus(Character ch)
     {
         return characterDamageBonus.ContainsKey(ch.id) ? characterDamageBonus[ch.id] : 0;
     }
 
-    /// <summary>Reduces incoming damage by armor perk bonus (minimum 1).</summary>
     int ReduceByArmor(Character ch, int incomingDamage)
     {
         int armor = characterArmorBonus.ContainsKey(ch.id) ? characterArmorBonus[ch.id] : 0;
         return Mathf.Max(1, incomingDamage - armor);
     }
-
-    // =========================================================================
-    //  LIFECYCLE
-    // =========================================================================
 
     public void StartTurnBasedGame()
     {
@@ -326,11 +311,14 @@ public class TurnBasedLogic : MonoBehaviour
 
         Debug.Log("Characters loaded: " + string.Join(", ", characters.Select(c => c.name)));
 
-        // Apply perk bonuses before anything else
         ApplyPerksToCharacters();
 
         inicializeTurnBasedGame();
         HideInfo();
+
+        
+
+
     }
 
     void Update()
@@ -382,10 +370,6 @@ public class TurnBasedLogic : MonoBehaviour
         }
     }
 
-    // =========================================================================
-    //  ARROW NAVIGATION
-    // =========================================================================
-
     void CycleEnemyArrow(int dir)
     {
         List<int> alive = currentEnemy
@@ -420,10 +404,6 @@ public class TurnBasedLogic : MonoBehaviour
         ShowArrow(arrowsCharacters, currentArrow);
     }
 
-    // =========================================================================
-    //  INITIALIZATION
-    // =========================================================================
-
     void inicializeTurnBasedGame()
     {
         onTurnbasedStart();
@@ -451,6 +431,18 @@ public class TurnBasedLogic : MonoBehaviour
         if (victoryPanel     != null) victoryPanel.SetActive(false);
         if (parryDodgePromptText != null) parryDodgePromptText.gameObject.SetActive(false);
         if (critIndicatorText    != null) critIndicatorText.gameObject.SetActive(false);
+
+        for (int i = 0; i < startUIEnemys.Count; i++)
+        {
+            var enemyData = enemeyInfos.FirstOrDefault(e => e.ID == whatEnemiesIsFighting[i]); 
+            startUIEnemys[i].GetComponent<UnityEngine.UI.Image>().sprite = enemyData.TurnBasedIcon;
+        }
+
+        for (int i = 0; i < startUIEnemysText.Count; i++)
+        {
+            var enemyData = enemeyInfos.FirstOrDefault(e => e.ID == whatEnemiesIsFighting[i]);
+            startUIEnemysText[i].text = enemyData.name;
+        }
     }
 
     void onTurnbasedStart()
@@ -491,10 +483,6 @@ public class TurnBasedLogic : MonoBehaviour
         Debug.Log("Current enemy: " + string.Join(", ", currentEnemy.Select(e => e.name)));
     }
 
-    // =========================================================================
-    //  TURN ORDER
-    // =========================================================================
-
     void createTurnOrder()
     {
         turnOrder.Clear();
@@ -525,7 +513,6 @@ public class TurnBasedLogic : MonoBehaviour
 
         while (turnOrder.Count < 500)
         {
-            // Each enemy gets 2 turns before players go
             if (enemyPool.Count > 0)
             {
                 int enemyTurnsPerRound = 2;
@@ -603,10 +590,6 @@ public class TurnBasedLogic : MonoBehaviour
         return 0;
     }
 
-    // =========================================================================
-    //  NEXT TURN / PLAY TURN
-    // =========================================================================
-
     public void nextTurn()
     {
         if (isBattleOver || isAnimating) return;
@@ -657,10 +640,6 @@ public class TurnBasedLogic : MonoBehaviour
         yield return new WaitForSeconds(delay);
         chooseMenu.SetActive(true);
     }
-
-    // =========================================================================
-    //  ENEMY TURN
-    // =========================================================================
 
     IEnumerator EnemyTurnCoroutine(int enemyIndex)
     {
@@ -745,7 +724,6 @@ public class TurnBasedLogic : MonoBehaviour
             }
             else
             {
-                // Enemy hits land — reduced by armor perks
                 int finalDmg = ReduceByArmor(target, hit.damage);
                 target.health -= finalDmg;
                 if (target.health < 0) target.health = 0;
@@ -756,7 +734,6 @@ public class TurnBasedLogic : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
         }
 
-        // Perfect dodge — deal total damage back to enemy
         if (dodgedHitsCount == totalHitsInAttack && totalHitsInAttack > 0)
         {
             int totalDmg = chosenAttack.hits.Sum(h => h.damage);
@@ -812,10 +789,6 @@ public class TurnBasedLogic : MonoBehaviour
         return enemy.attacks[0];
     }
 
-    // =========================================================================
-    //  DEATH HANDLERS
-    // =========================================================================
-
     void HandleEnemyDeath(int enemyIndex)
     {
         if (enemyIndex < enemyUIs.Count     && enemyUIs[enemyIndex]     != null) enemyUIs[enemyIndex].SetActive(false);
@@ -867,10 +840,6 @@ public class TurnBasedLogic : MonoBehaviour
         }
     }
 
-    // =========================================================================
-    //  PLAYER ATTACK SELECTION
-    // =========================================================================
-
     public void basicAttack()
     {
         if (isAnimating) return;
@@ -900,10 +869,6 @@ public class TurnBasedLogic : MonoBehaviour
         ShowArrowEnemySafe(currentArrow);
     }
 
-    // =========================================================================
-    //  PLAYER ATTACK COROUTINE (with crit)
-    // =========================================================================
-
     IEnumerator HandlePlayerAttackCoroutine()
     {
         if (isAnimating) yield break;
@@ -917,7 +882,6 @@ public class TurnBasedLogic : MonoBehaviour
 
         switch (currentTypeAttack)
         {
-            // ── Basic attack ─────────────────────────────────────────────────
             case 0:
             {
                 Enemy targetEnemy = currentEnemy[targetEnemyIndex];
@@ -932,7 +896,6 @@ public class TurnBasedLogic : MonoBehaviour
 
                 yield return new WaitForSeconds(0.1f);
 
-                // Base damage from weapon or character stat
                 int damage = currentCharacter.attack;
                 if (itemDatabase != null)
                 {
@@ -940,10 +903,8 @@ public class TurnBasedLogic : MonoBehaviour
                     if (weapon != null) damage = (int)weapon.Damage;
                 }
 
-                // Add damage perk bonus
                 damage += GetDamageBonus(currentCharacter);
 
-                // Crit roll
                 bool isCrit = RollCrit(currentCharacter);
                 if (isCrit)
                 {
@@ -978,7 +939,6 @@ public class TurnBasedLogic : MonoBehaviour
                 break;
             }
 
-            // ── Skill attack ─────────────────────────────────────────────────
             case 1:
             {
                 Skills currentSkill = skillDatabase.GetSkillByID(currentSkillID);
@@ -1030,7 +990,6 @@ public class TurnBasedLogic : MonoBehaviour
                 break;
             }
 
-            // ── Item attack ───────────────────────────────────────────────────
             case 2:
             {
                 Item  currentItem = itemDatabase.GetItemByID(currentItemID);
@@ -1077,10 +1036,6 @@ public class TurnBasedLogic : MonoBehaviour
         CheckBattleEnd();
         if (!isBattleOver) nextTurn();
     }
-
-    // =========================================================================
-    //  PLAYER SELF-TARGET COROUTINE
-    // =========================================================================
 
     IEnumerator HandlePlayerSelfTargetCoroutine()
     {
@@ -1149,10 +1104,6 @@ public class TurnBasedLogic : MonoBehaviour
         if (!isBattleOver) nextTurn();
     }
 
-    // =========================================================================
-    //  SELECTION HELPERS
-    // =========================================================================
-
     void handleSelection(bool isChoosingEnemyInput, int currentTypeAttackInput)
     {
         if (isAnimating) return;
@@ -1214,10 +1165,6 @@ public class TurnBasedLogic : MonoBehaviour
         if (!chooseMenu.activeSelf) chooseMenu.SetActive(true);
         handleSkillOpening();
     }
-
-    // =========================================================================
-    //  SKILL / ITEM MENUS
-    // =========================================================================
 
     public void handleSkillOpening()
     {
@@ -1325,10 +1272,6 @@ public class TurnBasedLogic : MonoBehaviour
         parryDodgePromptText.gameObject.SetActive(false);
     }
 
-    // =========================================================================
-    //  POSITIONS / CAMERA
-    // =========================================================================
-
     void getDefaultPositions()
     {
         defaultEnemyPositions  = enemyPosition.Select(p => p.transform.position).ToList();
@@ -1362,10 +1305,6 @@ public class TurnBasedLogic : MonoBehaviour
         obj.transform.position = to;
     }
 
-    // =========================================================================
-    //  BATTLE END
-    // =========================================================================
-
     void CheckBattleEnd()
     {
         if (currentEnemy.All(e => e.isDead))  { TriggerVictory(); return; }
@@ -1390,10 +1329,6 @@ public class TurnBasedLogic : MonoBehaviour
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
     }
 
-    // =========================================================================
-    //  CAMERA SYSTEM
-    // =========================================================================
-
     void SetActiveCamera(int cameraID)
     {
         var target = camerasInfo.FirstOrDefault(c => c.IDofCamera == cameraID);
@@ -1411,7 +1346,7 @@ public class TurnBasedLogic : MonoBehaviour
         Camera mainCam = camerasInfo.FirstOrDefault(c => c.IDofCamera == 0).targetCamera;
         var    ppCam   = mainCam.GetComponent<PixelPerfectCamera>();
 
-        Vector3    startPos  = mainCam.transform.position;
+        Vector3 startPos  = mainCam.transform.position;
         Quaternion startRot  = mainCam.transform.rotation;
         int        startPPU  = ppCam.assetsPPU;
         Vector3    endPos    = targetCam.transform.position;
@@ -1427,7 +1362,7 @@ public class TurnBasedLogic : MonoBehaviour
             float t = Mathf.SmoothStep(0f, 1f, elapsed / transitionDuration);
             mainCam.transform.position = Vector3.Lerp(startPos, endPos, t);
             mainCam.transform.rotation = Quaternion.Lerp(startRot, endRot, t);
-            ppCam.assetsPPU            = Mathf.RoundToInt(Mathf.Lerp(startPPU, endPPU, t));
+            ppCam.assetsPPU = Mathf.RoundToInt(Mathf.Lerp(startPPU, endPPU, t));
             yield return null;
         }
 
@@ -1439,10 +1374,6 @@ public class TurnBasedLogic : MonoBehaviour
     void SwitchToOverviewCamera()          => SetActiveCamera(0);
     void SwitchToPlayerCamera(int playerID) => SetActiveCamera(playerID);
     void SwitchToEnemyCamera(int enemyCamID) => SetActiveCamera(enemyCamID);
-
-    // =========================================================================
-    //  UI HELPERS
-    // =========================================================================
 
     void UpdateFaces()
     {
