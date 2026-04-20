@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
-  m_Name: basic_knife
+  m_Name: TurnBasedHeal
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 1
-  itemName: Basic Knife
-  allowedCharacterIDs: 0100000002000000030000000400000005000000
-  icon: {fileID: -1273024007585565325, guid: 798773904929f59448a702cfbedb193b, type: 3}
+  id: 9
+  itemName: 
+  allowedCharacterIDs: 
+  icon: {fileID: 0}
   prefab: {fileID: 0}
-  description: sadfasdfasdfasdfsad
-  isResearched: 1
-  isUsable: 1
-  isTurnedBaseItem: 0
+  description: 
+  isResearched: 0
+  isUsable: 0
+  isTurnedBaseItem: 1
   canBeSold: 1
-  basePrice: 61
+  basePrice: 0
   maxStack: 0
   isDefaultItem: 1
-  defaultAmount: 5
+  defaultAmount: 1
   defaultLevel: 1
-  itemType: 4
+  itemType: 0
   weaponType: 0
   isTurnedBaseWeapon: 0
   firstCharID: 0
@@ -49,5 +49,5 @@ MonoBehaviour:
   Armor: 0
   weight: 0
   turnBaseItemType: 0
-  turnBaseItemEffectAmount: 0
-  turnBaseItemDuration: 0
+  turnBaseItemEffectAmount: 100
+  turnBaseItemDuration: 1

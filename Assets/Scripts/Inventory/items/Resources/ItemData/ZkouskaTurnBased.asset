@@ -20,6 +20,7 @@ MonoBehaviour:
   description: GUUUUN
   isResearched: 1
   isUsable: 1
+  isTurnedBaseItem: 0
   canBeSold: 1
   basePrice: 67
   maxStack: 0
@@ -47,3 +48,6 @@ MonoBehaviour:
   armorType: 0
   Armor: 0
   weight: 0
+  turnBaseItemType: 1
+  turnBaseItemEffectAmount: 0
+  turnBaseItemDuration: 0

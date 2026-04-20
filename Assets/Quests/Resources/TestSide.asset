@@ -15,7 +15,7 @@ MonoBehaviour:
   questID: jisao iosa diosadsaio
   questName: Side Quest Test
   questType: 1
-  currentState: 0
+  currentState: 1
   questSteps:
   - objectiveDescription: "Pod ke mn\u011B"
     logText: "Hej tady chci jenom otestovat proc to nefunguje a proc to funguje takze

@@ -10,29 +10,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
-  m_Name: basic_knife
+  m_Name: ZkouskaTurnBasedctryrrii
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 1
-  itemName: Basic Knife
-  allowedCharacterIDs: 0100000002000000030000000400000005000000
-  icon: {fileID: -1273024007585565325, guid: 798773904929f59448a702cfbedb193b, type: 3}
+  id: 5
+  itemName: PROSIM FUNGUJ
+  allowedCharacterIDs: 04000000
+  icon: {fileID: 6674386295937086461, guid: 3fe6fcf79ab36d54bafb9ec4aef07479, type: 3}
   prefab: {fileID: 0}
-  description: sadfasdfasdfasdfsad
+  description: TOTO JE TURNBASED ZBRAN
   isResearched: 1
   isUsable: 1
   isTurnedBaseItem: 0
   canBeSold: 1
-  basePrice: 61
+  basePrice: 120
   maxStack: 0
   isDefaultItem: 1
-  defaultAmount: 5
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 4
   weaponType: 0
-  isTurnedBaseWeapon: 0
-  firstCharID: 0
+  isTurnedBaseWeapon: 1
+  firstCharID: 4
   isMagical: 0
-  Damage: 0
+  Damage: 10
   FireRate: 0
   Range: 0
   ReloadTime: 0
