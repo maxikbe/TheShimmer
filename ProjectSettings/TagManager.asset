@@ -50,6 +50,9 @@ TagManager:
   - name: GenerationMap
     uniqueID: 1881948473
     locked: 0
+  - name: TileMap
+    uniqueID: 326505519
+    locked: 0
   - name: LakeMap
     uniqueID: 831052261
     locked: 0
