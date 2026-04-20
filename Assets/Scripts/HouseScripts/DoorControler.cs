@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
+using UnityEngine.InputSystem.Interactions;
 
 public class DoorControler : MonoBehaviour
 {
@@ -9,14 +10,17 @@ public class DoorControler : MonoBehaviour
     public bool isFunctional = false;
     public string spawnPointName;
     public string popUpTextContent = "It´s blocked...";
+    public string interactUITextContent = "Enter [E]"; 
     public float transitionWaitTime = 1f;
 
     private GameObject InteractUI;
     private GameObject PopUpUI;
     private TextMeshProUGUI popUpText;
+    private TextMeshProUGUI interactUIText;
     private Animator popUpAnimator;
     private Animator transitionAnimator;
     private GameObject TransitionPanel;
+    
 
     private bool isPlayerInTrigger = false;
 
@@ -45,6 +49,8 @@ public class DoorControler : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             InteractUI = other.transform.Find("PlayerInfoUICanvas/Interaction").gameObject;
+            interactUIText = InteractUI.GetComponentInChildren<TextMeshProUGUI>();
+            interactUIText.text = interactUITextContent;
 
             if (!isFunctional)
             {

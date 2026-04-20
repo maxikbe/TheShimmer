@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: RevGrassDirtCornerLT
   m_EditorClassIdentifier: Assembly-CSharp::TileData
   tile: {fileID: 11400000, guid: b547aacc7ad21e3459bac58f835ebe0a, type: 2}
-  validUp: 04000000070000000a000000
+  validUp: 04000000070000000a00000010000000
   validDown: 01000000060000000a0000000c000000
-  validLeft: 04000000090000000d000000
+  validLeft: 04000000090000000d00000010000000
   validRight: 01000000080000000c0000000d000000
   tileID: 11
   weight: 5

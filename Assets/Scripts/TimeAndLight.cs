@@ -6,7 +6,9 @@ public class TimeAndLight : MonoBehaviour
 {
     public Light2D globalLight;
     public Gradient nightDayColor;
-    public TextMeshProUGUI clockText;
+    public TextMeshProUGUI WatchText;
+    public GameObject WatchUILongArm;
+    public GameObject WatchUIShortArm;
     public float secondsInDay = 1200f;
     public float minIntensity = 0.01f;
     public float maxIntensity = 1.0f;
@@ -55,16 +57,26 @@ public class TimeAndLight : MonoBehaviour
 
     void UpdateClock()
     {
-        if (clockText == null) return;
+        float totalMinutesInDay = currentTime * 1440f; 
+        float hours = totalMinutesInDay / 60f;
+        float minutes = totalMinutesInDay % 60f;
 
-        float totalMinutes = currentTime * 1440f; 
-        int hours = Mathf.FloorToInt(totalMinutes / 60f);
-        int minutes = Mathf.FloorToInt(totalMinutes % 60f);
+        if (WatchText != null)
+        {
+            string suffix = hours >= 12 ? "PM" : "AM";
+            WatchText.text = suffix;
+        }
 
-        string suffix = hours >= 12 ? "PM" : "AM";
-        int displayHour = hours % 12;
-        if (displayHour == 0) displayHour = 12;
+        if (WatchUIShortArm != null)
+        {
+            float hourRotation = (currentTime * 720f);
+            WatchUIShortArm.transform.localRotation = Quaternion.Euler(0, 0, -hourRotation);
+        }
 
-        clockText.text = string.Format("{0:0}:{1:00} {2}", displayHour, minutes, suffix);
+        if (WatchUILongArm != null)
+        {
+            float minuteRotation = (hours * 360f);
+            WatchUILongArm.transform.localRotation = Quaternion.Euler(0, 0, -minuteRotation+90);
+        }
     }
 }
