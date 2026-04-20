@@ -4,49 +4,110 @@ using System.Collections;
 
 public class gramophoneScript : MonoBehaviour
 {
-    public bool isFunctional = false;
-    public string popUpTextContent = "It´s blocked...";
-    public string interactUITextContent = "Use [E]"; 
-    public float transitionWaitTime = 1f;
+    public AudioClip musicClip;
+    public AudioClip startSound;
+    public AudioClip stopSound;
 
+    private string interactUITextContent = "Stop [E]";
     private GameObject InteractUI;
     private TextMeshProUGUI interactUIText;
-    private GameObject PopUpUI;
-    private TextMeshProUGUI popUpText;
-    private Animator popUpAnimator;
-
+    private AudioSource audioSource;
     private bool isPlayerInTrigger = false;
+    private bool isPlaying = true;
+    private float savedTime = 0f;
+    private Coroutine activeRoutine;
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        audioSource.clip = musicClip;
+        audioSource.playOnAwake = false;
+        audioSource.loop = true;
+    }
 
     private void Update()
     {
         if (isPlayerInTrigger && Input.GetKeyDown(KeyCode.E))
         {
-            if (PopUpUI != null && popUpText != null && popUpAnimator != null)
-            {
-                popUpText.text = popUpTextContent;
-                PopUpUI.SetActive(true);
-                popUpAnimator.Play("PopUpUI", -1, 0f);
-            }
+            ToggleMusic();
         }
+    }
+
+    private void ToggleMusic()
+    {
+        if (activeRoutine != null) StopCoroutine(activeRoutine);
+
+        if (!isPlaying)
+        {
+            activeRoutine = StartCoroutine(PlayMusicWithDelay());
+        }
+        else
+        {
+            StopMusicWithSave();
+        }
+
+        if (interactUIText != null)
+        {
+            interactUIText.text = interactUITextContent;
+        }
+    }
+
+    private IEnumerator PlayMusicWithDelay()
+    {
+        isPlaying = true;
+        interactUITextContent = "Stop [E]";
+
+        if (startSound != null)
+        {
+            audioSource.PlayOneShot(startSound);
+            yield return new WaitForSeconds(startSound.length);
+        }
+
+        audioSource.time = savedTime;
+        audioSource.Play();
+        
+        activeRoutine = null;
+    }
+
+    private void StopMusicWithSave()
+    {
+        isPlaying = false;
+        interactUITextContent = "Play [E]";
+
+        if (audioSource.isPlaying)
+        {
+            savedTime = audioSource.time;
+        }
+
+        audioSource.Stop();
+
+        if (stopSound != null)
+        {
+            audioSource.PlayOneShot(stopSound);
+        }
+
+        activeRoutine = null;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            InteractUI = other.transform.Find("PlayerInfoUICanvas/Interaction").gameObject;
-            interactUIText = InteractUI.GetComponentInChildren<TextMeshProUGUI>();
-            interactUIText.text = interactUITextContent;
-
-            if (!isFunctional)
+            Transform uiPath = other.transform.Find("PlayerInfoUICanvas/Interaction");
+            if (uiPath != null)
             {
-                PopUpUI = other.transform.Find("PlayerInfoUICanvas/PopUp").gameObject;
-                popUpText = PopUpUI.GetComponentInChildren<TextMeshProUGUI>();
-                popUpAnimator = PopUpUI.GetComponent<Animator>();
+                InteractUI = uiPath.gameObject;
+                interactUIText = InteractUI.GetComponentInChildren<TextMeshProUGUI>();
+                interactUIText.text = interactUITextContent;
+
+                isPlayerInTrigger = true;
+                InteractUI.SetActive(true);
             }
-            
-            isPlayerInTrigger = true;
-            if (InteractUI != null) InteractUI.SetActive(true);
         }
     }
 
@@ -56,7 +117,6 @@ public class gramophoneScript : MonoBehaviour
         {
             isPlayerInTrigger = false;
             if (InteractUI != null) InteractUI.SetActive(false);
-            if (PopUpUI != null) PopUpUI.SetActive(false); 
         }
     }
 }
