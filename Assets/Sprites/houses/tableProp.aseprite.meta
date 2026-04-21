@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0f613db9bb4f6c344bd61021fbad7446
+guid: 52bdbd11a6324b84c977b5c1ddd48934
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -127,9 +127,9 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: germanA
+  - name: tableProp
     originalName: 
-    pivot: {x: 0.4417808, y: 0}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -137,9 +137,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 146
-      height: 179
-    spriteID: 67623414db99ba94ca26a32e7a74dbae
+      width: 64
+      height: 39
+    spriteID: 8a2b5913e15d7294b885cf75e47dfc88
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -153,25 +153,25 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 870030399
+      value0: 3155265767
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: germanA
+    name: tableProp
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: germanA
+    - name: tableProp
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 30
+        x: 0
         y: 0
-        width: 146
-        height: 179
-      spriteId: 67623414db99ba94ca26a32e7a74dbae
+        width: 64
+        height: 39
+      spriteId: 8a2b5913e15d7294b885cf75e47dfc88
     linkedCells: []
     tileCells: []
     tileSetIndex: 0
@@ -181,5 +181,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 189, y: 204}
-  previousTextureSize: {x: 256, y: 256}
+  canvasSize: {x: 64, y: 39}
+  previousTextureSize: {x: 128, y: 64}
