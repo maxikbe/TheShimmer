@@ -40,6 +40,12 @@ public class gameDataManager : MonoBehaviour
     {
         if (currentGameData != null)
         {
+            // pred zapisem questmanager aktualizuje data
+            if (QuestManager.Instance != null)
+            {
+                QuestManager.Instance.SaveQuestsToData();
+            }
+
             string json = JsonUtility.ToJson(currentGameData, true);
             File.WriteAllText(savePath, json);
             Debug.Log("Data uložena do JSONu.");
