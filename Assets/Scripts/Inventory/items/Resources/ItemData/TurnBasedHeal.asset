@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: TurnBasedHeal
   m_EditorClassIdentifier: Assembly-CSharp::Item
   id: 9
-  itemName: 
+  itemName: Heal Potion
   allowedCharacterIDs: 
   icon: {fileID: 0}
   prefab: {fileID: 0}
-  description: 
+  description: Heal Potion + 100
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 1
