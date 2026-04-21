@@ -47,13 +47,32 @@ public class DialogueManager : MonoBehaviour
         // vytvori tlacitka pro kazdou choice
         foreach (DialogueChoice choice in node.choices)
         {
+            // --- KONTROLA PODMÍNEK (ZAKLÍNAČSKÝ UPDATE) ---
+            bool canShowChoice = true;
+
+            if (choice.conditions != null && choice.conditions.Count > 0)
+            {
+                foreach (QuestCondition condition in choice.conditions)
+                {
+                    // Pokud máme nastavenou podmínku na quest a jeho stav neodpovídá tomu, co vyžadujeme...
+                    if (condition.quest != null && condition.quest.currentState != condition.requiredState)
+                    {
+                        canShowChoice = false; // ... tak volbu zakážeme
+                        break; 
+                    }
+                }
+            }
+
+            // Pokud podmínky neprošly, přeskočíme zbytek kódu a jdeme na další volbu
+            if (!canShowChoice) continue;
+            // ----------------------------------------------
+
             GameObject newButton = Instantiate(buttonPrefab, buttonContainer);
             newButton.GetComponentInChildren<TextMeshProUGUI>().text = choice.choiceText;
 
             // Pro qeuesty a dalsi veci
             newButton.GetComponent<Button>().onClick.AddListener(() => 
             {
-
                 if (choice.opensShop)
                 {
                     dialoguePanel.SetActive(false);
@@ -73,7 +92,6 @@ public class DialogueManager : MonoBehaviour
                     // pokud je u odpovedi choice, spusti quest
                     if (choice.questToStart != null)
                     {
-                    // volá QuestManagera
                         QuestManager.Instance.StartQuest(choice.questToStart);
                     }
 
