@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: TurnBasedMana
   m_EditorClassIdentifier: Assembly-CSharp::Item
   id: 10
-  itemName: 
+  itemName: Mana potion
   allowedCharacterIDs: 
   icon: {fileID: 0}
   prefab: {fileID: 0}
-  description: 
+  description: Mana potion +100
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 1

@@ -10,4 +10,8 @@ public class GameData
     public List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
     public List<SkillSaveData> Skills = new List<SkillSaveData>();
     public List<MerchantReputation> merchantReputations = new List<MerchantReputation>();
+    
+    // QUESTY:
+    public List<QuestSaveData> savedQuests = new List<QuestSaveData>();
+    public string trackedQuestID = ""; // aktuálně trackovaný quest
 }

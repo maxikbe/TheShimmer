@@ -221,21 +221,36 @@ public class ShopManager : MonoBehaviour
         foreach (Transform child in playerInventoryContainer) Destroy(child.gameObject);
         foreach (Transform child in merchantInventoryContainer) Destroy(child.gameObject);
 
+        // sleva podle reputace
+        MerchantReputation rep = GetCurrentMerchantReputation();
+        float repValue = rep != null ? rep.reputationValue : 50f;
+        
+        // vzorec: (50 - 50) * 0.002 = 0. (100 - 50) * 0.002 = +0.1 (10% bonus)
+        float repModifier = (repValue - 50f) * 0.002f; 
+
+        // Vykreslení obchodu
         foreach (ItemSaveData itemData in currentMerchant.currentInventory)
         {
             Item staticData = itemDatabase.GetItemByID(itemData.id);
             if (staticData == null) continue;
 
-            int buyPrice = Mathf.RoundToInt(staticData.basePrice * currentMerchant.sellModifier);
+            // Obchodník prodává ( menší číslo):
+            float finalSellMod = currentMerchant.sellModifier - repModifier; 
+            int buyPrice = Mathf.RoundToInt(staticData.basePrice * finalSellMod);
+            
             CreateItemSlot(itemData, staticData, buyPrice, false, merchantInventoryContainer);
         }
 
+        // Vykreslení hráče
         foreach (ItemSaveData itemData in gameDataManager.currentGameData.OwnedItems)
         {
             Item staticData = itemDatabase.GetItemByID(itemData.id);
             if (staticData == null) continue; 
 
-            int sellPrice = Mathf.RoundToInt(staticData.basePrice * currentMerchant.buyModifier);
+            // Obchodník kupuje ( větší číslo):
+            float finalBuyMod = currentMerchant.buyModifier + repModifier;
+            int sellPrice = Mathf.RoundToInt(staticData.basePrice * finalBuyMod);
+            
             CreateItemSlot(itemData, staticData, sellPrice, true, playerInventoryContainer);
         }
     }
@@ -371,9 +386,13 @@ public class ShopManager : MonoBehaviour
             if (currentMerchant.currentPatience <= 0)
             {
                 Debug.Log("Zebraku, nemam te rad GRRR. Konec hsoppu.");
+                
+                // Trest za ztrátu trpělivosti (-10 bodů)
+                ModifyReputation(-10f); 
+                gameDataManager.SaveData(); 
+                
                 hagglePanel.SetActive(false);
                 CloseShop(); // di do ksa
-                // !!!!!!!TADY POTOM PRIDAT REPUTACI MINUS
             }
             else
             {
@@ -438,7 +457,9 @@ public class ShopManager : MonoBehaviour
             Debug.Log($"Prodáno! Zůstatek: {gameDataManager.currentGameData.player.numberOfCoins}");
         }
 
-        // !!!TADY POTOM ZASE PŘIDAT REPUTACI!!"!!
+        // Value-based růst: Např. za každých 100 G přidá 1 bod reputace
+        float repGain = cartTotalSum * 0.01f;
+        ModifyReputation(repGain);
         
         gameDataManager.SaveData(); // ulozime do jsonu
 
@@ -449,5 +470,35 @@ public class ShopManager : MonoBehaviour
         hagglePanel.SetActive(false);
         UpdateCartSum();
         RefreshShopUI();
+    }
+    
+    private MerchantReputation GetCurrentMerchantReputation()
+    {
+        if (string.IsNullOrEmpty(currentMerchant.merchantID)) return null;
+
+        // najde reputaci podle ID obchodníka
+        MerchantReputation rep = gameDataManager.currentGameData.merchantReputations.FirstOrDefault(r => r.merchantID == currentMerchant.merchantID);
+        
+        // kdyz poprve tak zakladame reputaci
+        if (rep == null)
+        {
+            rep = new MerchantReputation();
+            rep.merchantID = currentMerchant.merchantID;
+            rep.reputationValue = 50f; 
+            gameDataManager.currentGameData.merchantReputations.Add(rep);
+        }
+        return rep;
+    }
+
+    private void ModifyReputation(float amount)
+    {
+        MerchantReputation rep = GetCurrentMerchantReputation();
+        if (rep != null)
+        {
+            rep.reputationValue += amount;
+            // min 0 max 100
+            rep.reputationValue = Mathf.Clamp(rep.reputationValue, 0f, 100f);
+            Debug.Log($"Reputace upravena o {amount}. Aktuální: {rep.reputationValue}/100");
+        }
     }
 }
