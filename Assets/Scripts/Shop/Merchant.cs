@@ -8,6 +8,9 @@ public class Merchant : MonoBehaviour
     
     public MerchantType merchantType;
     
+    [Header("Identifikace (PRO ULOŽENÍ)")]
+    public string merchantID; // unikatni ID
+    
     [Header("Cenová politika")]
     public float buyModifier = 0.5f;    
     public float sellModifier = 1.2f;
@@ -53,6 +56,24 @@ public class Merchant : MonoBehaviour
             currentInventory.Add(newItem);
         }
 
-        // TADY POTOM AZ BUDE REPUTACE TAK PRIDANI SECRET STOCKU
+        // pokud je nactene a mame dost repu tak zobrazuju produkty
+        if (gameDataManager.currentGameData != null)
+        {
+            MerchantReputation rep = gameDataManager.currentGameData.merchantReputations.Find(r => r.merchantID == merchantID);
+            
+            if (rep != null && rep.reputationValue >= repRequiredForSecret)
+            {
+                foreach (Item secretTemplate in secretStock)
+                {
+                    ItemSaveData newSecret = new ItemSaveData();
+                    newSecret.id = secretTemplate.id;
+                    newSecret.isOwned = false;
+                    newSecret.level = secretTemplate.defaultLevel;
+                    newSecret.amount = 1;
+                    
+                    currentInventory.Add(newSecret);
+                }
+            }
+        }
     }
 }
