@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro; 
@@ -17,9 +18,15 @@ public class QuestManager : MonoBehaviour
     [Header("UI Tracker (vlevo nahoře)")]
     public GameObject trackerPanel; 
     public TextMeshProUGUI trackerNameText; 
-    public TextMeshProUGUI trackerObjectiveText; 
-    
-    
+    public TextMeshProUGUI trackerObjectiveText;
+
+
+    private void Start()
+    {
+        // Za předpokladu, že gameDataManager.currentGameData už existuje
+        LoadQuestsFromData();
+    }
+
 
     private void Awake()
     {
@@ -142,5 +149,81 @@ public class QuestManager : MonoBehaviour
         quest.currentState = QuestState.Completed;
         
         // tady kdyztak dalsi funkce pro odmeny
+    }
+    
+    // Tuto metodu zavoláš PŘEDTÍM, než se zavolá samotné ukládání do JSONu
+    public void SaveQuestsToData()
+    {
+        gameDataManager.currentGameData.savedQuests.Clear();
+
+        // Projdeme všechny questy v databázi
+        foreach (QuestData quest in questDatabase.allQuests) // <-- "allQuests" si uprav podle tvé databáze
+        {
+            // Ukládáme jen ty, které už hráč začal nebo dokončil
+            if (quest.currentState != QuestState.NotStarted)
+            {
+                QuestSaveData qData = new QuestSaveData();
+                qData.questID = quest.questID;
+                qData.currentState = quest.currentState;
+                
+                // Uložíme postup jednotlivých kroků
+                foreach (QuestStep step in quest.questSteps)
+                {
+                    qData.stepsCompleted.Add(step.isCompleted);
+                }
+                
+                gameDataManager.currentGameData.savedQuests.Add(qData);
+            }
+        }
+
+        // Uložíme si, co hráč zrovna trackuje
+        if (trackedQuest != null)
+            gameDataManager.currentGameData.trackedQuestID = trackedQuest.questID;
+        else
+            gameDataManager.currentGameData.trackedQuestID = "";
+    }
+
+    // Tuto metodu zavoláš POTÉ, co se JSON načte do currentGameData
+    public void LoadQuestsFromData()
+    {
+        activeQuests.Clear();
+        UntrackQuest();
+
+        // DŮLEŽITÉ: ScriptableObjecty si v Unity Editoru pamatují stav mezi zapnutím hry. 
+        // Musíme je všechny natvrdo resetovat, než na ně aplikujeme uložená data.
+        foreach (QuestData quest in questDatabase.allQuests)
+        {
+            quest.currentState = QuestState.NotStarted;
+            foreach (QuestStep step in quest.questSteps) step.isCompleted = false;
+        }
+
+        // Pokud nemáme žádná data (nová hra), končíme
+        if (gameDataManager.currentGameData.savedQuests == null) return;
+
+        // Načítání z JSON dat
+        foreach (QuestSaveData qData in gameDataManager.currentGameData.savedQuests)
+        {
+            // Najdeme odpovídající quest v databázi podle unikátního ID
+            QuestData quest = questDatabase.GetQuestByID(qData.questID);
+            if (quest != null)
+            {
+                quest.currentState = qData.currentState;
+                
+                // Nahrajeme stav kroků
+                for (int i = 0; i < qData.stepsCompleted.Count; i++)
+                {
+                    if (i < quest.questSteps.Length)
+                        quest.questSteps[i].isCompleted = qData.stepsCompleted[i];
+                }
+
+                // Pokud je quest aktivní, hodíme ho do listu activeQuests
+                if (quest.currentState == QuestState.Active)
+                    activeQuests.Add(quest);
+
+                // Obnovení trackeru
+                if (gameDataManager.currentGameData.trackedQuestID == quest.questID)
+                    TrackQuest(quest);
+            }
+        }
     }
 }
