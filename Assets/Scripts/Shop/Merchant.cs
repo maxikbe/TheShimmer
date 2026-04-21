@@ -21,7 +21,7 @@ public class Merchant : MonoBehaviour
     public int maxPatience = 3; // kolikrat ho muzu nsrat
     [HideInInspector] public int currentPatience;
 
-    public bool playerHasHagglePerk = false; // potom perk funkce na zjisteni
+    //  public bool playerHasHagglePerk = false; // potom perk funkce na zjisteni
 
     [Header("Podpultovky (Secret Stash)")]
     [Tooltip("Kolik reputace potřebuješ pro odemčení (0-100)")]
