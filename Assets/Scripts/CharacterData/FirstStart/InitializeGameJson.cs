@@ -87,6 +87,7 @@ public class InitializeGameJson : MonoBehaviour
                     }
                 }
             }
+            
         }
 
         foreach (Item item in allItemsFromDB)
