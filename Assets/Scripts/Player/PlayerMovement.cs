@@ -20,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movement;
     private Vector2 lastMoveDir = Vector2.down;
     private float currentSpeed;
+    private float currentStaminaLevel;
 
     private static readonly int AnimMoveX = Animator.StringToHash("MoveX");
     private static readonly int AnimMoveY = Animator.StringToHash("MoveY");
@@ -37,6 +38,11 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        currentStaminaLevel = gameDataManager.currentGameData.player.staminaLevel;
+    }
+
     private void Update()
     {
         float horizontal = 0f;
@@ -47,12 +53,22 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(keyDown))  vertical  -= 1f;
         if (Input.GetKey(keyUp))    vertical  += 1f;
 
-        bool isRunning = Input.GetKey(keyRun);
+        movement = new Vector2(horizontal, vertical);
+
+        bool isRunning = Input.GetKey(keyRun) && movement.sqrMagnitude > 0.01f && currentStaminaLevel > 0;
         currentSpeed = isRunning ? runSpeed : walkSpeed;
 
-        movement = new Vector2(horizontal, vertical);
         if (movement.sqrMagnitude > 1f)
             movement.Normalize();
+
+        if (isRunning)
+        {
+            currentStaminaLevel -= 100f * Time.deltaTime; 
+            
+            if (currentStaminaLevel < 0) currentStaminaLevel = 0;
+            
+            PlayerGUI.Instance.UpdateStamina((int)currentStaminaLevel);
+        }
 
         UpdateAnimator(isRunning);
     }
@@ -102,5 +118,10 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat(AnimMoveX, lastMoveDir.x);
         animator.SetFloat(AnimMoveY, lastMoveDir.y);
         animator.SetFloat(AnimSpeed, animSpeed);
+    }
+    
+    public Vector2 GetFacingDirection()
+    {
+        return lastMoveDir;
     }
 }

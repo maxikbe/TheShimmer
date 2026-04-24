@@ -129,7 +129,15 @@ public class InitializeGameJson : MonoBehaviour
             dayNumber = 1,
             currentScene = "MainStoryMap",
             isTentPlaced = false,
-            tentPos = new Vector2(0,0)
+            tentPos = new Vector2(0,0),
+            thirstLevel = 100,
+            maxThirstLevel = 100,
+            hungerLevel = 100,
+            maxHungerLevel = 100,
+            staminaLevel = 100,
+            maxStaminaLevel = 100,
+            sleepLevel = 100f,
+            maxSleepLevel = 100f
         };
 
         Perks[] allPerksFromResources = Resources.LoadAll<Perks>("PerksData");

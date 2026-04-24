@@ -9,6 +9,10 @@ public class Mob_combat : MonoBehaviour
     public int maxHealth = 10;
     private int currentHealth; 
     public bool isDead = false;
+    
+    [Header("Real-Time Combat Settings")]
+    public bool canBeHitInRealTime = true;
+    public bool startTurnBaseAfterHit = false;
 
     [Header("Encounter Settings")]
     public bool isTurnBasedMob = true;
