@@ -3,7 +3,7 @@ using TMPro;
 
 public class Tent : MonoBehaviour
 {
-    public string TextContent = "Hold [F]";
+    public string TextContent = "PickUp [F]";
     private TextMeshProUGUI interactUIHOLDText;
     private GameObject InteractUIHOLD;
     private PlacementManager manager;

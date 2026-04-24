@@ -87,6 +87,7 @@ public class InitializeGameJson : MonoBehaviour
                     }
                 }
             }
+            
         }
 
         foreach (Item item in allItemsFromDB)
@@ -122,7 +123,21 @@ public class InitializeGameJson : MonoBehaviour
             playerName = "Player",
             numberOfCoins = 100,
             numberOfMaterial = 5,
-            numberOfGunUpgraders = 1
+            numberOfGunUpgraders = 1,
+            playerPos = new Vector2(0,0),
+            time = 0.5f,
+            dayNumber = 1,
+            currentScene = "MainStoryMap",
+            isTentPlaced = false,
+            tentPos = new Vector2(0,0),
+            thirstLevel = 100,
+            maxThirstLevel = 100,
+            hungerLevel = 100,
+            maxHungerLevel = 100,
+            staminaLevel = 100,
+            maxStaminaLevel = 100,
+            sleepLevel = 100f,
+            maxSleepLevel = 100f
         };
 
         Perks[] allPerksFromResources = Resources.LoadAll<Perks>("PerksData");

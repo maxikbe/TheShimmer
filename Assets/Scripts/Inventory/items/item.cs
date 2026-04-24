@@ -57,9 +57,25 @@ public class Item : ScriptableObject
     public TurnBaseItemType turnBaseItemType;
     public int turnBaseItemEffectAmount;
     public int turnBaseItemDuration;
+    
+    //Samples
+    public Rarity rarity;
+    public string originMobName; 
+    
+    // staty pro alchymii, az kdyz isResearched == true
+    public int potionHeal;
+    public int potionAditionalHealth;
+    public int potionBonusSpeed;
+    public int potionBonusStamina;
+    public int potionBonusFOV;
+    public double potionBonushungerSpeed;
+    public int potionBonusdamage;
+    public bool hilightResources;
+
 }
 
-public enum ItemType { Consumable, Healing, Armor, Resource, Weapon }
+public enum ItemType { Consumable, Healing, Armor, Resource, Weapon, Sample }
+public enum Rarity {Common, Uncommon, Rare, Epic, Legendary}
 public enum ArmorType { Head, Chest, Legs, Feet, Hands, Shield }
 public enum WeaponType { Melee, Ranged, Magic }
 public enum MagicalElement { Fire, Water, Earth, Air, Light, Dark, Alien, Star }

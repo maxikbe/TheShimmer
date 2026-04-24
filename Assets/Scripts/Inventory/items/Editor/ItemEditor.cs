@@ -9,6 +9,7 @@ public class ItemEditor : Editor
     SerializedProperty itemName, description, itemType, icon, prefab;
     SerializedProperty isResearched, isUsable, maxStack, isTurnedBaseItem;
     SerializedProperty canBeSold, basePrice;
+    SerializedProperty rarity, originMobName, potionHeal, potionAditionalHealth, potionBonusSpeed, potionBonusStamina, potionBonusFOV, potionBonushungerSpeed, potionBonusdamage, hilightResources;
 
     void OnEnable()
     {
@@ -30,6 +31,17 @@ public class ItemEditor : Editor
         
         canBeSold = serializedObject.FindProperty("canBeSold");
         basePrice = serializedObject.FindProperty("basePrice");
+        
+        rarity = serializedObject.FindProperty("rarity");
+        originMobName = serializedObject.FindProperty("originMobName");
+        potionHeal = serializedObject.FindProperty("potionHeal");
+        potionAditionalHealth = serializedObject.FindProperty("potionAditionalHealth");
+        potionBonusSpeed = serializedObject.FindProperty("potionBonusSpeed");
+        potionBonusStamina = serializedObject.FindProperty("potionBonusStamina");
+        potionBonusFOV =  serializedObject.FindProperty("potionBonusFOV");
+        potionBonushungerSpeed =  serializedObject.FindProperty("potionBonushungerSpeed");
+        potionBonusdamage =  serializedObject.FindProperty("potionBonusdamage");
+        hilightResources =  serializedObject.FindProperty("hilightResources");
     }
 
     public override void OnInspectorGUI()
@@ -89,6 +101,9 @@ public class ItemEditor : Editor
             case ItemType.Consumable:
                 DrawConsumableSettings(item);
                 break;
+            case ItemType.Sample:
+                DrawSampleSettings(item);
+                break;
         }
 
         EditorGUILayout.Space();
@@ -140,5 +155,25 @@ public class ItemEditor : Editor
     {
         EditorGUILayout.LabelField("NASTAVENÍ KONZUMACE", EditorStyles.boldLabel);
         item.HealAmount = EditorGUILayout.IntField("Léčení / Obnova", item.HealAmount);
+    }
+    
+    private void DrawSampleSettings(Item item)
+    {
+        EditorGUILayout.LabelField("NASTAVENÍ VZORKU (SAMPLE)", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(rarity, new GUIContent("Rarita vzorku"));
+        EditorGUILayout.PropertyField(originMobName, new GUIContent("Původní monstrum"));
+        
+        EditorGUILayout.Space();
+        EditorGUILayout.HelpBox("Tyto staty se hráči ukážou v UI až když bude vzorek vyzkoumaný.", MessageType.Info);
+        
+        // V editoru to vidíme vždy, abychom to mohli nastavit, ale ve hře si to pak vyfiltruješ
+        EditorGUILayout.PropertyField(potionHeal, new GUIContent("Kolik HP potion přidá (vyhealuje do maximálních HP)"));
+        EditorGUILayout.PropertyField(potionAditionalHealth, new GUIContent("Bonusový health nad maximum"));
+        EditorGUILayout.PropertyField(potionBonusSpeed, new GUIContent("Bonusový sped"));
+        EditorGUILayout.PropertyField(potionBonusStamina, new GUIContent("Bonusová stamina"));
+        EditorGUILayout.PropertyField(potionBonusFOV, new GUIContent("Bonusové FOV do hry"));
+        EditorGUILayout.PropertyField(potionBonushungerSpeed, new GUIContent("Rychlost ubýhání hungeru (desetinné číslo, může i zpomalovat)"));
+        EditorGUILayout.PropertyField(potionBonusdamage, new GUIContent("Bonusový damage"));
+        EditorGUILayout.PropertyField(hilightResources, new GUIContent("Zvýraznění dřeva, a různých resources"));
     }
 }
