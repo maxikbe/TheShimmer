@@ -2,11 +2,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using NaughtyAttributes;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class Mob_combat : MonoBehaviour
 {
     [Header("Combat Stats")]
     public int maxHealth = 10;
-    private int currentHealth;
+    private int currentHealth; 
+    public bool isDead = false;
 
     [Header("Encounter Settings")]
     public bool isTurnBasedMob = true;
@@ -16,30 +18,43 @@ public class Mob_combat : MonoBehaviour
     public string turnBasedScene; 
 
     [ShowIf("isTurnBasedMob")]
-    public float encounterRadius = 1.5f; // vzdalenost pro turn based combat
+    public float encounterRadius = 1.5f;
 
-    // pozice hráče
+    [Header("Death Settings")]
+    public Sprite deadMeatSprite; 
+    public CorpseLoot lootScript; 
+
     private Animal_movement animalMovement;
-    private bool isTransitioning = false; // at se scena nenacita 60x za vterinu
+    private SpriteRenderer spriteRenderer;
+    private bool isTransitioning = false;
     
-    void Start()
+    // ZMĚNA: Přesunuto do Awake pro okamžitou dostupnost po Instantiate
+    void Awake() 
     {
-        currentHealth = maxHealth;
-        
         animalMovement = GetComponent<Animal_movement>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        currentHealth = maxHealth;
     }
 
-    
+    void Start()
+    {
+        if(lootScript != null && !isDead) 
+            lootScript.enabled = false;
+    }
+
     void Update()
     {
-           
-        if (!isTurnBasedMob || animalMovement == null || animalMovement.playerPosition == null || isTransitioning || animalMovement.behavior != Ghost_movement.MobBehavior.Aggressive) 
+        if (Input.GetKeyDown(KeyCode.L) && !isDead)
+        {
+            Debug.Log("Cheater Kokkott zabil mobku stiskem klávesy L!");
+            Die();
+        }
+        
+        if (isDead || !isTurnBasedMob || animalMovement == null || animalMovement.playerPosition == null || isTransitioning || animalMovement.behavior != Ghost_movement.MobBehavior.Aggressive) 
             return;
 
-        // vzdalenost k hraci
         float distToPlayer = Vector3.Distance(transform.position, animalMovement.playerPosition.position);
 
-        // spousti turnbased
         if (distToPlayer <= encounterRadius)
         {
             TriggerTurnBasedCombat();
@@ -48,35 +63,62 @@ public class Mob_combat : MonoBehaviour
     
     private void TriggerTurnBasedCombat()
     {
-        if (string.IsNullOrEmpty(turnBasedScene))
-        {
-            Debug.LogError("Nemáš nastavenou scénu u mobky!");
-            return;
-        }
-
-        isTransitioning = true; // aby nespamoval update
-        Debug.Log("Načítám scénu...");
+        if (string.IsNullOrEmpty(turnBasedScene)) return;
+        isTransitioning = true; 
+        
+        // ULOŽENÍ GAME MANAGER MOBKY A SPUSTENI
+        // GameStateManager.Instance.lastEngagedMobID = ...
         
         SceneManager.LoadScene(turnBasedScene);
     }
 
-    // --- KLASICKÝ COMBAT ---
     public void TakeDamage(int damage)
     {
+        if (isDead) return;
+
         currentHealth -= damage;
         Debug.Log($"{gameObject.name} dostal za {damage}! Zbývá {currentHealth} HP.");
 
         if (animalMovement != null && animalMovement.behavior == Ghost_movement.MobBehavior.Neutral && isTurnBasedMob)
         {
             animalMovement.MakeAggressive();
-            Debug.Log("Z neutrální mobky je agresivní!");
         }
-        
         
         if (currentHealth <= 0)
         {
-            Destroy(gameObject);
+            Die(); 
         }
+    }
+
+    // api metoda pro chabra
+    public void Die()
+    {
+        if (isDead) return;
+
+        isDead = true;
+        currentHealth = 0; 
+        Debug.Log($"{gameObject.name} zařval. Můžeš lootovat.");
+
+        //  Změna textury na maso
+        if (deadMeatSprite != null && spriteRenderer != null)
+        {
+            spriteRenderer.sprite = deadMeatSprite;
+        }
+
+        // vypnutí AI pohybu
+        if (animalMovement != null)
+        {
+            Destroy(animalMovement); 
+        }
+
+        // zapne looting script
+        if (lootScript != null)
+        {
+            lootScript.enabled = true;
+        }
+        
+        // vypne combat script
+        this.enabled = false; 
     }
 
     // pro encounter radius v editoru
