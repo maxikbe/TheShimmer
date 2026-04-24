@@ -15,16 +15,22 @@ public class TimeAndLight : MonoBehaviour
     
     [Range(0, 1)]
     public float currentTime = 0.5f;
+    public int currectDay = 1;
+    public TextMeshProUGUI dayTextUI;
 
     void Start()
     {
+        currentTime = gameDataManager.currentGameData.player.time;
+        currectDay = gameDataManager.currentGameData.player.dayNumber;
+        dayTextUI.text = currectDay.ToString();
         if (globalLight == null) globalLight = GetComponent<Light2D>();
     }
 
     void Update()
     {
         currentTime += (Time.deltaTime / secondsInDay);
-        if (currentTime >= 1) currentTime = 0;
+        if (currentTime >= 1) {currentTime = 0; currectDay +=1;}
+        dayTextUI.text = currectDay.ToString();
 
         float intensity = CalculateIntensity();
         globalLight.intensity = intensity;
