@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8a5fd479e72e4c945a91344efb3f2b2d
+guid: 480dcc1c86da04b659233d1cfc233c02
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -127,72 +127,9 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: Frame_0
+  - name: Radek
     originalName: 
-    pivot: {x: 0.5, y: 0}
-    alignment: 7
-    border: {x: 0, y: 0, z: 0, w: 0}
-    customData: 
-    rect:
-      serializedVersion: 2
-      x: 4
-      y: 69
-      width: 30
-      height: 58
-    spriteID: 8e081ec6de762a6469d8e2a7eb56b72a
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    uvTransform: {x: 4, y: 69}
-  - name: Frame_1
-    originalName: 
-    pivot: {x: 0.43333328, y: -0.4912281}
-    alignment: 9
-    border: {x: 0, y: 0, z: 0, w: 0}
-    customData: 
-    rect:
-      serializedVersion: 2
-      x: 4
-      y: 135
-      width: 30
-      height: 57
-    spriteID: e2e3d6cf3e4bb754b9c58fdf3a8ce726
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    uvTransform: {x: -43, y: 107}
-  - name: Frame_2
-    originalName: 
-    pivot: {x: 0.43333328, y: -0.50877196}
-    alignment: 9
-    border: {x: 0, y: 0, z: 0, w: 0}
-    customData: 
-    rect:
-      serializedVersion: 2
-      x: 46
-      y: 4
-      width: 30
-      height: 57
-    spriteID: a1e0083a5e94fd04da63e89688b829b1
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    uvTransform: {x: -1, y: -25}
-  - name: Frame_3
-    originalName: 
-    pivot: {x: 0.50000006, y: -0.50877196}
+    pivot: {x: 0.5, y: -0.509434}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -200,9 +137,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 34
-      height: 57
-    spriteID: a12baaac96af7bd42b0cfc25b2925d32
+      width: 30
+      height: 53
+    spriteID: 637be6987a86d4339a0bcf1c11a8fb28
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -210,58 +147,31 @@ ScriptedImporter:
     indices: 
     edges: []
     tessellationDetail: 0
-    uvTransform: {x: -39, y: -25}
+    uvTransform: {x: -37, y: -23}
   spriteSheetImportData: []
   tileSetImportData: []
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 1799671923
+      value0: 2515822973
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: walkLeftFront
+    name: Radek
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: Frame_0
+    - name: Radek
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 47
-        y: 28
-        width: 30
-        height: 58
-      spriteId: 8e081ec6de762a6469d8e2a7eb56b72a
-    - name: Frame_1
-      frameIndex: 1
-      additiveSortOrder: 0
-      cellRect:
         x: 0
         y: 0
-        width: 120
-        height: 120
-      spriteId: e2e3d6cf3e4bb754b9c58fdf3a8ce726
-    - name: Frame_2
-      frameIndex: 2
-      additiveSortOrder: 0
-      cellRect:
-        x: 0
-        y: 0
-        width: 120
-        height: 120
-      spriteId: a1e0083a5e94fd04da63e89688b829b1
-    - name: Frame_3
-      frameIndex: 3
-      additiveSortOrder: 0
-      cellRect:
-        x: 0
-        y: 0
-        width: 120
-        height: 120
-      spriteId: a12baaac96af7bd42b0cfc25b2925d32
+        width: 112
+        height: 112
+      spriteId: 637be6987a86d4339a0bcf1c11a8fb28
     linkedCells: []
     tileCells: []
     tileSetIndex: 0
@@ -271,5 +181,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 120, y: 120}
-  previousTextureSize: {x: 128, y: 256}
+  canvasSize: {x: 112, y: 112}
+  previousTextureSize: {x: 64, y: 64}

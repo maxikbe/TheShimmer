@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
-  m_Name: apple
+  m_Name: HusbandVzorek
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 0
-  itemName: Jabko
+  id: 11
+  itemName: VzorekMuze
   allowedCharacterIDs: 
-  icon: {fileID: -1808982527863717971, guid: c170b0e650963df4f8826d9d4b7aa689, type: 3}
+  icon: {fileID: 6124540790918181189, guid: 4ce739548703c5c4d8e4f6a735876230, type: 3}
   prefab: {fileID: 0}
-  description: 
-  isResearched: 1
-  isUsable: 1
+  description: "toto je vzorek je velkmi vzorkov\xFD"
+  isResearched: 0
+  isUsable: 0
   isTurnedBaseItem: 0
-  canBeSold: 1
-  basePrice: 102
-  maxStack: 0
+  canBeSold: 0
+  basePrice: 0
+  maxStack: 1
   isDefaultItem: 0
   defaultAmount: 0
   defaultLevel: 1
-  itemType: 0
+  itemType: 5
   weaponType: 0
   isTurnedBaseWeapon: 0
   firstCharID: 0
@@ -45,19 +45,19 @@ MonoBehaviour:
   consumeAmount: 0
   waterAmount: 0
   durability: 0
-  armorType: 2
+  armorType: 0
   Armor: 0
   weight: 0
   turnBaseItemType: 0
   turnBaseItemEffectAmount: 0
   turnBaseItemDuration: 0
   rarity: 0
-  originMobName: 
+  originMobName: Manzel
   potionHeal: 0
   potionAditionalHealth: 0
-  potionBonusSpeed: 0
+  potionBonusSpeed: 5
   potionBonusStamina: 0
-  potionBonusFOV: 0
-  potionBonushungerSpeed: 0
+  potionBonusFOV: 5
+  potionBonushungerSpeed: 0.5
   potionBonusdamage: 0
-  hilightResources: 0
+  hilightResources: 1
