@@ -5,17 +5,21 @@ public class ButtonManager : MonoBehaviour
     [SerializeField] private GameObject charPickerUI;
     [SerializeField] private GameObject inventoryMenuUI;
     [SerializeField] private GameObject characterMenuUI;
+    [SerializeField] private GameObject NavbarUI;
 
 
     public void openCharPicker()
     {
+        NavbarUI.SetActive(true);
         charPickerUI.SetActive(true);
         inventoryMenuUI.SetActive(false);
         characterMenuUI.SetActive(false);
     }
 
+
     public void openInventory()
     {
+        NavbarUI.SetActive(true);
         inventoryMenuUI.SetActive(true);
         charPickerUI.SetActive(false);
         characterMenuUI.SetActive(false);
@@ -23,6 +27,7 @@ public class ButtonManager : MonoBehaviour
 
     public void openCharacterMenu()
     {
+        NavbarUI.SetActive(true);
         characterMenuUI.SetActive(true);
         inventoryMenuUI.SetActive(false);
         charPickerUI.SetActive(false);
