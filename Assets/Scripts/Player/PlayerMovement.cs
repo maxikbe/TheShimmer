@@ -103,4 +103,9 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat(AnimMoveY, lastMoveDir.y);
         animator.SetFloat(AnimSpeed, animSpeed);
     }
+    
+    public Vector2 GetFacingDirection()
+    {
+        return lastMoveDir;
+    }
 }
