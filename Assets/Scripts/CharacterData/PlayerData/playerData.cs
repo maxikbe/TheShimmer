@@ -12,4 +12,10 @@ public class playerData
     public int numberOfCoins;
     public List<int> unFoundPerks = new List<int>();
     public List<int> foundPerks = new List<int>();
+    public Vector2 playerPos;
+    public float time;
+    public int dayNumber;
+    public string currentScene;
+    public bool isTentPlaced;
+    public Vector2 tentPos;
 }

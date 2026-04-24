@@ -123,7 +123,13 @@ public class InitializeGameJson : MonoBehaviour
             playerName = "Player",
             numberOfCoins = 100,
             numberOfMaterial = 5,
-            numberOfGunUpgraders = 1
+            numberOfGunUpgraders = 1,
+            playerPos = new Vector2(0,0),
+            time = 0.5f,
+            dayNumber = 1,
+            currentScene = "MainStoryMap",
+            isTentPlaced = false,
+            tentPos = new Vector2(0,0)
         };
 
         Perks[] allPerksFromResources = Resources.LoadAll<Perks>("PerksData");

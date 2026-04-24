@@ -122,7 +122,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2690455878520227085}
   m_Layer: 0
-  m_Name: TentSpawn
+  m_Name: TentSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -157,7 +157,7 @@ GameObject:
   - component: {fileID: 6012212992472463395}
   m_Layer: 15
   m_Name: TentPlacableItem
-  m_TagString: Untagged
+  m_TagString: Tent
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
