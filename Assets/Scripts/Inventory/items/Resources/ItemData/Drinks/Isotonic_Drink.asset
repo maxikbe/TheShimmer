@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Isotonic_Drink
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 21
+  itemName: Isotonic Drink
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -1154947519123426653, guid: 734cd94df4c521f4ea1aa310a85d293c, type: 3}
   prefab: {fileID: 0}
-  description: 
+  description: Chemical-tasting powder mix. Your muscles will thank you later.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0

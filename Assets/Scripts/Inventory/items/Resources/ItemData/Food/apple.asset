@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: apple
   m_EditorClassIdentifier: Assembly-CSharp::Item
   id: 0
-  itemName: Jabko
+  itemName: Fresh Apple
   allowedCharacterIDs: 
   icon: {fileID: -1808982527863717971, guid: c170b0e650963df4f8826d9d4b7aa689, type: 3}
   prefab: {fileID: 0}
-  description: 
+  description: Crisp and sweet. Seems suspiciously perfect for the Shimmer.
   isResearched: 1
   isUsable: 1
   isTurnedBaseItem: 0
@@ -42,8 +42,9 @@ MonoBehaviour:
   Speed: 0
   magicalElement: 0
   HealAmount: 0
-  consumeAmount: 0
-  waterAmount: 0
+  consumeAmount: 15
+  waterAmount: 10
+  sleepAmount: 0
   durability: 0
   armorType: 2
   Armor: 0

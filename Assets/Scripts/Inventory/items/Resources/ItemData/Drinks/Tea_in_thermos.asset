@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Tea_in_thermos
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 28
+  itemName: Strong Black Tea in Thermos
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 7091957095697695319, guid: db1dc29c632ca054eb0e1c030e4988ae, type: 3}
   prefab: {fileID: 0}
-  description: 
+  description: A warm, comforting brew that sharpens the mind.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
@@ -43,7 +43,7 @@ MonoBehaviour:
   magicalElement: 0
   HealAmount: 0
   consumeAmount: 0
-  waterAmount: 0
+  waterAmount: 20
   sleepAmount: 0
   durability: 0
   armorType: 0

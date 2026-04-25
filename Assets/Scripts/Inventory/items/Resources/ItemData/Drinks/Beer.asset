@@ -12,17 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Beer
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 12
+  itemName: Bottled Beer
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -9189692981037117210, guid: 5a063a8b06e76b644867b5cef0376cb1, type: 3}
   prefab: {fileID: 0}
-  description: 
+  description: A lukewarm bottle found in an abandoned fridge. A relic of simpler
+    times.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
   canBeSold: 1
-  basePrice: 0
+  basePrice: 20
   maxStack: 0
   isDefaultItem: 0
   defaultAmount: 0
@@ -42,8 +43,9 @@ MonoBehaviour:
   Speed: 0
   magicalElement: 0
   HealAmount: 0
-  consumeAmount: 0
-  waterAmount: 0
+  consumeAmount: 10
+  waterAmount: 20
+  sleepAmount: 0
   durability: 0
   armorType: 0
   Armor: 0

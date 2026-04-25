@@ -12,17 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Coffe
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 15
+  itemName: Instant Coffee
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 6606648821387404312, guid: 47b859259622a16488c2399bc90ae15f, type: 3}
   prefab: {fileID: 0}
-  description: 
+  description: Bitter black liquid. Essential for staying awake during the night
+    watch.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
   canBeSold: 1
-  basePrice: 0
+  basePrice: 30
   maxStack: 0
   isDefaultItem: 0
   defaultAmount: 0
@@ -43,8 +44,8 @@ MonoBehaviour:
   magicalElement: 0
   HealAmount: 0
   consumeAmount: 0
-  waterAmount: 0
-  sleepAmount: 0
+  waterAmount: 15
+  sleepAmount: 35
   durability: 0
   armorType: 0
   Armor: 0

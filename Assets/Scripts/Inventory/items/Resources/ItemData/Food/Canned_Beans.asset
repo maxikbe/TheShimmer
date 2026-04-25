@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Canned_Beans
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 36
+  itemName: Canned Beans
   allowedCharacterIDs: 
   icon: {fileID: 0}
   prefab: {fileID: 0}
-  description: 
+  description: A staple for any survivor. Eat them cold or heat them up.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
@@ -42,8 +42,8 @@ MonoBehaviour:
   Speed: 0
   magicalElement: 0
   HealAmount: 0
-  consumeAmount: 0
-  waterAmount: 0
+  consumeAmount: 40
+  waterAmount: 10
   sleepAmount: 0
   durability: 0
   armorType: 0

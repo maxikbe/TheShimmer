@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Purified_Water
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 26
+  itemName: Purified Water
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -834837278031287790, guid: 626e7e11c6efb284cb6da3d3a1878c8d, type: 3}
   prefab: {fileID: 0}
-  description: 
+  description: Standard issue canteen. Tastes like plastic, but it keeps you alive.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
@@ -43,7 +43,7 @@ MonoBehaviour:
   magicalElement: 0
   HealAmount: 0
   consumeAmount: 0
-  waterAmount: 0
+  waterAmount: 40
   sleepAmount: 0
   durability: 0
   armorType: 0

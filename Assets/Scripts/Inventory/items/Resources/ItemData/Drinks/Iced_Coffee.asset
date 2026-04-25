@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Iced_Coffee
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 20
+  itemName: Iced Coffee
   allowedCharacterIDs: 
   icon: {fileID: 0}
   prefab: {fileID: 0}
-  description: 
+  description: Cold caffeine kick. Tastes better when the world isn't ending.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
@@ -42,9 +42,9 @@ MonoBehaviour:
   Speed: 0
   magicalElement: 0
   HealAmount: 0
-  consumeAmount: 0
-  waterAmount: 0
-  sleepAmount: 0
+  consumeAmount: 10
+  waterAmount: 20
+  sleepAmount: 15
   durability: 0
   armorType: 0
   Armor: 0

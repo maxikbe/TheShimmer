@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Aloe_Vera
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 13
+  itemName: Aloe Vera Drink
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -3549665926095703295, guid: 1909238c399a71f489bf66821a64db86, type: 3}
   prefab: {fileID: 0}
-  description: 
+  description: Chunky texture. It feels... alive as it goes down.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
@@ -42,8 +42,8 @@ MonoBehaviour:
   Speed: 0
   magicalElement: 0
   HealAmount: 0
-  consumeAmount: 0
-  waterAmount: 0
+  consumeAmount: 5
+  waterAmount: 35
   sleepAmount: 0
   durability: 0
   armorType: 0

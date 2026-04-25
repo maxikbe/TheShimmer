@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Fish_In_Oil
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 38
+  itemName: Canned Fish in Oil
   allowedCharacterIDs: 
   icon: {fileID: 0}
   prefab: {fileID: 0}
-  description: 
+  description: High in Omega-3. The smell might attract predators.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
@@ -42,7 +42,7 @@ MonoBehaviour:
   Speed: 0
   magicalElement: 0
   HealAmount: 0
-  consumeAmount: 0
+  consumeAmount: 45
   waterAmount: 0
   sleepAmount: 0
   durability: 0

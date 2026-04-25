@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
   m_Name: Monster
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: -1
-  itemName: 
+  id: 24
+  itemName: Energy Drink
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -9133981527234656834, guid: d21542da7afd75e4aba18390be510c38, type: 3}
   prefab: {fileID: 0}
-  description: 
+  description: Caffeine and taurine. Your heart rate might become a problem later.
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
   canBeSold: 1
-  basePrice: 0
+  basePrice: 50
   maxStack: 0
   isDefaultItem: 0
   defaultAmount: 0
@@ -42,9 +42,9 @@ MonoBehaviour:
   Speed: 0
   magicalElement: 0
   HealAmount: 0
-  consumeAmount: 0
-  waterAmount: 0
-  sleepAmount: 0
+  consumeAmount: 5
+  waterAmount: 20
+  sleepAmount: 50
   durability: 0
   armorType: 0
   Armor: 0
