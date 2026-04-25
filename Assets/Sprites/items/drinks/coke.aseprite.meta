@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d21542da7afd75e4aba18390be510c38
+guid: 3ac101c119b2ace45b046e50ab01a841
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -127,9 +127,9 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: monster
+  - name: coke
     originalName: 
-    pivot: {x: 0.51754385, y: -0.008}
+    pivot: {x: 0.5576923, y: -0.16}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -137,9 +137,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 57
-      height: 125
-    spriteID: 582d29fc59123c843b1a4ebe0a6c17d4
+      width: 26
+      height: 50
+    spriteID: c4f2caba16130394cbec980ef51d3080
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -153,25 +153,25 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 3154834060
+      value0: 1414245048
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: monster
+    name: coke
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: monster
+    - name: coke
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 1
-        y: 1
-        width: 57
-        height: 125
-      spriteId: 582d29fc59123c843b1a4ebe0a6c17d4
+        x: 5
+        y: 8
+        width: 26
+        height: 50
+      spriteId: c4f2caba16130394cbec980ef51d3080
     linkedCells: []
     tileCells: []
     tileSetIndex: 0
@@ -181,5 +181,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 61, y: 128}
-  previousTextureSize: {x: 128, y: 256}
+  canvasSize: {x: 39, y: 64}
+  previousTextureSize: {x: 64, y: 64}

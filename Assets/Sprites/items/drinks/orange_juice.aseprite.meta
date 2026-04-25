@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d21542da7afd75e4aba18390be510c38
+guid: dfbea015be7567f4297bec5d38999f7e
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -127,9 +127,9 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: monster
+  - name: orange_juice
     originalName: 
-    pivot: {x: 0.51754385, y: -0.008}
+    pivot: {x: 0.5, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -137,9 +137,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 57
-      height: 125
-    spriteID: 582d29fc59123c843b1a4ebe0a6c17d4
+      width: 53
+      height: 128
+    spriteID: f475698493b20d64e81019c712db2c3a
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -153,25 +153,25 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 3154834060
+      value0: 1529854087
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: monster
+    name: orange_juice
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: monster
+    - name: orange_juice
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 1
-        y: 1
-        width: 57
-        height: 125
-      spriteId: 582d29fc59123c843b1a4ebe0a6c17d4
+        x: 0
+        y: 0
+        width: 53
+        height: 128
+      spriteId: f475698493b20d64e81019c712db2c3a
     linkedCells: []
     tileCells: []
     tileSetIndex: 0
@@ -181,5 +181,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 61, y: 128}
+  canvasSize: {x: 53, y: 128}
   previousTextureSize: {x: 128, y: 256}

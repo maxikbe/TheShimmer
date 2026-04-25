@@ -45,6 +45,7 @@ public class Item : ScriptableObject
     public int HealAmount;
     public int consumeAmount;
     public int waterAmount;
+    public int sleepAmount;
     
     // Brnění
     public int durability;
