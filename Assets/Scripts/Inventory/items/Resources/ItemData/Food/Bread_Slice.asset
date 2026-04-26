@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 35
   itemName: Bread Slice
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 4388775680398515253, guid: 0dac659633c68d54abf97b6c366501ff, type: 3}
   prefab: {fileID: 0}
   description: Stale, but filling. Soak it in soup to make it edible.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

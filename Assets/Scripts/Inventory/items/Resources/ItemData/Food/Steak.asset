@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 47
   itemName: Steak
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 2682535543283281938, guid: b5a2219c6827ab944a2cc3debcb02d20, type: 3}
   prefab: {fileID: 0}
   description: A heavy meal. You'll need a nap after this one.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

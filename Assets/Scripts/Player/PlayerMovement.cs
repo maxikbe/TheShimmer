@@ -64,10 +64,9 @@ public class PlayerMovement : MonoBehaviour
         if (isRunning)
         {
             currentStaminaLevel -= 100f * Time.deltaTime; 
-            
             if (currentStaminaLevel < 0) currentStaminaLevel = 0;
-            
-            PlayerGUI.Instance.UpdateStamina((int)currentStaminaLevel);
+
+            PlayerGUI.Instance.SetStamina(currentStaminaLevel, gameDataManager.currentGameData.player.maxStaminaLevel);
         }
 
         UpdateAnimator(isRunning);

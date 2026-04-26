@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 29
   itemName: Tomato Juice
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 2510834192991520823, guid: 2554b830c1f4a324685bef579bf06605, type: 3}
   prefab: {fileID: 0}
   description: Thick and salty. Almost a meal in liquid form.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 22
   itemName: Lemon Water
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -2101797427231831410, guid: af025faf58127bb48b61f3edbbd59506, type: 3}
   prefab: {fileID: 0}
   description: Simple hydration with a twist of acidity.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

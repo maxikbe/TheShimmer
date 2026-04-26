@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 31
   itemName: Baguette
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 1558502458156866106, guid: d008f72172983ce45ad0b0d1e6b6213c, type: 3}
   prefab: {fileID: 0}
   description: Hard crust, soft inside. Good for dipping in stew.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

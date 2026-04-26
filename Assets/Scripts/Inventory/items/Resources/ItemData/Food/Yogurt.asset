@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 48
   itemName: Yogurt
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -4371166055273732949, guid: 3e86c50bdc28573418e7845dc000cd6c, type: 3}
   prefab: {fileID: 0}
   description: Smooth and cooling. Eat it before the heat spoils it.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

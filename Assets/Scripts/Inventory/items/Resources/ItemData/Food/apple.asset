@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 0
   itemName: Fresh Apple
   allowedCharacterIDs: 
-  icon: {fileID: -1808982527863717971, guid: c170b0e650963df4f8826d9d4b7aa689, type: 3}
+  icon: {fileID: -6458746110739057475, guid: bbc3eccd610a600468a18914eb9239bb, type: 3}
   prefab: {fileID: 0}
   description: Crisp and sweet. Seems suspiciously perfect for the Shimmer.
   isResearched: 1
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 102
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

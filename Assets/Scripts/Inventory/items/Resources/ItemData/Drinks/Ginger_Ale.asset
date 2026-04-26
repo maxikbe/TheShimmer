@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 18
   itemName: Ginger Ale
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -3083423542024374276, guid: b5e25cc5270e30147b6c9f99129d8146, type: 3}
   prefab: {fileID: 0}
   description: Spicy and sharp. Settles a stomach churned by anxiety.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 41
   itemName: MRE (Field Ration)
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -3813335115628325884, guid: 4d29d1332eb8ee343874184b71e4e02f, type: 3}
   prefab: {fileID: 0}
   description: Meal Ready to Eat. Tastes like cardboard, but fuels the body.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 100
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

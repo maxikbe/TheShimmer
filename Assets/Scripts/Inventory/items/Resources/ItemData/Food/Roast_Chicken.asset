@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 44
   itemName: Roast Chicken
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 1343607229827382891, guid: 63c907851a1fd6449b2635accc6f2e7b, type: 3}
   prefab: {fileID: 0}
   description: A rare luxury. Real meat provides real strength.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

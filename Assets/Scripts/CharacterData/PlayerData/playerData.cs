@@ -10,12 +10,12 @@ public class playerData
     public int numberOfGunUpgraders;
     public int numberOfMaterial;
     public int numberOfCoins;
-    public int thirstLevel;
-    public int maxThirstLevel;
-    public int hungerLevel;
-    public int maxHungerLevel;
-    public int staminaLevel;
-    public int maxStaminaLevel;
+    public float thirstLevel;
+    public float maxThirstLevel;
+    public float hungerLevel;
+    public float maxHungerLevel;
+    public float staminaLevel;
+    public float maxStaminaLevel;
     public float sleepLevel;
     public float maxSleepLevel;
     public List<int> unFoundPerks = new List<int>();

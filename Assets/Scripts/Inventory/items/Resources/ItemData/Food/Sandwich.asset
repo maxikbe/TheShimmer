@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 45
   itemName: Sandwich
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -3007980619530071713, guid: f2639f5a68435c04bb3b50ffab61c59b, type: 3}
   prefab: {fileID: 0}
   description: Two slices of bread with hope in the middle.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

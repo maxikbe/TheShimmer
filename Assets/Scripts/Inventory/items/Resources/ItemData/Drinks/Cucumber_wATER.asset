@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 17
   itemName: Cucumber Water
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -8147345185999897348, guid: 37fc8b4f38e228c4e863b10cf323ab69, type: 3}
   prefab: {fileID: 0}
   description: Refreshing and crisp. Feels like a spa day in a war zone.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

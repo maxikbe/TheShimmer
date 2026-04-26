@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 39
   itemName: Goulash
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 3716822911912371799, guid: 2b0ca0e87c7b8e1408fe433ac5e960e5, type: 3}
   prefab: {fileID: 0}
   description: Rich, meaty stew. Smells like a kitchen you used to know.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 23
   itemName: Lemonade
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -6516742536649752118, guid: e2dacbe0f5815dc4dad145cc89c201cb, type: 3}
   prefab: {fileID: 0}
   description: Sugary and fizzy. A temporary escape from the humidity.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

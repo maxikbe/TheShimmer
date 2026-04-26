@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 32
   itemName: Banana
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 1915571217638763133, guid: b7a67d1767da3ef4b995c60c368a505d, type: 3}
   prefab: {fileID: 0}
   description: "Nature\u2019s energy bar. Potassium helps prevent leg cramps."
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

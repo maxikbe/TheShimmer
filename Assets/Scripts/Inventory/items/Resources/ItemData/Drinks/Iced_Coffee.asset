@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 20
   itemName: Iced Coffee
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 7727648202202178678, guid: 2ed457c15ae68d541a5b257dc6c2c846, type: 3}
   prefab: {fileID: 0}
   description: Cold caffeine kick. Tastes better when the world isn't ending.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

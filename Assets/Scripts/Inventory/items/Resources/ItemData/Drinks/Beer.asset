@@ -25,8 +25,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 20
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0

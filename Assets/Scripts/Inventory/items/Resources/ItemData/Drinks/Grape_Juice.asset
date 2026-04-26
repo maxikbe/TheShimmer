@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 19
   itemName: Grape Juice
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: 6227071788014230575, guid: c7bb2d1416fec774384bb71952bef98a, type: 3}
   prefab: {fileID: 0}
   description: Dark and heavy. Leaves a purple stain on your lips.
   isResearched: 0
@@ -24,8 +24,8 @@ MonoBehaviour:
   canBeSold: 1
   basePrice: 0
   maxStack: 0
-  isDefaultItem: 0
-  defaultAmount: 0
+  isDefaultItem: 1
+  defaultAmount: 1
   defaultLevel: 1
   itemType: 0
   weaponType: 0
