@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
-  m_Name: Soda_Water
+  m_Name: Soda
   m_EditorClassIdentifier: Assembly-CSharp::Item
   id: 27
-  itemName: Soda Water
+  itemName: 'Soda '
   allowedCharacterIDs: 
-  icon: {fileID: 0}
+  icon: {fileID: -5055526524681033212, guid: bca9dba76f0c1474886fdf9cff3ccb3d, type: 3}
   prefab: {fileID: 0}
   description: Bubbles provide a brief distraction from hunger.
   isResearched: 0
