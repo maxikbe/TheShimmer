@@ -137,7 +137,8 @@ public class InitializeGameJson : MonoBehaviour
             staminaLevel = 100,
             maxStaminaLevel = 100,
             sleepLevel = 100f,
-            maxSleepLevel = 100f
+            maxSleepLevel = 100f,
+            campFires = new List<CampFire>()
         };
 
         Perks[] allPerksFromResources = Resources.LoadAll<Perks>("PerksData");
