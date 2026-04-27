@@ -12,7 +12,7 @@ public class Ghost_movement : MonoBehaviour
     public enum State { Patrolling, Fleeing, Returning, Chasing}
     private State currentState;
 
-    public enum MobBehavior { Friendly, Neutral, Aggressive }
+    public enum MobBehavior { Friendly, Neutral, Aggressive, Companion }
     private MobBehavior behavior; 
 
     // posílá animal pres setup
@@ -60,6 +60,11 @@ public class Ghost_movement : MonoBehaviour
     // nastavitelne na prefabu ducha toto je jenom globalni
     [SerializeField] private LayerMask wallLayer;
     
+    //companion settings
+    private float minFollowDistance ;
+    private float maxFollowDistance;
+    public bool isWaiting;
+    
     
     private bool isInitialized = false;
 
@@ -99,6 +104,10 @@ public class Ghost_movement : MonoBehaviour
         this.breakChancePercent = stats.breakChancePercent;
         
         this.waitAfterLostTime = stats.waitAfterLostTime;
+        
+        this.minFollowDistance = stats.minFollowDistance;
+        this.maxFollowDistance = stats.maxFollowDistance;
+        this.isWaiting = stats.isWaiting;
         
         this.viewAngle = stats.viewAngle;
         // odkaz na hmotne telo
@@ -152,6 +161,12 @@ public class Ghost_movement : MonoBehaviour
             }
         }
 
+        if (behavior == MobBehavior.Companion)
+        {
+            CompanionLogic();
+            return;
+        }
+        
         // --- NO-FRIENDLY LOGIKA ---
         if (behavior != MobBehavior.Friendly)
         {
@@ -504,4 +519,40 @@ public class Ghost_movement : MonoBehaviour
             ChasePlayer();
         }
     }
+    
+    private void CompanionLogic()
+    {
+        if (isWaiting) 
+        {
+            // NPC stojí na místě (můžeš sem později hodit idle animaci)
+            agent.ResetPath();
+            return;
+        }
+
+        float distToPlayer = Vector3.Distance(transform.position, playerPosition.position);
+
+        // Pokud je hráč moc daleko, najdeme si novou pozici v kruhu kolem něj
+        if (distToPlayer > maxFollowDistance && !agent.pathPending)
+        {
+            agent.speed = runSpeed; // Pokud nestíhá, běží
+        
+            // Vygenerování náhodného bodu kolem hráče v povoleném radiusu
+            Vector2 randomDir = Random.insideUnitCircle.normalized;
+            float randomDist = Random.Range(minFollowDistance, maxFollowDistance);
+            Vector3 targetPos = playerPosition.position + new Vector3(randomDir.x, randomDir.y, 0) * randomDist;
+
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(targetPos, out hit, 2.0f, NavMesh.AllAreas))
+            {
+                agent.SetDestination(hit.position);
+            }
+        }
+        else if (distToPlayer <= minFollowDistance)
+        {
+            // Jsme dost blízko, jdeme normální rychlostí nebo zastavíme
+            agent.speed = moveSpeed;
+        }
+    }
+    
+    
 }

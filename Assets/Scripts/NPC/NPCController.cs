@@ -16,13 +16,12 @@ public class NPCController : MonoBehaviour
         }
     }
 
-
     public void Interact()
     {
-        //pokud je obchodnik  ulozime merchant script
+        //pokud je obchodnik ulozime merchant script
         Merchant myMerchant = GetComponent<Merchant>();
         
-        // pripadne spustime konvezaci pres dialogue managera
-        FindObjectOfType<DialogueManager>().StartConversation(npcName, startingNode, myMerchant);
+        // TADY JE ZMĚNA: Přidáváme "gameObject" jako 4. parametr, abychom věděli, s jakým tělem mluvíme
+        FindObjectOfType<DialogueManager>().StartConversation(npcName, startingNode, myMerchant, gameObject);
     }
 }
