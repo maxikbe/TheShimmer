@@ -18,17 +18,6 @@ public class SaveData : MonoBehaviour
         gameDataManager.currentGameData.player.time = Appearance.GetComponentInChildren<TimeAndLight>().currentTime;
         gameDataManager.currentGameData.player.dayNumber = Appearance.GetComponentInChildren<TimeAndLight>().currectDay;
         gameDataManager.currentGameData.player.currentScene = SceneManager.GetActiveScene().name;
-        gameDataManager.currentGameData.player.isTentPlaced = playerObject.GetComponentInChildren<PlacementManager>().hasPlacedTent;
-        tent = GameObject.FindWithTag("Tent");
-        if(tent != null)
-        {
-            Debug.Log(tent.transform.position);
-            gameDataManager.currentGameData.player.tentPos = tent.transform.position;
-        }
-        else
-        {
-            Debug.Log("No TENT found");
-        }
         gameDataManager.SaveData();
     }
 }
