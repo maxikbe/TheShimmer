@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ColapseGeneration : MonoBehaviour
 {
@@ -18,7 +19,6 @@ public class ColapseGeneration : MonoBehaviour
         public bool isCollapsed = false;
         public TileData chosenTile = null;
         public List<TileData> possibilities;
-        public bool inQueue = false;
 
         public Cell(int x, int y, List<TileData> options)
         {
@@ -27,9 +27,39 @@ public class ColapseGeneration : MonoBehaviour
             position = new Vector3Int(x, y, 0);
             possibilities = new List<TileData>(options);
         }
+
+        public Cell Clone()
+        {
+            return new Cell(x, y, new List<TileData>(possibilities))
+            {
+                isCollapsed = this.isCollapsed,
+                chosenTile = this.chosenTile
+            };
+        }
+    }
+
+    private class WFCState
+    {
+        public Cell[,] gridSnapshot;
+        public Vector3Int collapsedPos;
+        public TileData attemptedTile;
+
+        public WFCState(Cell[,] currentGrid, Vector3Int pos, TileData tile)
+        {
+            int w = currentGrid.GetLength(0);
+            int h = currentGrid.GetLength(1);
+            gridSnapshot = new Cell[w, h];
+            for (int i = 0; i < w; i++)
+                for (int j = 0; j < h; j++)
+                    gridSnapshot[i, j] = currentGrid[i, j].Clone();
+
+            collapsedPos = pos;
+            attemptedTile = tile;
+        }
     }
 
     private Cell[,] grid;
+    private Stack<WFCState> history = new Stack<WFCState>();
     private readonly Vector3Int[] directions = { Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right };
 
     void Start() => GenerateMap();
@@ -37,6 +67,8 @@ public class ColapseGeneration : MonoBehaviour
     public void GenerateMap()
     {
         StopAllCoroutines();
+        targetTilemap.ClearAllTiles();
+        history.Clear();
         InitializeGrid();
         StartCoroutine(WFCAlgorithm());
     }
@@ -45,32 +77,8 @@ public class ColapseGeneration : MonoBehaviour
     {
         grid = new Cell[width, height];
         for (int x = 0; x < width; x++)
-        {
             for (int y = 0; y < height; y++)
-            {
                 grid[x, y] = new Cell(x, y, tileOptions);
-            }
-        }
-
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                TileBase existing = targetTilemap.GetTile(grid[x, y].position);
-                if (existing != null)
-                {
-                    TileData match = tileOptions.Find(t => t.tile == existing);
-                    if (match != null)
-                    {
-                        grid[x, y].chosenTile = match;
-                        grid[x, y].possibilities.Clear();
-                        grid[x, y].possibilities.Add(match);
-                        grid[x, y].isCollapsed = true;
-                        Propagate(grid[x, y]);
-                    }
-                }
-            }
-        }
     }
 
     IEnumerator WFCAlgorithm()
@@ -84,65 +92,83 @@ public class ColapseGeneration : MonoBehaviour
 
             if (nextCell.possibilities.Count == 0)
             {
-                Debug.LogError($"Contradiction at {nextCell.position}! Waiting 1s and restarting...");
-                targetTilemap.ClearAllTiles(); 
-
-                yield return new WaitForSeconds(1f); 
-                
-                GenerateMap();
-                yield break;
+                if (history.Count == 0)
+                {
+                    Debug.LogError("No valid configuration possible.");
+                    yield break;
+                }
+                Backtrack();
+                continue;
             }
 
-            CollapseCell(nextCell);
-            Propagate(nextCell);
+            TileData choice = PickWeightedTile(nextCell);
+            history.Push(new WFCState(grid, nextCell.position, choice));
+
+            ApplyCollapse(nextCell, choice);
+
+            if (!Propagate(nextCell))
+            {
+                Backtrack();
+                continue;
+            }
 
             processedThisFrame++;
             if (processedThisFrame >= tilesPerFrame)
             {
                 processedThisFrame = 0;
-                yield return null; 
+                yield return null;
             }
         }
-        Debug.Log("Generation Complete!");
     }
 
-    void CollapseCell(Cell cell)
+    void Backtrack()
     {
-        float totalWeight = 0;
-        for (int i = 0; i < cell.possibilities.Count; i++)
-            totalWeight += cell.possibilities[i].weight;
+        WFCState lastState = history.Pop();
+        grid = lastState.gridSnapshot;
+        
+        Cell cellInGrid = grid[lastState.collapsedPos.x, lastState.collapsedPos.y];
+        cellInGrid.possibilities.RemoveAll(t => t.tileID == lastState.attemptedTile.tileID);
+        
+        UpdateTilemapVisuals();
+    }
 
+    void UpdateTilemapVisuals()
+    {
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                targetTilemap.SetTile(grid[x, y].position, grid[x, y].isCollapsed ? grid[x, y].chosenTile.tile : null);
+    }
+
+    TileData PickWeightedTile(Cell cell)
+    {
+        float totalWeight = cell.possibilities.Sum(t => t.weight);
         float r = Random.Range(0, totalWeight);
         float currentWeight = 0;
 
         foreach (var tile in cell.possibilities)
         {
             currentWeight += tile.weight;
-            if (r <= currentWeight)
-            {
-                cell.chosenTile = tile;
-                break;
-            }
+            if (r <= currentWeight) return tile;
         }
-
-        if (cell.chosenTile == null) cell.chosenTile = cell.possibilities[0];
-
-        cell.possibilities.Clear();
-        cell.possibilities.Add(cell.chosenTile);
-        cell.isCollapsed = true;
-        targetTilemap.SetTile(cell.position, cell.chosenTile.tile);
+        return cell.possibilities[0];
     }
 
-    void Propagate(Cell collapsedCell)
+    void ApplyCollapse(Cell cell, TileData tile)
+    {
+        cell.chosenTile = tile;
+        cell.possibilities = new List<TileData> { tile };
+        cell.isCollapsed = true;
+        targetTilemap.SetTile(cell.position, tile.tile);
+    }
+
+    bool Propagate(Cell collapsedCell)
     {
         Queue<Cell> queue = new Queue<Cell>();
         queue.Enqueue(collapsedCell);
-        collapsedCell.inQueue = true;
 
         while (queue.Count > 0)
         {
             Cell current = queue.Dequeue();
-            current.inQueue = false;
 
             foreach (Vector3Int dir in directions)
             {
@@ -155,37 +181,23 @@ public class ColapseGeneration : MonoBehaviour
                     if (neighbor.isCollapsed) continue;
 
                     int startCount = neighbor.possibilities.Count;
-                    
-                    for (int i = neighbor.possibilities.Count - 1; i >= 0; i--)
-                    {
-                        TileData nTile = neighbor.possibilities[i];
-                        if (!IsStillValid(nTile, current.possibilities, dir))
-                        {
-                            neighbor.possibilities.RemoveAt(i);
-                        }
-                    }
+                    neighbor.possibilities.RemoveAll(nTile => !IsStillValid(nTile, current.possibilities, dir));
+
+                    if (neighbor.possibilities.Count == 0) return false;
 
                     if (neighbor.possibilities.Count < startCount)
                     {
-                        if (neighbor.possibilities.Count == 0) return;
-                        if (!neighbor.inQueue)
-                        {
-                            queue.Enqueue(neighbor);
-                            neighbor.inQueue = true;
-                        }
+                        if (!queue.Contains(neighbor)) queue.Enqueue(neighbor);
                     }
                 }
             }
         }
+        return true;
     }
 
     bool IsStillValid(TileData neighborTile, List<TileData> currentPossibilities, Vector3Int dir)
     {
-        for (int i = 0; i < currentPossibilities.Count; i++)
-        {
-            if (IsCompatible(currentPossibilities[i], neighborTile, dir)) return true;
-        }
-        return false;
+        return currentPossibilities.Any(curr => IsCompatible(curr, neighborTile, dir));
     }
 
     bool IsCompatible(TileData anchor, TileData check, Vector3Int dir)
@@ -210,13 +222,9 @@ public class ColapseGeneration : MonoBehaviour
                 if (cell.isCollapsed) continue;
 
                 int count = cell.possibilities.Count;
-                if (count < minEntropy)
+                if (count > 0 && count < minEntropy)
                 {
                     minEntropy = count;
-                    bestCell = cell;
-                }
-                else if (count == minEntropy && Random.value > 0.8f)
-                {
                     bestCell = cell;
                 }
             }
