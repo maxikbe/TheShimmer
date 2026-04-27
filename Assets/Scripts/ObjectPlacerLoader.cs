@@ -6,7 +6,7 @@ public class ObjectPlacerLoader : MonoBehaviour
     [SerializeField] private GameObject campfirePrefab;
     [SerializeField] private GameObject campfireBluePrintPrefab;
 
-    void Start()
+    void Awake()
     {
         SpawnSavedCampfires();
     }
