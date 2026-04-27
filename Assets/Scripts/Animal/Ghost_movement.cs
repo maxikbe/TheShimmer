@@ -137,8 +137,10 @@ public class Ghost_movement : MonoBehaviour
 
         bool canSeePlayer = CheckForPlayer();
 
+        // Pokud tě vidí, průběžně si ukládá tvoji pozici (pro případ, že mu zmizíš)
         if (canSeePlayer)
         {
+            lastKnownPlayerPos = playerPosition.position;
             isHavingBreak = false;
             isWaitingAtPatrol = false; 
             isCoolingDown = false; 
@@ -156,14 +158,13 @@ public class Ghost_movement : MonoBehaviour
                 {
                     myAnimalStats.behavior = originalBehavior; 
                 }
-                
-                // Debug.Log("Nikdo nebyl nalezen, vracím se zpět do normálu");
             }
         }
 
+        // TADY PŘEDÁVÁME canSeePlayer DO LOGIKY COMPANIONA
         if (behavior == MobBehavior.Companion)
         {
-            CompanionLogic();
+            CompanionLogic(canSeePlayer);
             return;
         }
         
@@ -301,22 +302,22 @@ public class Ghost_movement : MonoBehaviour
     {
         if (playerPosition == null) return false;
 
-        // kontrola vzdalenosti
         float distanceToPlayer = Vector3.Distance(transform.position, playerPosition.position);
         if (distanceToPlayer > visionRadius) return false;
 
         Vector3 directionToPlayer = (playerPosition.position - transform.position).normalized;
 
-        // --- 2. NOVÁ KONTROLA ÚHLU (Zorné pole) ---
-        // pokud je uhel od hrace vetsi nez polovina zorneho pole, hrace nevidime
-        if (Vector3.Angle(facingDirection, directionToPlayer) > viewAngle / 2f)
+        // --- ZMĚNA ZDE: Společníci mají 360 stupňový výhled ---
+        // Ignorujeme úhel pohledu, pokud je to companion
+        if (behavior != MobBehavior.Companion)
         {
-            return false;
+            if (Vector3.Angle(facingDirection, directionToPlayer) > viewAngle / 2f)
+            {
+                return false;
+            }
         }
-        
-        
 
-        // kontrola zdí
+        // kontrola zdí (platí pro všechny, i pro companiony)
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, directionToPlayer, visionRadius);
 
         foreach (RaycastHit2D hit in hits)
@@ -325,12 +326,12 @@ public class Ghost_movement : MonoBehaviour
             
             if (hit.collider.CompareTag("Player"))
             {
-                return true; // vidi hrace
+                return true; 
             }
             
             if (!hit.collider.isTrigger)
             {
-                return false; // vidi zed
+                return false; 
             }
         }
 
@@ -520,37 +521,57 @@ public class Ghost_movement : MonoBehaviour
         }
     }
     
-    private void CompanionLogic()
+    private void CompanionLogic(bool canSeePlayer)
     {
         if (isWaiting) 
         {
-            // NPC stojí na místě (můžeš sem později hodit idle animaci)
-            agent.ResetPath();
+            // Zastavíme agenta, pokud má zrovna nějakou cestu
+            if (agent.hasPath) agent.ResetPath();
             return;
         }
 
-        float distToPlayer = Vector3.Distance(transform.position, playerPosition.position);
-
-        // Pokud je hráč moc daleko, najdeme si novou pozici v kruhu kolem něj
-        if (distToPlayer > maxFollowDistance && !agent.pathPending)
+        if (canSeePlayer)
         {
-            agent.speed = runSpeed; // Pokud nestíhá, běží
-        
-            // Vygenerování náhodného bodu kolem hráče v povoleném radiusu
-            Vector2 randomDir = Random.insideUnitCircle.normalized;
-            float randomDist = Random.Range(minFollowDistance, maxFollowDistance);
-            Vector3 targetPos = playerPosition.position + new Vector3(randomDir.x, randomDir.y, 0) * randomDist;
+            float distToPlayer = Vector3.Distance(transform.position, playerPosition.position);
 
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(targetPos, out hit, 2.0f, NavMesh.AllAreas))
+            // Pokud jsi moc daleko, zapíná sprint k tobě
+            if (distToPlayer > maxFollowDistance)
             {
-                agent.SetDestination(hit.position);
+                agent.speed = runSpeed; 
+                agent.SetDestination(playerPosition.position);
+            }
+            // Pokud jsi blíž, tak jenom normálně chodí
+            else if (distToPlayer > minFollowDistance)
+            {
+                agent.speed = moveSpeed;
+                agent.SetDestination(playerPosition.position);
+            }
+            // Pokud je v optimální vzdálenosti přímo u tebe, zastaví
+            else
+            {
+                if (agent.hasPath) agent.ResetPath();
             }
         }
-        else if (distToPlayer <= minFollowDistance)
+        else
         {
-            // Jsme dost blízko, jdeme normální rychlostí nebo zastavíme
-            agent.speed = moveSpeed;
+            // Ztratil tě za rohem - jde prozkoumat tvoji lastKnown pozici
+            agent.speed = moveSpeed; // Stačí chůze, nemusí sprintovat
+            agent.SetDestination(lastKnownPlayerPos);
+
+            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+            {
+                if (myAnimalStats != null)
+                {
+                    myAnimalStats.SetWaitState(true); 
+                }
+                else
+                {
+                    isWaiting = true;
+                }
+                
+                agent.ResetPath();
+                Debug.Log($"{gameObject.name}: Ztratil jsem Kokkotta. Čekám na místě.");
+            }
         }
     }
     
