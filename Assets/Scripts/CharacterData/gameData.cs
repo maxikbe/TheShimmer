@@ -10,6 +10,7 @@ public class GameData
     public List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
     public List<SkillSaveData> Skills = new List<SkillSaveData>();
     public List<MerchantReputation> merchantReputations = new List<MerchantReputation>();
+    public List<NPCSaveState> savedWorldNPCs = new List<NPCSaveState>(); // Tohle nahradí tvůj list enemies
     
     // QUESTY:
     public List<QuestSaveData> savedQuests = new List<QuestSaveData>();

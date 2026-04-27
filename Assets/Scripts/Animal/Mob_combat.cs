@@ -5,6 +5,10 @@ using NaughtyAttributes;
 [RequireComponent(typeof(SpriteRenderer))]
 public class Mob_combat : MonoBehaviour
 {
+    
+    private NPCController myIDCard;
+    
+    
     [Header("Combat Stats")]
     public int maxHealth = 10;
     private int currentHealth; 
@@ -37,6 +41,7 @@ public class Mob_combat : MonoBehaviour
     {
         animalMovement = GetComponent<Animal_movement>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        myIDCard = GetComponent<NPCController>(); // Získáme referenci na občanku
         currentHealth = maxHealth;
     }
 
@@ -98,30 +103,20 @@ public class Mob_combat : MonoBehaviour
     public void Die()
     {
         if (isDead) return;
-
         isDead = true;
-        currentHealth = 0; 
-        Debug.Log($"{gameObject.name} zařval. Můžeš lootovat.");
+    
+        // Tvůj kód pro vizuální smrt zůstává...
+        if (deadMeatSprite != null && spriteRenderer != null) spriteRenderer.sprite = deadMeatSprite;
+        if (animalMovement != null) Destroy(animalMovement); 
+        if (lootScript != null) lootScript.enabled = true;
 
-        //  Změna textury na maso
-        if (deadMeatSprite != null && spriteRenderer != null)
+        // ZÁPIS DO MASTER SYSTÉMU:
+        if (myIDCard != null)
         {
-            spriteRenderer.sprite = deadMeatSprite;
+            myIDCard.isDead = true;
+            myIDCard.SaveMyState(); // NPCController se postará o zápis do JSONu
         }
-
-        // vypnutí AI pohybu
-        if (animalMovement != null)
-        {
-            Destroy(animalMovement); 
-        }
-
-        // zapne looting script
-        if (lootScript != null)
-        {
-            lootScript.enabled = true;
-        }
-        
-        // vypne combat script
+    
         this.enabled = false; 
     }
 
