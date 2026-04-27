@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 [System.Serializable]
 public class CraftableItem
@@ -81,7 +82,21 @@ public class BuildingManager : MonoBehaviour
 
     void PlaceBuildSite()
     {
-        Instantiate(selectedItem.buildSitePrefab, currentGhostInstance.transform.position, Quaternion.identity);
+        CampFire newFireData = new CampFire {
+            id = Guid.NewGuid().ToString(),
+            pos = currentGhostInstance.transform.position,
+            isBlueprint = true,
+            woodLeft = 3,
+            stoneLeft = 2,
+            woodFuelAmount = 1,
+            isLit = false
+        };
+
+        gameDataManager.currentGameData.player.campFires.Add(newFireData);
+
+        GameObject site = Instantiate(selectedItem.buildSitePrefab, newFireData.pos, Quaternion.identity);
+        site.GetComponent<BluePrintObjectScript>().Initialize(newFireData);
+
         CancelPlacement();
     }
 

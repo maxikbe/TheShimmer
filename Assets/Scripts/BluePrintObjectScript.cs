@@ -21,11 +21,18 @@ public class BluePrintObjectScript : MonoBehaviour
     public string TextContent = "Destroy [F]";
     private TextMeshProUGUI interactUIHOLDText;
     private GameObject InteractUIHOLD;
-    private PlacementManager manager;
+    private CampFire myData;
 
-    void Start()
+    public void Initialize(CampFire data)
     {
-        textInfo.text = "Wood " + currentWood +" / " + woodRequired + "\nRocks " + currentRocks + " / " + rocksRequired;
+        myData = data;
+        currentWood = woodRequired - data.woodLeft;
+        currentRocks = rocksRequired - data.stoneLeft;
+
+        if (textInfo != null)
+        {
+            UpdateUI();
+        }
     }
 
     void Update()
@@ -34,66 +41,88 @@ public class BluePrintObjectScript : MonoBehaviour
         {
             TryAddMaterials();
         }
-        if (Input.GetKey(KeyCode.F))
+
+        if (isPlayerNearby && Input.GetKey(KeyCode.F))
         {
             holdTimer += Time.deltaTime;
-
             if (interactUIHOLDText != null) 
-            interactUIHOLDText.text = "Packing... " + (holdTimer / holdDuration * 100).ToString("F0") + "%";
+                interactUIHOLDText.text = "Packing... " + (holdTimer / holdDuration * 100f).ToString("F0") + "%";
 
             if (holdTimer >= holdDuration)
             {
-                PickUp();
-                holdTimer = 0f;
+                gameDataManager.currentGameData.player.campFires.Remove(myData);
+                gameDataManager.SaveData();
+                Destroy(gameObject);
             }
         }
-        else
+        else if (Input.GetKeyUp(KeyCode.F))
         {
             holdTimer = 0f;
+            if (interactUIHOLDText != null) interactUIHOLDText.text = TextContent;
         }
-    }
-    public void PickUp()
-    {
-        if (InteractUIHOLD != null) InteractUIHOLD.SetActive(false);
-        if (InteractUI != null) InteractUI.SetActive(false);
-        Destroy(gameObject);
     }
 
     void TryAddMaterials()
     {
-        if (currentWood < woodRequired) currentWood++;
-        else if (currentRocks < rocksRequired) currentRocks++;
+        if (currentWood < woodRequired)
+        {
+            currentWood++;
+            if (myData != null) myData.woodLeft--;
+        }
+        else if (currentRocks < rocksRequired)
+        {
+            currentRocks++;
+            if (myData != null) myData.stoneLeft--;
+        }
 
-        textInfo.text = "Wood " + currentWood +" / " + woodRequired + "\nRocks " + currentRocks + " / " + rocksRequired;
+        UpdateUI();
 
         if (currentWood >= woodRequired && currentRocks >= rocksRequired)
         {
-            Instantiate(finalPrefab, transform.position, Quaternion.identity);
+            myData.isBlueprint = false;
+            GameObject final = Instantiate(finalPrefab, transform.position, Quaternion.identity);
+            final.GetComponent<campFireScript>().Initialize(myData);
+            gameDataManager.SaveData();
             Destroy(gameObject);
         }
     }
 
+    void UpdateUI()
+    {
+        if (textInfo != null)
+            textInfo.text = "Wood " + currentWood + " / " + woodRequired + "\nRocks " + currentRocks + " / " + rocksRequired;
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        InteractUI = other.transform.Find("PlayerInfoUICanvas/Interaction").gameObject;
-        if (InteractUI != null){
-            interactUIText = InteractUI.GetComponentInChildren<TextMeshProUGUI>();
-            interactUIText.text = interactUITextContent;
-        }
-
-        InteractUIHOLD = other.transform.Find("PlayerInfoUICanvas/LongInteractionHOLD").gameObject;
-            
-        if (InteractUIHOLD != null)
+        if (other.CompareTag("Player"))
         {
-            interactUIHOLDText = InteractUIHOLD.GetComponentInChildren<TextMeshProUGUI>();
-            interactUIHOLDText.text = TextContent;
-            InteractUIHOLD.SetActive(true);
+            isPlayerNearby = true;
+            Transform canvas = other.transform.Find("PlayerInfoUICanvas");
+            if (canvas != null)
+            {
+                InteractUI = canvas.Find("Interaction").gameObject;
+                InteractUIHOLD = canvas.Find("LongInteractionHOLD").gameObject;
+
+                interactUIText = InteractUI.GetComponentInChildren<TextMeshProUGUI>();
+                interactUIText.text = interactUITextContent;
+                InteractUI.SetActive(true);
+
+                interactUIHOLDText = InteractUIHOLD.GetComponentInChildren<TextMeshProUGUI>();
+                interactUIHOLDText.text = TextContent;
+                InteractUIHOLD.SetActive(true);
+            }
         }
-        if (other.CompareTag("Player")){ isPlayerNearby = true; InteractUI.SetActive(true);}
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player")){ isPlayerNearby = false; InteractUI.SetActive(false); InteractUIHOLD.SetActive(false);}
+        if (other.CompareTag("Player"))
+        {
+            isPlayerNearby = false;
+            holdTimer = 0f;
+            if (InteractUI != null) InteractUI.SetActive(false);
+            if (InteractUIHOLD != null) InteractUIHOLD.SetActive(false);
+        }
     }
 }

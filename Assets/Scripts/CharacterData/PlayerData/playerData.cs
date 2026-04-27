@@ -7,6 +7,7 @@ using Unity.Collections;
 
 public class CampFire
 {
+    public string id;
     public Vector2 pos;
     public bool isBlueprint;
     public int woodLeft;
