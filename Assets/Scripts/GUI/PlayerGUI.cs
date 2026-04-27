@@ -26,6 +26,7 @@ public class PlayerGUI : MonoBehaviour
     {
         LoadInitialData();
         InvokeRepeating(nameof(UpdateLevelsPerMinute), 60f, 60f);
+        InvokeRepeating(nameof(UpdateStaminaLevel), 0.1f, 0.1f);
     }
 
     private void LoadInitialData()
@@ -54,6 +55,11 @@ public class PlayerGUI : MonoBehaviour
         UpdateSleep(-0.5f);
     }
 
+    private void UpdateStaminaLevel()
+    {
+        UpdateStamina(+0.5f);
+    }
+
     public void UpdateThirst(float amount)
     {
         currentThirst = Mathf.Clamp(currentThirst + amount, 0, maxThirst);
@@ -68,7 +74,14 @@ public class PlayerGUI : MonoBehaviour
 
     public void UpdateStamina(float amount)
     {
-        currentStamina = Mathf.Clamp(amount, 0, maxStamina);
+        currentStamina = Mathf.Clamp(currentStamina + amount, 0, maxStamina);
+        if (staminaBar != null) staminaBar.fillAmount = currentStamina / maxStamina;
+    }
+
+    public void SetStamina(float current, float max)
+    {
+        currentStamina = Mathf.Clamp(current, 0, max);
+        maxStamina = max;
         if (staminaBar != null) staminaBar.fillAmount = currentStamina / maxStamina;
     }
 
@@ -82,7 +95,7 @@ public class PlayerGUI : MonoBehaviour
     {
         UpdateThirst(0);
         UpdateHunger(0);
-        UpdateStamina(currentStamina);
+        UpdateStamina(0);
         UpdateSleep(0);
     }
 }

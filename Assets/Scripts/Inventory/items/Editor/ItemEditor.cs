@@ -10,6 +10,7 @@ public class ItemEditor : Editor
     SerializedProperty isResearched, isUsable, maxStack, isTurnedBaseItem;
     SerializedProperty canBeSold, basePrice;
     SerializedProperty rarity, originMobName, potionHeal, potionAditionalHealth, potionBonusSpeed, potionBonusStamina, potionBonusFOV, potionBonushungerSpeed, potionBonusdamage, hilightResources;
+    SerializedProperty HealAmount, consumeAmount, waterAmount, sleepAmount;
 
     void OnEnable()
     {
@@ -42,6 +43,11 @@ public class ItemEditor : Editor
         potionBonushungerSpeed =  serializedObject.FindProperty("potionBonushungerSpeed");
         potionBonusdamage =  serializedObject.FindProperty("potionBonusdamage");
         hilightResources =  serializedObject.FindProperty("hilightResources");
+
+        HealAmount = serializedObject.FindProperty("HealAmount");
+        consumeAmount = serializedObject.FindProperty("consumeAmount");
+        waterAmount = serializedObject.FindProperty("waterAmount");
+        sleepAmount = serializedObject.FindProperty("sleepAmount");
     }
 
     public override void OnInspectorGUI()
@@ -153,8 +159,11 @@ public class ItemEditor : Editor
 
     private void DrawConsumableSettings(Item item)
     {
-        EditorGUILayout.LabelField("NASTAVENÍ KONZUMACE", EditorStyles.boldLabel);
-        item.HealAmount = EditorGUILayout.IntField("Léčení / Obnova", item.HealAmount);
+        EditorGUILayout.LabelField("NASTAVENÍ KONZUMACE / LÉČENÍ", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(HealAmount, new GUIContent("Obnova HP"));
+        EditorGUILayout.PropertyField(consumeAmount, new GUIContent("Obnova Jídla"));
+        EditorGUILayout.PropertyField(waterAmount, new GUIContent("Obnova Vody"));
+        EditorGUILayout.PropertyField(sleepAmount, new GUIContent("Obnova Spánku"));
     }
     
     private void DrawSampleSettings(Item item)
@@ -166,14 +175,13 @@ public class ItemEditor : Editor
         EditorGUILayout.Space();
         EditorGUILayout.HelpBox("Tyto staty se hráči ukážou v UI až když bude vzorek vyzkoumaný.", MessageType.Info);
         
-        // V editoru to vidíme vždy, abychom to mohli nastavit, ale ve hře si to pak vyfiltruješ
-        EditorGUILayout.PropertyField(potionHeal, new GUIContent("Kolik HP potion přidá (vyhealuje do maximálních HP)"));
-        EditorGUILayout.PropertyField(potionAditionalHealth, new GUIContent("Bonusový health nad maximum"));
-        EditorGUILayout.PropertyField(potionBonusSpeed, new GUIContent("Bonusový sped"));
+        EditorGUILayout.PropertyField(potionHeal, new GUIContent("HP potion (heal do max)"));
+        EditorGUILayout.PropertyField(potionAditionalHealth, new GUIContent("Bonusový health (nad max)"));
+        EditorGUILayout.PropertyField(potionBonusSpeed, new GUIContent("Bonusový speed"));
         EditorGUILayout.PropertyField(potionBonusStamina, new GUIContent("Bonusová stamina"));
-        EditorGUILayout.PropertyField(potionBonusFOV, new GUIContent("Bonusové FOV do hry"));
-        EditorGUILayout.PropertyField(potionBonushungerSpeed, new GUIContent("Rychlost ubýhání hungeru (desetinné číslo, může i zpomalovat)"));
+        EditorGUILayout.PropertyField(potionBonusFOV, new GUIContent("Bonusové FOV"));
+        EditorGUILayout.PropertyField(potionBonushungerSpeed, new GUIContent("Rychlost hungeru"));
         EditorGUILayout.PropertyField(potionBonusdamage, new GUIContent("Bonusový damage"));
-        EditorGUILayout.PropertyField(hilightResources, new GUIContent("Zvýraznění dřeva, a různých resources"));
+        EditorGUILayout.PropertyField(hilightResources, new GUIContent("Zvýraznění resources"));
     }
 }

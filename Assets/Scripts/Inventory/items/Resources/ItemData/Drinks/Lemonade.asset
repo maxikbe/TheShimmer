@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
+  m_Name: Lemonade
+  m_EditorClassIdentifier: Assembly-CSharp::Item
+  id: 23
+  itemName: Lemonade
+  allowedCharacterIDs: 
+  icon: {fileID: -6516742536649752118, guid: e2dacbe0f5815dc4dad145cc89c201cb, type: 3}
+  prefab: {fileID: 0}
+  description: Sugary and fizzy. A temporary escape from the humidity.
+  isResearched: 0
+  isUsable: 0
+  isTurnedBaseItem: 0
+  canBeSold: 1
+  basePrice: 0
+  maxStack: 0
+  isDefaultItem: 1
+  defaultAmount: 1
+  defaultLevel: 1
+  itemType: 0
+  weaponType: 0
+  isTurnedBaseWeapon: 0
+  firstCharID: 0
+  isMagical: 0
+  Damage: 0
+  FireRate: 0
+  Range: 0
+  ReloadTime: 0
+  AmmoCapacity: 0
+  AmmoID: 0
+  AmmoAmount: 0
+  Speed: 0
+  magicalElement: 0
+  HealAmount: 0
+  consumeAmount: 5
+  waterAmount: 35
+  sleepAmount: 0
+  durability: 0
+  armorType: 0
+  Armor: 0
+  weight: 0
+  turnBaseItemType: 0
+  turnBaseItemEffectAmount: 0
+  turnBaseItemDuration: 0
+  rarity: 0
+  originMobName: 
+  potionHeal: 0
+  potionAditionalHealth: 0
+  potionBonusSpeed: 0
+  potionBonusStamina: 0
+  potionBonusFOV: 0
+  potionBonushungerSpeed: 0
+  potionBonusdamage: 0
+  hilightResources: 0
