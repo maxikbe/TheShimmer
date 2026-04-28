@@ -45,6 +45,14 @@ public class Animal_movement : MonoBehaviour
     public float waitAfterLostTime = 2f;
     [Tooltip("Jak dlouho mobka hlídkuje jako agresivní, než se uklidní")]
     public float calmDownTime = 30f; 
+    
+    [Header("Companion Settings")]
+    public float minFollowDistance = 2f;
+    public float maxFollowDistance = 5f;
+    public bool isWaiting = false; // Tohle budeme přepínat přes dialogy
+    public bool isManualWait = false;
+    
+    
 
     [Header("References")]
     public Transform playerPosition; // rhac
@@ -192,6 +200,25 @@ public class Animal_movement : MonoBehaviour
         {
             myGhost.ChangeBehavior(behavior);
         }
+    }
+    
+    // Předá rozkaz čekání přímo našemu duchovi a uloží si ho
+    // Přidali jsme parametr isManual s výchozí hodnotou true (pro příkazy z dialogu)
+    public void SetWaitState(bool wait, bool isManual = true)
+    {
+        isWaiting = wait; 
+        if (myGhost != null)
+        {
+            myGhost.isWaiting = wait;
+            myGhost.isManualWait = isManual; // Duchovi řekneme, jestli to byl tvůj rozkaz
+        }
+    }
+
+    // Zeptá se, jestli aktuálně NPC čeká
+    public bool IsWaiting()
+    {
+        if (myGhost != null) return myGhost.isWaiting;
+        return isWaiting;
     }
     
 }

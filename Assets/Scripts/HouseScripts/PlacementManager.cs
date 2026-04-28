@@ -32,6 +32,7 @@ public class PlacementManager : MonoBehaviour
     public void NotifyTentRemoved()
     {
         hasPlacedTent = false;
+        gameDataManager.currentGameData.player.isTentPlaced = hasPlacedTent;
     }
 
     void Update()
@@ -107,6 +108,8 @@ public class PlacementManager : MonoBehaviour
             hasPlacedTent = true;
             isBuilding = false;
             ghostPreview.SetActive(false);
+            gameDataManager.currentGameData.player.isTentPlaced = hasPlacedTent;
+            gameDataManager.currentGameData.player.tentPos = pos;
         }
     }
 }

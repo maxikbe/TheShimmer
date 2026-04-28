@@ -12,7 +12,7 @@ public class Ghost_movement : MonoBehaviour
     public enum State { Patrolling, Fleeing, Returning, Chasing}
     private State currentState;
 
-    public enum MobBehavior { Friendly, Neutral, Aggressive }
+    public enum MobBehavior { Friendly, Neutral, Aggressive, Companion }
     private MobBehavior behavior; 
 
     // posílá animal pres setup
@@ -60,6 +60,12 @@ public class Ghost_movement : MonoBehaviour
     // nastavitelne na prefabu ducha toto je jenom globalni
     [SerializeField] private LayerMask wallLayer;
     
+    //companion settings
+    private float minFollowDistance ;
+    private float maxFollowDistance;
+    public bool isWaiting;
+    public bool isManualWait;
+    
     
     private bool isInitialized = false;
 
@@ -100,6 +106,11 @@ public class Ghost_movement : MonoBehaviour
         
         this.waitAfterLostTime = stats.waitAfterLostTime;
         
+        this.minFollowDistance = stats.minFollowDistance;
+        this.maxFollowDistance = stats.maxFollowDistance;
+        this.isWaiting = stats.isWaiting;
+        this.isManualWait = stats.isManualWait;
+        
         this.viewAngle = stats.viewAngle;
         // odkaz na hmotne telo
         this.myBody = stats.gameObject; 
@@ -128,8 +139,10 @@ public class Ghost_movement : MonoBehaviour
 
         bool canSeePlayer = CheckForPlayer();
 
+        // Pokud tě vidí, průběžně si ukládá tvoji pozici (pro případ, že mu zmizíš)
         if (canSeePlayer)
         {
+            lastKnownPlayerPos = playerPosition.position;
             isHavingBreak = false;
             isWaitingAtPatrol = false; 
             isCoolingDown = false; 
@@ -147,11 +160,16 @@ public class Ghost_movement : MonoBehaviour
                 {
                     myAnimalStats.behavior = originalBehavior; 
                 }
-                
-                // Debug.Log("Nikdo nebyl nalezen, vracím se zpět do normálu");
             }
         }
 
+        // TADY PŘEDÁVÁME canSeePlayer DO LOGIKY COMPANIONA
+        if (behavior == MobBehavior.Companion)
+        {
+            CompanionLogic(canSeePlayer);
+            return;
+        }
+        
         // --- NO-FRIENDLY LOGIKA ---
         if (behavior != MobBehavior.Friendly)
         {
@@ -286,22 +304,22 @@ public class Ghost_movement : MonoBehaviour
     {
         if (playerPosition == null) return false;
 
-        // kontrola vzdalenosti
         float distanceToPlayer = Vector3.Distance(transform.position, playerPosition.position);
         if (distanceToPlayer > visionRadius) return false;
 
         Vector3 directionToPlayer = (playerPosition.position - transform.position).normalized;
 
-        // --- 2. NOVÁ KONTROLA ÚHLU (Zorné pole) ---
-        // pokud je uhel od hrace vetsi nez polovina zorneho pole, hrace nevidime
-        if (Vector3.Angle(facingDirection, directionToPlayer) > viewAngle / 2f)
+        // --- ZMĚNA ZDE: Společníci mají 360 stupňový výhled ---
+        // Ignorujeme úhel pohledu, pokud je to companion
+        if (behavior != MobBehavior.Companion)
         {
-            return false;
+            if (Vector3.Angle(facingDirection, directionToPlayer) > viewAngle / 2f)
+            {
+                return false;
+            }
         }
-        
-        
 
-        // kontrola zdí
+        // kontrola zdí (platí pro všechny, i pro companiony)
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, directionToPlayer, visionRadius);
 
         foreach (RaycastHit2D hit in hits)
@@ -310,12 +328,12 @@ public class Ghost_movement : MonoBehaviour
             
             if (hit.collider.CompareTag("Player"))
             {
-                return true; // vidi hrace
+                return true; 
             }
             
             if (!hit.collider.isTrigger)
             {
-                return false; // vidi zed
+                return false; 
             }
         }
 
@@ -504,4 +522,76 @@ public class Ghost_movement : MonoBehaviour
             ChasePlayer();
         }
     }
+    
+    private void CompanionLogic(bool canSeePlayer)
+    {
+        // --- AUTO-RESUME LOGIKA ---
+        // Přečte si, že tě vidí a že čeká. Ale nově se rozběhne JEN TEHDY, když to nebyl manuální příkaz (!isManualWait)
+        if (canSeePlayer && isWaiting && !isManualWait) 
+        {
+            if (myAnimalStats != null)
+            {
+                // Voláme s isManual = false, ať si to systém neplete
+                myAnimalStats.SetWaitState(false, false); 
+            }
+            else
+            {
+                isWaiting = false; 
+                isManualWait = false;
+            }
+            Debug.Log($"{gameObject.name}: Vidím tě, Kokkotte! Ukončuji auto-čekání.");
+        }
+
+        // Pokud čeká (ať už manuálně, nebo protože tě ztratil), prostě stojí a čumí
+        if (isWaiting) 
+        {
+            if (agent.hasPath) agent.ResetPath(); 
+            return;
+        }
+
+        if (canSeePlayer)
+        {
+            // --- STANDARDNÍ FOLLOW LOGIKA ---
+            float distToPlayer = Vector3.Distance(transform.position, playerPosition.position);
+
+            if (distToPlayer > maxFollowDistance)
+            {
+                agent.speed = runSpeed; 
+                agent.SetDestination(playerPosition.position);
+            }
+            else if (distToPlayer > minFollowDistance)
+            {
+                agent.speed = moveSpeed;
+                agent.SetDestination(playerPosition.position);
+            }
+            else
+            {
+                if (agent.hasPath) agent.ResetPath();
+            }
+        }
+        else
+        {
+            // --- LOGIKA "ZTRATIL JSEM TĚ" ---
+            agent.speed = runSpeed; // Dal jsem ti sem zpátky runSpeed, ať to na to lastKnown místo dokluše rychle
+            agent.SetDestination(lastKnownPlayerPos);
+
+            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+            {
+                if (myAnimalStats != null)
+                {
+                    // DŮLEŽITÉ: Posíláme false! Tím dáváme najevo "zastavil jsem se sám, Kokkott mi to neřekl"
+                    myAnimalStats.SetWaitState(true, false); 
+                }
+                else
+                {
+                    isWaiting = true;
+                    isManualWait = false;
+                }
+                
+                agent.ResetPath();
+            }
+        }
+    }
+    
+    
 }

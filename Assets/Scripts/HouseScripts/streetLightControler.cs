@@ -4,21 +4,27 @@ using UnityEngine.Rendering.Universal;
 public class streetLightControler : MonoBehaviour
 {
     private GameObject lights;
-    public Light2D lightIntensity;
+    private Light2D globalLight;
+
     void Start()
     {
         lights = transform.GetChild(0).gameObject;
+        
+        if (AppearencePersistance.instance != null)
+        {
+            globalLight = AppearencePersistance.instance.transform.gameObject.GetComponentInChildren<Light2D>();
+        }
     }
 
-    void Update()
+   void Update()
     {
-        if(lightIntensity.intensity > 0.35)
+        if (globalLight.intensity > 0.35f)
         {
-            lights.SetActive(false);
+            if (lights.activeSelf) lights.SetActive(false);
         }
         else
         {
-            lights.SetActive(true);
+            if (!lights.activeSelf) lights.SetActive(true);
         }
     }
 }

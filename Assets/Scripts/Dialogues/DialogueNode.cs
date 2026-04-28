@@ -9,6 +9,8 @@ public class QuestCondition
     public QuestState requiredState; // např. musí být "Completed", aby se volba ukázala
 }
 
+public enum CommandType { None, WaitHere, FollowMe, AllWait, AllFollow }
+
 [System.Serializable]
 public class DialogueChoice
 {
@@ -16,6 +18,9 @@ public class DialogueChoice
     public string choiceText; 
     public DialogueNode nextNode; 
     public QuestData questToStart; 
+    
+    [Header("Příkazy pro NPC")]
+    public CommandType npcCommand; // Nová proměnná pro příkazy
     
     [Header("Witcher Podmínky")]
     // Seznam podmínek, které musí být splněny. Pokud je prázdný, ukáže se vždycky.

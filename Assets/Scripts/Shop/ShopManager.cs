@@ -474,10 +474,12 @@ public class ShopManager : MonoBehaviour
     
     private MerchantReputation GetCurrentMerchantReputation()
     {
-        if (string.IsNullOrEmpty(currentMerchant.merchantID)) return null;
+        // Místo currentMerchant.merchantID použijeme občanku
+        NPCController merchantIDCard = currentMerchant.GetComponent<NPCController>();
+        if (merchantIDCard == null || string.IsNullOrEmpty(merchantIDCard.uniqueID)) return null;
 
-        // najde reputaci podle ID obchodníka
-        MerchantReputation rep = gameDataManager.currentGameData.merchantReputations.FirstOrDefault(r => r.merchantID == currentMerchant.merchantID);
+        MerchantReputation rep = gameDataManager.currentGameData.merchantReputations
+            .FirstOrDefault(r => r.merchantID == merchantIDCard.uniqueID);
         
         // kdyz poprve tak zakladame reputaci
         if (rep == null)

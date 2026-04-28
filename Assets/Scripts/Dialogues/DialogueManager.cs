@@ -13,28 +13,23 @@ public class DialogueManager : MonoBehaviour
     public GameObject buttonPrefab; 
     public Transform buttonContainer; // container pro ty tacitka
 
-
     private string currentSpeakerName;
-
     private Merchant currentMerchant;
-    // Vola script na NPC pro start konverzace
-    public void StartConversation(string npcName, DialogueNode firstNode, Merchant merchant = null)
+    private GameObject currentNPCObject; // Uložení aktuálního NPC pro Companion příkazy
+
+    // Vola script na NPC pro start konverzace (přidán parametr npcObject)
+    public void StartConversation(string npcName, DialogueNode firstNode, Merchant merchant = null, GameObject npcObject = null)
     {
-        // uklada jmeno pro dalsi pouziti
         currentSpeakerName = npcName; 
         currentMerchant = merchant;
+        currentNPCObject = npcObject; // Zapamatujeme si, kdo to je
         
-        // pusti dialog
         ContinueDialogue(firstNode);
     }
 
-
     public void ContinueDialogue(DialogueNode node)
     {
-        // zapne dialog okno
         dialoguePanel.SetActive(true);
-
-        // pouze ono jmeno
         npcNameText.text = currentSpeakerName; 
         dialogueText.text = node.dialogueText;
 
@@ -43,6 +38,10 @@ public class DialogueManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+
+        // --- PŘÍPRAVA PRO COMPANION LOGIKU ---
+        Animal_movement[] allCompanions = FindObjectsOfType<Animal_movement>();
+        Animal_movement currentAnimal = currentNPCObject != null ? currentNPCObject.GetComponent<Animal_movement>() : null;
 
         // vytvori tlacitka pro kazdou choice
         foreach (DialogueChoice choice in node.choices)
@@ -54,12 +53,39 @@ public class DialogueManager : MonoBehaviour
             {
                 foreach (QuestCondition condition in choice.conditions)
                 {
-                    // Pokud máme nastavenou podmínku na quest a jeho stav neodpovídá tomu, co vyžadujeme...
                     if (condition.quest != null && condition.quest.currentState != condition.requiredState)
                     {
-                        canShowChoice = false; // ... tak volbu zakážeme
+                        canShowChoice = false; 
                         break; 
                     }
+                }
+            }
+
+            // --- KONTROLA COMPANION TLAČÍTEK (DYNAMICKÉ SKRÝVÁNÍ) ---
+            if (canShowChoice && choice.npcCommand != CommandType.None)
+            {
+                switch (choice.npcCommand)
+                {
+                    case CommandType.WaitHere:
+                        // Zobrazí se jen když zvíře NEČEKÁ
+                        if (currentAnimal == null || currentAnimal.IsWaiting()) canShowChoice = false;
+                        break;
+                    case CommandType.FollowMe:
+                        // Zobrazí se jen když zvíře ČEKÁ
+                        if (currentAnimal == null || !currentAnimal.IsWaiting()) canShowChoice = false;
+                        break;
+                    case CommandType.AllWait:
+                        // Zobrazí se jen pokud aspoň někdo NEČEKÁ
+                        bool anyoneFollowing = false;
+                        foreach (var c in allCompanions) if (c.behavior == Ghost_movement.MobBehavior.Companion && !c.IsWaiting()) anyoneFollowing = true;
+                        if (!anyoneFollowing) canShowChoice = false;
+                        break;
+                    case CommandType.AllFollow:
+                        // Zobrazí se jen pokud aspoň někdo ČEKÁ
+                        bool anyoneWaiting = false;
+                        foreach (var c in allCompanions) if (c.behavior == Ghost_movement.MobBehavior.Companion && c.IsWaiting()) anyoneWaiting = true;
+                        if (!anyoneWaiting) canShowChoice = false;
+                        break;
                 }
             }
 
@@ -70,9 +96,14 @@ public class DialogueManager : MonoBehaviour
             GameObject newButton = Instantiate(buttonPrefab, buttonContainer);
             newButton.GetComponentInChildren<TextMeshProUGUI>().text = choice.choiceText;
 
-            // Pro qeuesty a dalsi veci
             newButton.GetComponent<Button>().onClick.AddListener(() => 
             {
+                if (choice.npcCommand != CommandType.None)
+                {
+                    // Posíláme přímo GameObject toho, s kým mluvíme
+                    ExecuteCompanionCommand(choice.npcCommand, currentNPCObject); 
+                }
+                
                 if (choice.opensShop)
                 {
                     dialoguePanel.SetActive(false);
@@ -83,19 +114,17 @@ public class DialogueManager : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("Někdo se snaží obchodovat s někým kdo není prodejce");
+                        Debug.Log("Někdo se snaží obchodovat s někým, kdo není prodejce");
                     }
                     return;
                 }
                 else
                 {
-                    // pokud je u odpovedi choice, spusti quest
                     if (choice.questToStart != null)
                     {
                         QuestManager.Instance.StartQuest(choice.questToStart);
                     }
 
-                    // kontroluje jeslti je dalsi dialog pokracujici
                     if (choice.nextNode != null)
                     {
                         ContinueDialogue(choice.nextNode); 
@@ -106,6 +135,44 @@ public class DialogueManager : MonoBehaviour
                     }
                 }
             });
+        }
+    }
+    
+    private void ExecuteCompanionCommand(CommandType command, GameObject currentNPC)
+    {
+        Animal_movement[] allCompanions = FindObjectsOfType<Animal_movement>();
+        // Najdeme hráče pro měření vzdálenosti (Doslech/Aggro radius)
+        Transform playerPos = GameObject.FindGameObjectWithTag("Player").transform;
+
+        foreach (Animal_movement companion in allCompanions)
+        {
+            if (companion.behavior != Ghost_movement.MobBehavior.Companion) continue;
+
+            // Změříme vzdálenost mezi hráčem a companionem
+            float distanceToPlayer = Vector3.Distance(playerPos.position, companion.transform.position);
+
+            // Hromadné příkazy s dosahem (když jsi moc daleko, neuslyší tě)
+            if (command == CommandType.AllWait)
+            {
+                if (distanceToPlayer <= companion.visionRadius) companion.SetWaitState(true);
+            }
+            else if (command == CommandType.AllFollow)
+            {
+                if (distanceToPlayer <= companion.visionRadius) companion.SetWaitState(false);
+            }
+            // Příkazy pro jedno konkrétní NPC
+            else if (currentNPC != null && companion.gameObject == currentNPC)
+            {
+                if (command == CommandType.WaitHere)
+                {
+                    companion.SetWaitState(true);
+                }
+                else if (command == CommandType.FollowMe)
+                {
+                    // Když mu to říkáš do ksichtu, měl bys být u něj, ale raději to zkontrolujeme taky
+                    if (distanceToPlayer <= companion.visionRadius) companion.SetWaitState(false);
+                }
+            }
         }
     }
 }

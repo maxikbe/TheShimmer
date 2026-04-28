@@ -25,7 +25,7 @@ public class PlayerGUI : MonoBehaviour
     void Start()
     {
         LoadInitialData();
-        InvokeRepeating(nameof(UpdateLevelsPerMinute), 60f, 60f);
+        InvokeRepeating(nameof(UpdateLevelsPerMinute), 1f, 1f);
         InvokeRepeating(nameof(UpdateStaminaLevel), 0.1f, 0.1f);
     }
 
