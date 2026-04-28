@@ -7,6 +7,8 @@ public class KeyBoardSetting : MonoBehaviour
     public static KeyCode keyLeft = KeyCode.A;
     public static KeyCode keyRight = KeyCode.D;
     public static KeyCode keyRun = KeyCode.LeftShift;
+    public static KeyCode TBinventory = KeyCode.Tab;
+    public static KeyCode NormalInventory = KeyCode.I;
 
     // TurnBased ShortCuts
     public static KeyCode chooseSpecialSpell = KeyCode.Q; 

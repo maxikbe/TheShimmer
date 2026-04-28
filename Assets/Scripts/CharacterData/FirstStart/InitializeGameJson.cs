@@ -55,6 +55,51 @@ public class InitializeGameJson : MonoBehaviour
         }
 
         GameData data = new GameData();
+        data.settings = new SettingsSaver();
+        
+        var s = data.settings;
+
+        // GameSettings
+        s.autoSave = GameSettings.autoSave;
+        s.autoSaveTime = GameSettings.autoSaveTime;
+        s.currentDifficulty = GameSettings.currentDifficulty;
+        s.needToEat = GameSettings.needToEat;
+        s.needToDrink = GameSettings.needToDrink;
+        s.needToSleep = GameSettings.needToSleep;
+        s.staminaEnabled = GameSettings.staminaEnabled;
+        s.inventoryKapacityEnabled = GameSettings.inventoryKapacityEnabled;
+        s.inventoryKapacity = GameSettings.inventoryKapacity;
+        s.masterVolume = GameSettings.masterVolume;
+        s.musicVolume = GameSettings.musicVolume;
+        s.sfxVolume = GameSettings.sfxVolume;
+        s.ambientVolume = GameSettings.ambientVolume;
+        s.ambientVolumeEnabled = GameSettings.ambientVolumeEnabled;
+        s.sfxVolumeEnabled = GameSettings.sfxVolumeEnabled;
+        s.musicVolumeEnabled = GameSettings.musicVolumeEnabled;
+        s.currentLanguage = GameSettings.currentLanguage;
+        s.fpsShown = GameSettings.fpsShown;
+        s.pingShown = GameSettings.pingShown;
+
+        // KeyBoardSetting
+        s.keyUp = KeyBoardSetting.keyUp;
+        s.keyDown = KeyBoardSetting.keyDown;
+        s.keyLeft = KeyBoardSetting.keyLeft;
+        s.keyRight = KeyBoardSetting.keyRight;
+        s.keyRun = KeyBoardSetting.keyRun;
+        s.chooseSpecialSpell = KeyBoardSetting.chooseSpecialSpell;
+        s.chooseNormalSpell = KeyBoardSetting.chooseNormalSpell;
+        s.chooseItem = KeyBoardSetting.chooseItem;
+        s.doAccept = KeyBoardSetting.doAccept;
+        s.doBack = KeyBoardSetting.doBack;
+        s.swapUp = KeyBoardSetting.swapUp;
+        s.swapDown = KeyBoardSetting.swapDown;
+        s.swapLeft = KeyBoardSetting.swapLeft;
+        s.swapRight = KeyBoardSetting.swapRight;
+        s.swapAliveUp = KeyBoardSetting.swapAliveUp;
+        s.swapAliveDown = KeyBoardSetting.swapAliveDown;
+        s.jump = KeyBoardSetting.jump;
+        s.dodge = KeyBoardSetting.dodge;
+        s.parry = KeyBoardSetting.parry;
 
         data.characters.Add(new Character { id = 1, name = "Dr. Ventress", health = 150, maxHealth = 150, level = 1, speed = 5.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 10 });
         data.characters.Add(new Character { id = 2, name = "Lena", health = 80, maxHealth = 80, level = 1, speed = 4.5f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 20 });

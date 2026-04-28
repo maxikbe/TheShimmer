@@ -40,4 +40,5 @@ public class playerData
     public bool isTentPlaced;
     public Vector2 tentPos;
     public List<CampFire> campFires = new List<CampFire>();
+   
 }

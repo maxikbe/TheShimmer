@@ -3,6 +3,7 @@ using System.Collections.Generic;
 public class GameData
 {
     public playerData player = new playerData();
+    public SettingsSaver settings = new SettingsSaver();
     public List<Character> characters = new List<Character>();
     public List<ItemSaveData> OwnedItems = new List<ItemSaveData>();
     public List<Enemy> enemies = new List<Enemy>();
