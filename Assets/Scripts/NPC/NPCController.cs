@@ -1,7 +1,12 @@
 using UnityEngine;
 
+
 public class NPCController : MonoBehaviour
 {
+    [Header("Typ NPC")]
+    [SerializeField] public MobType mobType = MobType.None;
+    
+    
     [Header("Master Identifikace (Základ pro Save)")]
     public string uniqueID; // Musí být unikátní ve scéně (např. "Vlk_01")
     // databaseID jsme jebli do pryč!
