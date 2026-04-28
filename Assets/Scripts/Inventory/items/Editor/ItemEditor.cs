@@ -9,7 +9,7 @@ public class ItemEditor : Editor
     SerializedProperty itemName, description, itemType, icon, prefab;
     SerializedProperty isResearched, isUsable, maxStack, isTurnedBaseItem;
     SerializedProperty canBeSold, basePrice;
-    SerializedProperty rarity, originMobs, potionHeal, potionAditionalHealth, potionBonusSpeed, potionBonusStamina, potionBonusFOV, potionBonushungerSpeed, potionBonusdamage, hilightResources;
+    SerializedProperty rarity, originMobs, potionHeal, potionAditionalHealth, potionBonusSpeed, potionBonusStamina, potionBonusFOV, potionBonushungerSpeed, potionBonusdamage, hilightResources, researchTimeMinutes;
     SerializedProperty HealAmount, consumeAmount, waterAmount, sleepAmount;
 
     void OnEnable()
@@ -43,6 +43,7 @@ public class ItemEditor : Editor
         potionBonushungerSpeed =  serializedObject.FindProperty("potionBonushungerSpeed");
         potionBonusdamage =  serializedObject.FindProperty("potionBonusdamage");
         hilightResources =  serializedObject.FindProperty("hilightResources");
+        researchTimeMinutes = serializedObject.FindProperty("researchTimeMinutes");
 
         HealAmount = serializedObject.FindProperty("HealAmount");
         consumeAmount = serializedObject.FindProperty("consumeAmount");
@@ -170,8 +171,11 @@ public class ItemEditor : Editor
     {
         EditorGUILayout.LabelField("NASTAVENÍ VZORKU (SAMPLE)", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(rarity, new GUIContent("Rarita vzorku"));
+        EditorGUILayout.PropertyField(researchTimeMinutes, new GUIContent("Čas na vyzkoumání vzorku (minuty)"));
         
         EditorGUILayout.PropertyField(originMobs, new GUIContent("Původní monstra"), true);
+        
+        
         
         EditorGUILayout.Space();
         EditorGUILayout.HelpBox("Tyto staty se hráči ukážou v UI až když bude vzorek vyzkoumaný.", MessageType.Info);

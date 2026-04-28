@@ -62,6 +62,7 @@ public class Item : ScriptableObject
     //Samples
     public Rarity rarity;
     public List<MobType> originMobs = new List<MobType>();
+    public float researchTimeMinutes = 5f;
     
     // staty pro alchymii, az kdyz isResearched == true
     public int potionHeal;

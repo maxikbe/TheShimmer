@@ -44,6 +44,7 @@ MonoBehaviour:
   HealAmount: 0
   consumeAmount: 0
   waterAmount: 0
+  sleepAmount: 0
   durability: 0
   armorType: 0
   Armor: 0
@@ -52,7 +53,8 @@ MonoBehaviour:
   turnBaseItemEffectAmount: 0
   turnBaseItemDuration: 0
   rarity: 0
-  originMobName: Manzel
+  originMobs: 06000000
+  researchTimeMinutes: 8
   potionHeal: 0
   potionAditionalHealth: 0
   potionBonusSpeed: 5
