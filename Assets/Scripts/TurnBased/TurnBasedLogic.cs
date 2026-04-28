@@ -2,10 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NaughtyAttributes;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public struct EnemeyInfo
@@ -67,6 +69,12 @@ public class TurnBasedLogic : MonoBehaviour
     private KeyCode keyParry = KeyBoardSetting.parry;
 
     GameData data = new GameData();
+    
+    [Header("Návratová scéna")]
+    [Scene]
+    [SerializeField] private string mainWorldScene;
+    
+    
 
     [SerializeField] private Database _databaseReference;
     [SerializeField] private SkillDatabase _skillDatabaseReference;
@@ -313,6 +321,12 @@ public class TurnBasedLogic : MonoBehaviour
         Debug.Log("Characters loaded: " + string.Join(", ", characters.Select(c => c.name)));
 
         ApplyPerksToCharacters();
+
+        // NOVÉ: Přetáhne si seznam bojovníků z JSON master filu
+        if (gameDataManager.currentGameData.activeCombatEnemyIDs.Count > 0)
+        {
+            whatEnemiesIsFighting = new List<int>(gameDataManager.currentGameData.activeCombatEnemyIDs);
+        }
 
         inicializeTurnBasedGame();
         HideInfo();
@@ -1313,8 +1327,34 @@ public class TurnBasedLogic : MonoBehaviour
         if (isBattleOver) return;
         isBattleOver = true;
         StopAllCoroutines();
+    
         Debug.Log("=== VÍTĚZSTVÍ! ===");
         if (victoryPanel != null) victoryPanel.SetActive(true);
+
+        // Tvůj kód pro uložení stavu NPC...
+        foreach (string uniqueID in gameDataManager.currentGameData.activeCombatNPCIDs)
+        {
+            var state = gameDataManager.currentGameData.savedWorldNPCs.Find(n => n.uniqueID == uniqueID);
+            if (state != null)
+            {
+                state.isDead = true;
+                state.isInCombat = false;
+            }
+        }
+    
+        gameDataManager.currentGameData.activeCombatNPCIDs.Clear();
+        gameDataManager.currentGameData.activeCombatEnemyIDs.Clear();
+        gameDataManager.SaveData();
+
+        // TADY JE TA ZMĚNA:
+        if (!string.IsNullOrEmpty(mainWorldScene))
+        {
+            SceneManager.LoadScene(mainWorldScene);
+        }
+        else
+        {
+            Debug.LogError("zapomněl jsi v Inspectoru vybrat scénu, kam se máš vrátit!");
+        }
     }
 
     void TriggerGameOver()
@@ -1324,6 +1364,16 @@ public class TurnBasedLogic : MonoBehaviour
         StopAllCoroutines();
         Debug.Log("=== GAME OVER ===");
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
+
+        // Tady taky vyčistíme status, ať z toho po respawnu / loadu není hardcore soft-lock
+        foreach (string uniqueID in gameDataManager.currentGameData.activeCombatNPCIDs)
+        {
+            var state = gameDataManager.currentGameData.savedWorldNPCs.Find(n => n.uniqueID == uniqueID);
+            if (state != null) state.isInCombat = false;
+        }
+        gameDataManager.currentGameData.activeCombatNPCIDs.Clear();
+        gameDataManager.currentGameData.activeCombatEnemyIDs.Clear();
+        gameDataManager.SaveData();
     }
 
     void SetActiveCamera(int cameraID)

@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using NaughtyAttributes;
+using System.Collections.Generic; // Zásadní pro List<>
+using System.Linq;                // Zásadní pro .OrderBy()
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class Mob_combat : MonoBehaviour
@@ -106,7 +108,7 @@ public class Mob_combat : MonoBehaviour
         validMobs = validMobs.OrderBy(m => Vector3.Distance(transform.position, m.transform.position)).ToList();
 
         // Omezíme to na max 3 mobky (1 tahle, co to spustila + 2 další)
-        int mobsToPull = Mathf.Min(3, validMobs.Count);
+        int mobsToPull = System.Math.Min(3, validMobs.Count);
 
         // Vyčistíme master paměť z minula
         gameDataManager.currentGameData.activeCombatNPCIDs.Clear();
