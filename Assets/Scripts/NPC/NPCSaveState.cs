@@ -4,7 +4,7 @@ using UnityEngine;
 public class NPCSaveState
 {
     public string uniqueID;
-    //public int databaseID;
     public Vector3 position;
     public bool isDead;
+    public bool isInCombat; // Přidáno: abychom věděli, jestli tahle konkrétní mobka zrovna bojuje
 }

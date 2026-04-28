@@ -15,4 +15,8 @@ public class GameData
     // QUESTY:
     public List<QuestSaveData> savedQuests = new List<QuestSaveData>();
     public string trackedQuestID = ""; // aktuálně trackovaný quest
+    
+    // COMBAT TRACKING (Pro TurnBased):
+    public List<string> activeCombatNPCIDs = new List<string>(); // Unikátní ID konkrétních mobek ve světě
+    public List<int> activeCombatEnemyIDs = new List<int>(); // IDčka z databáze pro TurnBased script
 }
