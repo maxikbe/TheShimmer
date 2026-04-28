@@ -11,6 +11,9 @@ public class NPCController : MonoBehaviour
     public DialogueNode startingNode;
 
     [HideInInspector] public bool isDead = false;
+    
+    // Nová proměnná pro kontrolu, jestli jsi dost blízko
+    private bool isPlayerInRange = false;
 
     // Metoda pro uložení stavu do tvého JSONu
     public void SaveMyState()
@@ -36,13 +39,32 @@ public class NPCController : MonoBehaviour
         FindObjectOfType<DialogueManager>().StartConversation(npcName, startingNode, myMerchant, gameObject);
     }
     
-    // TADY JE TA OPRAVA DIALOGŮ - Tohle jsi omylem smazal!
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void Update()
     {
-        // Když hráč vleze do triggeru, postava není mrtvá a má co říct -> spustí se dialog
-        if (collision.CompareTag("Player") && startingNode != null && !isDead)
+        // Hlídáme, jestli je hráč v zóně a zmáčknul E
+        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
         {
             Interact();
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // Když hráč vleze do triggeru, postava není mrtvá a má co říct -> jen nastavíme range a logneme
+        if (collision.CompareTag("Player") && startingNode != null && !isDead)
+        {
+            isPlayerInRange = true;
+            Debug.Log("Můžeš interagovat! Zmáčkni 'E' pro pokec s " + npcName);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        // Když hráč zdrhne z triggeru, interakce už není možná
+        if (collision.CompareTag("Player"))
+        {
+            isPlayerInRange = false;
+            Debug.Log("Už jsi moc daleko od " + npcName + ", smůla.");
         }
     }
 }
