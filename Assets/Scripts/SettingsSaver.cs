@@ -22,6 +22,11 @@ public class SettingsSaver
     public Language currentLanguage;
     public bool fpsShown;
     public bool pingShown;
+    public float FinalSpeechVolume;
+    public float FinalMusicVolume;
+    public float FinalSfxVolume;
+
+    public float FinalAmbientVolume;
 
     // KeyBoardSetting
     public KeyCode keyUp;

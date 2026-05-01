@@ -1,4 +1,5 @@
 using UnityEngine;
+
 public enum GameDifficulty
 {
     Easy,
@@ -10,6 +11,7 @@ public enum Language
     English,
     Czech
 }
+
 public class GameSettings : MonoBehaviour
 {
     public static bool autoSave = true;
@@ -31,4 +33,16 @@ public class GameSettings : MonoBehaviour
     public static Language currentLanguage = Language.English;
     public static bool fpsShown = false;
     public static bool pingShown = false;
+
+    public static float FinalSpeechVolume =>
+        (masterVolume / 100f) * (sfxVolume / 100f) * (sfxVolumeEnabled ? 1f : 0f);
+
+    public static float FinalMusicVolume =>
+        (masterVolume / 100f) * (musicVolume / 100f) * (musicVolumeEnabled ? 1f : 0f);
+
+    public static float FinalSfxVolume =>
+        (masterVolume / 100f) * (sfxVolume / 100f) * (sfxVolumeEnabled ? 1f : 0f);
+
+    public static float FinalAmbientVolume =>
+        (masterVolume / 100f) * (ambientVolume / 100f) * (ambientVolumeEnabled ? 1f : 0f);
 }

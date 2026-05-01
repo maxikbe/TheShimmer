@@ -1,0 +1,12 @@
+{
+  "dialogues": [
+    {
+      "id": 0,
+      "name": "Scéna 1",
+      "lines": [
+        { "time": 0.0, "text": "Celá staletí jsme vzhlíželi ke hvězdám a ptali se, zda jsme ve vesmíru sami. Představovali jsme si ohromné flotily křižující temnotu mezi světy. Prastaré civilizace spící v chladných srdcích vzdálených galaxií, které čekají na své probuzení. Nikdy nás ale nenapadla prostší pravda. Vesmír nevede války. Nedobývá. On roste." },
+        { "time": 29.0, "text": "Možná k nám cestovali miliony světelných let. Nebo... možná nebyli nikdy daleko. Vetkaní do samotné struktury prostoru. Do hlíny. Do vzduchu. Do nás samotných. Čekající. Ne na pozvání. Jen na ten správný okamžik, kdy rozkvetou." }
+      ]
+    }
+  ]
+}

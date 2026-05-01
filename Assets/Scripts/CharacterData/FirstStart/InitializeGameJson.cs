@@ -79,6 +79,10 @@ public class InitializeGameJson : MonoBehaviour
         s.currentLanguage = GameSettings.currentLanguage;
         s.fpsShown = GameSettings.fpsShown;
         s.pingShown = GameSettings.pingShown;
+        s.FinalSpeechVolume = GameSettings.FinalSpeechVolume;
+        s.FinalMusicVolume = GameSettings.FinalMusicVolume;
+        s.FinalSfxVolume = GameSettings.FinalSfxVolume;
+        s.FinalAmbientVolume = GameSettings.FinalAmbientVolume;
 
         // KeyBoardSetting
         s.keyUp = KeyBoardSetting.keyUp;

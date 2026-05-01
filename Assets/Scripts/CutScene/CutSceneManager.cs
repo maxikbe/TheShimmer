@@ -29,19 +29,37 @@ public struct CutScene {
     public AudioClip music;
 }
 
+[System.Serializable]
+public struct LanguageJson {
+    public Language language;
+    public TextAsset jsonFile;
+}
+
 public class CutSceneManager : MonoBehaviour {
-    [SerializeField] private TextAsset jsonFile;
+    [SerializeField] private List<LanguageJson> languageFiles;
     [SerializeField] private CutScene[] cutScenes;
     [SerializeField] private TMP_Text textDisplay;
     [SerializeField] private AudioSource speechSource;
+    [SerializeField] private AudioSource musicSource;
     public string targetChildName = "CutSceneImg";
     private int currentSceneIndex = 0;
     private bool isPlaying;
     private DialogueList allDialogues;
 
     void Start() {
-        allDialogues = JsonUtility.FromJson<DialogueList>(jsonFile.text);
+        LoadDialoguesForCurrentLanguage();
         PlayScene();
+    }
+
+    private void LoadDialoguesForCurrentLanguage() {
+        Language currentLanguage = gameDataManager.currentGameData != null
+            ? gameDataManager.currentGameData.settings.currentLanguage
+            : GameSettings.currentLanguage;
+
+        LanguageJson match = languageFiles.Find(l => l.language == currentLanguage);
+
+        TextAsset file = match.jsonFile != null ? match.jsonFile : languageFiles[0].jsonFile;
+        allDialogues = JsonUtility.FromJson<DialogueList>(file.text);
     }
 
     public void PlayScene() {
@@ -61,26 +79,34 @@ public class CutSceneManager : MonoBehaviour {
             Animator anim = childTransform.GetComponent<Animator>();
             if (anim != null && scene.controller != null) {
                 anim.runtimeAnimatorController = scene.controller;
-                anim.Play(0); 
+                anim.Play(0);
             }
         }
+
+        speechSource.volume = gameDataManager.currentGameData.settings.FinalSpeechVolume;
+        musicSource.volume  = gameDataManager.currentGameData.settings.FinalMusicVolume - (gameDataManager.currentGameData.settings.FinalMusicVolume * 0.8f);
+        Debug.Log(musicSource.volume + " " + speechSource.volume);
+        
 
         if (scene.speech != null) {
             speechSource.clip = scene.speech;
             speechSource.Play();
         }
+        if (scene.music != null) {
+            musicSource.clip = scene.music;
+            musicSource.Play();
+        }
 
-        float duration = scene.speech != null ? scene.speech.length : 5f; 
+        float duration = scene.speech != null ? scene.speech.length : 10f; 
 
         while (timer < duration) {
             timer += Time.deltaTime;
 
-            if (data.lines != null && lineIndex < data.lines.Count) {
-                if (timer >= data.lines[lineIndex].time) {
-                    textDisplay.text = data.lines[lineIndex].text;
-                    lineIndex++;
-                }
+            while (data.lines != null && lineIndex < data.lines.Count && timer >= data.lines[lineIndex].time) {
+                textDisplay.text = data.lines[lineIndex].text;
+                lineIndex++;
             }
+            
             yield return null;
         }
 
