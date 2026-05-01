@@ -1,8 +1,12 @@
 {
   "dialogues": [
     {
+      "id": 0,
       "name": "Scéna 1",
-      "text": "We spent centuries looking up at the stars, asking if we were alone. We imagined vast armadas crossing the dark between worlds. Ancient civilizations, sleeping in the cold hearts of distant galaxies, waiting to be woken. We never considered a simpler truth. The universe does not wage war. It does not conquer. It grows. Perhaps they traveled across millions of light-years to reach us. Or perhaps... they were never far at all. Woven into the fabric of space itself. Into soil. Into air. Into us. Waiting. Not for an invitation. Just for the right moment to bloom."
+      "lines": [
+        { "time": 0.0, "text": "We spent centuries looking up at the stars, asking if we were alone. We imagined vast armadas crossing the dark between worlds. Ancient civilizations, sleeping in the cold hearts of distant galaxies, waiting to be woken. We never considered a simpler truth. The universe does not wage war. It does not conquer. It grows."},
+        { "time": 29.0, "text": "Perhaps they traveled across millions of light-years to reach us. Or perhaps... they were never far at all. Woven into the fabric of space itself. Into soil. Into air. Into us. Waiting. Not for an invitation. Just for the right moment to bloom."}
+      ]
     }
   ]
 }
