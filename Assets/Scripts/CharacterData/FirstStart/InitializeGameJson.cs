@@ -32,6 +32,8 @@ public class InitializeGameJson : MonoBehaviour
     private static Database itemDatabase;
     private static SkillDatabase skillDatabase;
 
+    public static string fileName;
+
     void Awake()
     {
         savePath = Path.Combine(Application.persistentDataPath, "Data.json");
@@ -40,13 +42,15 @@ public class InitializeGameJson : MonoBehaviour
         characterAnimationsStatic = characterAnimations;
         enemyAnimationsStatic = enemyAnimations;
         enemySpritesStatic = enemySprites;
-
-        if (!File.Exists(savePath))
-        {
-            SaveInitialData();
-        }
     }
 
+    public static void CreateSave(string FileName)
+    {
+        fileName = FileName;
+        savePath = Path.Combine(Application.persistentDataPath, FileName);
+        SaveInitialData();
+        
+    }
     public static GameData SaveInitialData()
     {
         if (itemDatabase == null || skillDatabase == null)
@@ -315,8 +319,10 @@ public class InitializeGameJson : MonoBehaviour
         data.characterAnimations = characterAnimationsStatic;
         data.enemyAnimations = enemyAnimationsStatic;
         gameDataManager.currentGameData = data;
+        gameDataManager.userDefaultName = fileName;
 
         string json = JsonUtility.ToJson(data, true);
+        Debug.Log("Vytvoření nového souboru s názvem: " + savePath);
         File.WriteAllText(savePath, json);
 
         return data;

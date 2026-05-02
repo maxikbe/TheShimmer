@@ -6,7 +6,7 @@ public class gameDataManager : MonoBehaviour
 {
     public static GameData currentGameData;
     private static string savePath;
-    private static string userDefaultName = "Data";
+    public static string userDefaultName = "Data";
 
     void Awake()
     {
@@ -32,7 +32,7 @@ public class gameDataManager : MonoBehaviour
 
     public static void LoadData()
     {
-        string path = Path.Combine(Application.persistentDataPath, "Data.json");
+        string path = Path.Combine(Application.persistentDataPath, userDefaultName + ".json");
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);
