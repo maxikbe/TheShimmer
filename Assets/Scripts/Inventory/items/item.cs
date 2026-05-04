@@ -64,6 +64,10 @@ public class Item : ScriptableObject
     public List<MobType> originMobs = new List<MobType>();
     public float researchTimeMinutes = 5f;
     
+    [Header("Alchymie a Crafting")]
+    public bool isCrushable; // Dá se to hodit do hmoždíře?
+    public Item crushedVersion; // Jaký item z toho vypadne, když to rozdrtíš?
+    
     // staty pro alchymii, az kdyz isResearched == true
     public int potionHeal;
     public int potionAditionalHealth;
