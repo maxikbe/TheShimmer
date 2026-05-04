@@ -131,25 +131,24 @@ public class AlchemyUI : MonoBehaviour
 
     private void UpdateMortarUI()
     {
-        // Ochrana před spuštěním, když vůbec nemáme stůl
         if (currentTable == null) return;
 
-        // Ochrana: Co když máme data, ale smazali jsme ten item static z databáze?
         if (currentTable.mortarItemData == null || currentTable.mortarItemStatic == null)
         {
-            if (mortarItemIcon != null) mortarItemIcon.enabled = false;
+            // MÍSTO: mortarItemIcon.enabled = false;
+            // DÁME TOHLE:
+            mortarItemIcon.color = new Color(1, 1, 1, 0); // Úplně průhledná (neviditelná)
+            
             if (crushProgressBar != null) crushProgressBar.value = 0;
             if (crushButton != null) crushButton.interactable = false;
             if (collectMortarButton != null) collectMortarButton.interactable = false;
-            if (crushButtonText != null) crushButtonText.text = "Rozdrtit";
         }
         else
         {
-            if (mortarItemIcon != null)
-            {
-                mortarItemIcon.sprite = currentTable.mortarItemStatic.icon;
-                mortarItemIcon.enabled = true;
-            }
+            // Nastavíme ikonu a vrátíme jí plnou viditelnost
+            mortarItemIcon.sprite = currentTable.mortarItemStatic.icon;
+            mortarItemIcon.color = new Color(1, 1, 1, 1); // Plně viditelná
+            mortarItemIcon.enabled = true; // Pro jistotu, kdyby byla vypnutá z minula
 
             float progress = (float)currentTable.currentCrushes / currentTable.mortarItemStatic.requiredCrushes;
             if (crushProgressBar != null) crushProgressBar.value = progress;
