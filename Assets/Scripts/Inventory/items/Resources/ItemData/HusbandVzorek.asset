@@ -54,7 +54,7 @@ MonoBehaviour:
   turnBaseItemDuration: 0
   rarity: 0
   originMobs: 06000000
-  researchTimeMinutes: 8
+  researchTimeMinutes: 0.5
   potionHeal: 0
   potionAditionalHealth: 0
   potionBonusSpeed: 5
