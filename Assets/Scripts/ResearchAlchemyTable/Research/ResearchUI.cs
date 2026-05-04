@@ -32,14 +32,14 @@ public class ResearchUI : MonoBehaviour
     [Header("Obrazovka 2: Vyzvednutí a Zrušení")]
     public Button collectButton; 
     public TextMeshProUGUI collectButtonText;
-    public Button cancelResearchButton; // NOVÉ: Tlačítko pro přerušení
+    public Button cancelResearchButton; 
 
     [Header("Alert Popup (Ověření zrušení)")]
-    public GameObject alertPanel; // Celý panel vyskakovacího okna
-    public Button alertYesButton; // Tlačítko "Ano, přerušit"
-    public Button alertNoButton;  // Tlačítko "Ne, nechat zkoumat"
+    public GameObject alertPanel; 
+    public Button alertYesButton; 
+    public Button alertNoButton;  
 
-    private ResearchTable currentTable; 
+    private LabTable currentTable; // ZMĚNA: používáme LabTable místo ResearchTable
     private bool hideResearched = false;
 
     private ItemSaveData selectedData;
@@ -51,7 +51,6 @@ public class ResearchUI : MonoBehaviour
         if (insertButton != null) insertButton.onClick.AddListener(OnInsertClicked);
         if (collectButton != null) collectButton.onClick.AddListener(OnCollectClicked);
         
-        // Napojení nových tlačítek
         if (cancelResearchButton != null) cancelResearchButton.onClick.AddListener(ShowAlert);
         if (alertYesButton != null) alertYesButton.onClick.AddListener(ConfirmCancelResearch);
         if (alertNoButton != null) alertNoButton.onClick.AddListener(HideAlert);
@@ -65,11 +64,11 @@ public class ResearchUI : MonoBehaviour
         }
     }
 
-    public void OpenCanvas(ResearchTable table)
+    public void OpenCanvas(LabTable table)
     {
         currentTable = table;
         canvasPanel.SetActive(true);
-        HideAlert(); // Ujistíme se, že alert na začátku nesvítí
+        HideAlert(); 
         
         if (currentTable.isResearching || currentTable.isFinished)
         {
@@ -88,9 +87,12 @@ public class ResearchUI : MonoBehaviour
         currentTable = null;
     }
 
-    // ==========================================
-    // LOGIKA OBRAZOVKY 1: VÝBĚR A VLOŽENÍ
-    // ==========================================
+    // NOVÁ FUNKCE: Vypne jen vnitřek, ale hlavní okno nechá svítit
+    public void HideResearchTabOnly()
+    {
+        if (inventoryScreen != null) inventoryScreen.SetActive(false);
+        if (progressScreen != null) progressScreen.SetActive(false);
+    }
 
     private void ShowInventoryScreen()
     {
@@ -116,15 +118,10 @@ public class ResearchUI : MonoBehaviour
         {
             if (!saveData.isOwned) continue;
 
-            // Kontrola databáze
             if (database == null) { Debug.LogError("Kokkotte, nemáš přiřazenou databázi v ResearchUI!"); return; }
 
             Item staticData = database.GetItemByID(saveData.id);
-            if (staticData == null) 
-            { 
-                Debug.LogWarning($"Našel jsem saveData s ID {saveData.id}, ale v Databázi ten item není!"); 
-                continue; 
-            }
+            if (staticData == null) continue;
 
             if (staticData.itemType != ItemType.Sample) continue;
 
@@ -133,16 +130,8 @@ public class ResearchUI : MonoBehaviour
 
             GameObject slot = Instantiate(slotPrefab, sampleContainer);
             
-            // POJISTKA PRO TEXT:
             var tmpro = slot.GetComponentInChildren<TextMeshProUGUI>();
-            if (tmpro != null) 
-            { 
-                tmpro.text = staticData.itemName; 
-            }
-            else 
-            { 
-                Debug.LogError("Tvůj prefab ItemSlot nemá v sobě žádný TextMeshProUGUI!"); 
-            }
+            if (tmpro != null) { tmpro.text = staticData.itemName; }
             
             Transform iconTransform = slot.transform.Find("Icon");
             if (iconTransform != null && staticData.icon != null) 
@@ -156,15 +145,10 @@ public class ResearchUI : MonoBehaviour
                 tmpro.color = Color.gray;
             }
 
-            // POJISTKA PRO TLAČÍTKO:
             Button btn = slot.GetComponentInChildren<Button>();
             if (btn != null)
             {
                 btn.onClick.AddListener(() => SelectSample(saveData, staticData, isAlreadyResearched));
-            }
-            else
-            {
-                Debug.LogError("Tvůj prefab ItemSlot nemá na sobě komponentu Button!");
             }
         }
     }
@@ -209,21 +193,17 @@ public class ResearchUI : MonoBehaviour
         }
     }
 
-    // ==========================================
-    // LOGIKA OBRAZOVKY 2: PROGRESS A VYZVEDNUTÍ
-    // ==========================================
-
     private void ShowProgressScreen()
     {
         inventoryScreen.SetActive(false);
         progressScreen.SetActive(true);
 
-        if (currentTable.currentSampleStaticData != null)
+        if (currentTable.researchItemStatic != null)
         {
-            activeItemNameText.text = currentTable.currentSampleStaticData.itemName;
-            if (currentTable.currentSampleStaticData.icon != null)
+            activeItemNameText.text = currentTable.researchItemStatic.itemName;
+            if (currentTable.researchItemStatic.icon != null)
             {
-                activeItemIcon.sprite = currentTable.currentSampleStaticData.icon;
+                activeItemIcon.sprite = currentTable.researchItemStatic.icon;
                 activeItemIcon.enabled = true;
             }
         }
@@ -235,7 +215,7 @@ public class ResearchUI : MonoBehaviour
     {
         if (currentTable.isResearching)
         {
-            float totalSeconds = currentTable.currentSampleStaticData.researchTimeMinutes * 60f;
+            float totalSeconds = currentTable.researchItemStatic.researchTimeMinutes * 60f;
             float elapsedSeconds = totalSeconds - currentTable.remainingTimeSeconds;
             float progressPercentage = elapsedSeconds / totalSeconds;
             
@@ -247,7 +227,6 @@ public class ResearchUI : MonoBehaviour
             collectButton.interactable = false;
             collectButtonText.text = "Zkoumám...";
             
-            // Zobrazíme tlačítko pro zrušení, protože výzkum běží
             if (cancelResearchButton != null) cancelResearchButton.gameObject.SetActive(true);
         }
         else if (currentTable.isFinished)
@@ -259,7 +238,6 @@ public class ResearchUI : MonoBehaviour
             collectButton.interactable = true;
             collectButtonText.text = "Vyzvednout Výsledek";
             
-            // Schováme tlačítko pro zrušení, už je hotovo
             if (cancelResearchButton != null) cancelResearchButton.gameObject.SetActive(false);
         }
     }
@@ -278,19 +256,8 @@ public class ResearchUI : MonoBehaviour
         }
     }
 
-    // ==========================================
-    // LOGIKA ALERTU (ZRUŠENÍ VÝZKUMU)
-    // ==========================================
-
-    private void ShowAlert()
-    {
-        if (alertPanel != null) alertPanel.SetActive(true);
-    }
-
-    private void HideAlert()
-    {
-        if (alertPanel != null) alertPanel.SetActive(false);
-    }
+    private void ShowAlert() { if (alertPanel != null) alertPanel.SetActive(true); }
+    private void HideAlert() { if (alertPanel != null) alertPanel.SetActive(false); }
 
     private void ConfirmCancelResearch()
     {
@@ -298,18 +265,15 @@ public class ResearchUI : MonoBehaviour
         
         if (currentTable != null && currentTable.isResearching)
         {
-            // Vytáhneme nedodělaný vzorek
             ItemSaveData retrievedData = currentTable.CancelAndRetrieveSample();
             
             if (retrievedData != null)
             {
-                // Vrátíme ho zpět do inventáře
                 gameDataManager.currentGameData.OwnedItems.Add(retrievedData);
                 gameDataManager.SaveData();
                 Debug.Log("Výzkum zrušen! Vzorek byl vrácen do inventáře.");
             }
             
-            // Přepneme zpět na výběr vzorků
             ShowInventoryScreen();
         }
     }

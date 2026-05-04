@@ -1,44 +1,40 @@
 using UnityEngine;
 
-[RequireComponent(typeof(ResearchTable))] // Pojistka: zaručí, že tam ResearchTable fakt je
+[RequireComponent(typeof(LabTable))] 
 public class TestTableInteract : MonoBehaviour
 {
     [Header("Odkaz na tvůj UI Manažer")]
-    public ResearchUI uiManager;
+    public LabUIManager uiManager; // ZMĚNA: Už nevoláme ResearchUI, ale ten hlavní Manager!
 
-    private ResearchTable myTable;
+    private LabTable myTable;
     private bool playerInRange = false;
 
     private void Start()
     {
-        // Najdeme si stůl, který je na stejném objektu
-        myTable = GetComponent<ResearchTable>();
+        myTable = GetComponent<LabTable>();
 
-        // Kdybys zapomněl přetáhnout UI v Inspektoru, zkusíme si ho najít sami
         if (uiManager == null)
         {
-            uiManager = FindObjectOfType<ResearchUI>();
+            uiManager = FindObjectOfType<LabUIManager>();
         }
     }
 
     private void Update()
     {
-        // Pokud stojíme blízko a zmáčkneme 'E'
         if (playerInRange && Input.GetKeyDown(KeyCode.E))
         {
             if (uiManager != null)
             {
                 Debug.Log("Otevírám terminál stolu!");
-                uiManager.OpenCanvas(myTable);
-            }
-            else
-            {
-                Debug.LogError("Chybí odkaz na ResearchUI, Kokkotte!");
+                
+                // Můžeš tady rovnou zapnout celý Canvas, pokud to máš tak nastavené
+                uiManager.gameObject.SetActive(true); 
+                
+                uiManager.OpenLabTerminals(myTable); 
             }
         }
     }
 
-    // Klasická trigger detekce jako máš u lootu
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
@@ -54,10 +50,10 @@ public class TestTableInteract : MonoBehaviour
         {
             playerInRange = false;
             
-            // Kdybys odešel od stolu, zatímco do něj čučíš, rovnou ho zavřeme
             if (uiManager != null)
             {
-                uiManager.CloseCanvas();
+                uiManager.CloseLabTerminals();
+                uiManager.gameObject.SetActive(false); // Vypne Canvas, pokud odejdeš
             }
         }
     }

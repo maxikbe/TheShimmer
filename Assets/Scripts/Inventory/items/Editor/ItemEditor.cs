@@ -11,6 +11,7 @@ public class ItemEditor : Editor
     SerializedProperty canBeSold, basePrice;
     SerializedProperty rarity, originMobs, potionHeal, potionAditionalHealth, potionBonusSpeed, potionBonusStamina, potionBonusFOV, potionBonushungerSpeed, potionBonusdamage, hilightResources, researchTimeMinutes;
     SerializedProperty HealAmount, consumeAmount, waterAmount, sleepAmount;
+    SerializedProperty canBeUsedInAlchemy, isCrushable, crushedVersion, requiredCrushes;
 
     void OnEnable()
     {
@@ -49,6 +50,11 @@ public class ItemEditor : Editor
         consumeAmount = serializedObject.FindProperty("consumeAmount");
         waterAmount = serializedObject.FindProperty("waterAmount");
         sleepAmount = serializedObject.FindProperty("sleepAmount");
+        
+        canBeUsedInAlchemy = serializedObject.FindProperty("canBeUsedInAlchemy");
+        isCrushable = serializedObject.FindProperty("isCrushable");
+        crushedVersion = serializedObject.FindProperty("crushedVersion");
+        requiredCrushes = serializedObject.FindProperty("requiredCrushes");
     }
 
     public override void OnInspectorGUI()
@@ -88,6 +94,25 @@ public class ItemEditor : Editor
         EditorGUILayout.PropertyField(isUsable, new GUIContent("Je použitelný?"));
         EditorGUILayout.PropertyField(maxStack, new GUIContent("Max Stack"));
         EditorGUILayout.PropertyField(isTurnedBaseItem, new GUIContent("Je Turn-Based předmět?"));
+        
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+        GUIStyle alchemyHeaderStyle = new GUIStyle(EditorStyles.boldLabel);
+        alchemyHeaderStyle.normal.textColor = new Color(0.7f, 0.4f, 0.8f); 
+        EditorGUILayout.LabelField("ALCHYMIE A CRAFTING", alchemyHeaderStyle);
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        
+        EditorGUILayout.PropertyField(canBeUsedInAlchemy, new GUIContent("Lze použít v alchymii? (Inventář)"));
+        
+        EditorGUILayout.Space();
+        
+        EditorGUILayout.PropertyField(isCrushable, new GUIContent("Lze rozdrtit v hmoždíři?"));
+        if (isCrushable.boolValue)
+        {
+            EditorGUILayout.PropertyField(requiredCrushes, new GUIContent("Potřebný počet úderů"));
+            EditorGUILayout.PropertyField(crushedVersion, new GUIContent("Výsledný prach (Nadrcený Item)"));
+        }
+        EditorGUILayout.EndVertical();
 
         if (isTurnedBaseItem.boolValue)
         {
@@ -119,6 +144,8 @@ public class ItemEditor : Editor
         EditorGUILayout.PropertyField(prefab, new GUIContent("Prefab"));
 
         serializedObject.ApplyModifiedProperties();
+        
+        
     }
 
     private void DrawTurnBasedItemSettings(Item item)
