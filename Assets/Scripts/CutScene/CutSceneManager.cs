@@ -63,11 +63,9 @@ public class CutSceneManager : MonoBehaviour {
     [SerializeField] private float transitionDuration = 0.5f;
     [SerializeField] private PlayableDirector playableDirector;
     public string targetChildName = "CutSceneImg";
-
-    private int currentSceneIndex = 0;
+    public static int currentSceneIndex = 0;
     private bool isPlaying;
     private DialogueList allDialogues;
-
     void Start() {
         LoadDialoguesForCurrentLanguage();
 
@@ -118,8 +116,7 @@ public class CutSceneManager : MonoBehaviour {
             if (s.voice != null) totalDuration = Mathf.Max(totalDuration, s.voice.length);
 
         foreach (var cc in scene.controllers)
-            if (cc.timeline != null && cc.controller == null)
-                totalDuration = Mathf.Max(totalDuration, (float)cc.timeline.duration);
+            if (cc.timeline != null && cc.controller == null) totalDuration = Mathf.Max(totalDuration, (float)cc.timeline.duration);
 
         while (timer < totalDuration || speechSource.isPlaying || 
               (playableDirector != null && playableDirector.state == PlayState.Playing) || 
