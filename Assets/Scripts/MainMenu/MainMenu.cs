@@ -58,6 +58,7 @@ public class MainMenu : MonoBehaviour
         
         PlayerPrefs.SetString("SaveToLoad", randomFileName + ".json");
         gameDataManager.userDefaultName = randomFileName;
+        
 
         UnityEngine.SceneManagement.SceneManager.LoadScene(1);
     }
@@ -70,6 +71,9 @@ public class MainMenu : MonoBehaviour
         foreach (string filePath in files)
         {
             string fileName = Path.GetFileName(filePath);
+            fileName = fileName.EndsWith(".json") 
+                ? fileName.Substring(0, fileName.Length - 5) 
+                : fileName;
             if (fileName.StartsWith("unity")) continue;
 
             GameObject btn = Instantiate(saveButtonPrefab, scrollContent);
