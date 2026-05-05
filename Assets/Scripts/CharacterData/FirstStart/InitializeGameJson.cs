@@ -211,13 +211,24 @@ public class InitializeGameJson : MonoBehaviour
                 attacks = new List<EnemyAttack> {
                     new EnemyAttack { 
                         id = 1, attackName = "Thunderous Word", totalAnimationDuration = 1.8f, 
-                        hits = new List<Hit> { new Hit { timeOffset = 0.8f, damage = 25, dodgeTimePlayer = 0.4f, dodgeType = dodgeType.normal } }, 
-                        weight = 60 
+                        hits = new List<Hit> { 
+                            new Hit { timeOffset = 0.4f, damage = 12, parryTimePlayer = 0.15f, dodgeTimePlayer = 0.35f, dodgeType = dodgeType.normal },
+                            new Hit { timeOffset = 0.8f, damage = 12, parryTimePlayer = 0.15f, dodgeTimePlayer = 0.35f, dodgeType = dodgeType.normal },
+                            new Hit { timeOffset = 1.3f, damage = 15, parryTimePlayer = 0.2f,  dodgeTimePlayer = 0.5f,  dodgeType = dodgeType.normal }
+                        }, 
+                        weight = 60,
+                        numberOfCharHits = 1
                     },
                     new EnemyAttack { 
-                        id = 2, attackName = "Static Discharge", totalAnimationDuration = 1.2f, 
-                        hits = new List<Hit> { new Hit { timeOffset = 0.4f, damage = 15, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.jump } }, 
-                        weight = 40 
+                        id = 2, attackName = "Static Discharge", totalAnimationDuration = 2.5f, 
+                        hits = new List<Hit> { 
+                            new Hit { timeOffset = 0.3f, damage = 10, parryTimePlayer = 0.1f, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.jump },
+                            new Hit { timeOffset = 0.8f, damage = 10, parryTimePlayer = 0.1f, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.jump },
+                            new Hit { timeOffset = 1.3f, damage = 10, parryTimePlayer = 0.1f, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.jump },
+                            new Hit { timeOffset = 1.8f, damage = 15, parryTimePlayer = 0.15f, dodgeTimePlayer = 0.4f, dodgeType = dodgeType.jump }
+                        }, 
+                        weight = 40,
+                        numberOfCharHits = 4
                     }
                 }
             }
