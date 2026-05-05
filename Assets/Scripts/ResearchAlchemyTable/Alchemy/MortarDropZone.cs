@@ -11,10 +11,22 @@ public class MortarDropZone : MonoBehaviour, IDropHandler
         
         if (draggedItem != null)
         {
-            if (draggedItem.staticData.isCrushable && alchemyUI.currentTable.mortarItemData == null)
+            bool isCrushable = draggedItem.staticData.isCrushable;
+            
+            // ZMĚNA ZDE: Už nekontrolujeme Data, ale Static! To je ta pravá pojistka.
+            bool isMortarEmpty = alchemyUI.currentTable.mortarItemStatic == null;
+
+            if (isCrushable && isMortarEmpty)
             {
+                Debug.Log("ÚSPĚCH! Item vložen do hmoždíře.");
                 alchemyUI.DropItemIntoMortar(draggedItem.saveData, draggedItem.staticData);
                 Destroy(draggedItem.gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("Zadrž, alchymisto!");
+                if (!isCrushable) Debug.LogWarning("- Tento předmět se nedá drtit.");
+                if (!isMortarEmpty) Debug.LogWarning("- Hmoždíř už je plný!");
             }
         }
     }
