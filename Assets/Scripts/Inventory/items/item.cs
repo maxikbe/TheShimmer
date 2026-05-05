@@ -64,6 +64,12 @@ public class Item : ScriptableObject
     public List<MobType> originMobs = new List<MobType>();
     public float researchTimeMinutes = 5f;
     
+    [Header("Alchymie a Crafting")]
+    public bool canBeUsedInAlchemy; // NOVÉ: Má se to ukázat v alchymistickém inventáři?
+    public bool isCrushable; 
+    public Item crushedVersion; 
+    public int requiredCrushes = 5;
+    
     // staty pro alchymii, az kdyz isResearched == true
     public int potionHeal;
     public int potionAditionalHealth;

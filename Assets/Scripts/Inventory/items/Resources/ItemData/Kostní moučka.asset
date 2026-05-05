@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ec08a2fa7ec04d67a7c770b09ca948f, type: 3}
-  m_Name: HusbandVzorek
+  m_Name: "Kostn\xED mou\u010Dka"
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 11
-  itemName: VzorekMuze
+  id: 49
+  itemName: Bone meal
   allowedCharacterIDs: 
-  icon: {fileID: 6124540790918181189, guid: 4ce739548703c5c4d8e4f6a735876230, type: 3}
+  icon: {fileID: -620209476419158622, guid: 10c284ecc52b14949a64d63588063708, type: 3}
   prefab: {fileID: 0}
-  description: "toto je vzorek je velkmi vzorkov\xFD"
+  description: "toto je kostn\xED mou\u010Dka, jde po\u017E\xEDt k alchymii"
   isResearched: 0
   isUsable: 0
   isTurnedBaseItem: 0
-  canBeSold: 0
-  basePrice: 0
-  maxStack: 1
+  canBeSold: 1
+  basePrice: 50
+  maxStack: 0
   isDefaultItem: 0
   defaultAmount: 0
   defaultLevel: 1
-  itemType: 5
+  itemType: 0
   weaponType: 0
   isTurnedBaseWeapon: 0
   firstCharID: 0
@@ -53,13 +53,17 @@ MonoBehaviour:
   turnBaseItemEffectAmount: 0
   turnBaseItemDuration: 0
   rarity: 0
-  originMobs: 06000000
-  researchTimeMinutes: 0.5
+  originMobs: 
+  researchTimeMinutes: 5
+  canBeUsedInAlchemy: 1
+  isCrushable: 0
+  crushedVersion: {fileID: 0}
+  requiredCrushes: 5
   potionHeal: 0
   potionAditionalHealth: 0
-  potionBonusSpeed: 5
+  potionBonusSpeed: 0
   potionBonusStamina: 0
-  potionBonusFOV: 5
-  potionBonushungerSpeed: 0.5
+  potionBonusFOV: 0
+  potionBonushungerSpeed: 0
   potionBonusdamage: 0
-  hilightResources: 1
+  hilightResources: 0
