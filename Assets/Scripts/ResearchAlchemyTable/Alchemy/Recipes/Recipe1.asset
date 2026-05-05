@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fb419d62eee5ab4085f7c9822fee16c, type: 3}
+  m_Name: Recipe1
+  m_EditorClassIdentifier: Assembly-CSharp::PotionRecipe
+  recipeName: 
+  requiredIngredients:
+  - {fileID: 11400000, guid: a2d89147b1ffd3843b1379148530e590, type: 2}
+  - {fileID: 11400000, guid: 772ddfdb367096e45a38bc15a2885a78, type: 2}
+  minBoilTimeSeconds: 5
+  maxBoilTimeSeconds: 10
+  resultPotion: {fileID: 11400000, guid: 6dc14dd9f7874a040bc5c89185cacc9c, type: 2}
+  failedSludge: {fileID: 11400000, guid: a2d89147b1ffd3843b1379148530e590, type: 2}

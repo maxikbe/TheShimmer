@@ -18,24 +18,47 @@ public class LabTable : MonoBehaviour
 
     [Header("=== ALCHYMIE - KOTLÍK (Příprava) ===")]
     public List<ItemSaveData> cauldronItemsData = new List<ItemSaveData>();
+    public List<Item> cauldronItemsStatic = new List<Item>(); // Potřebujeme znát i static data!
     public bool isBoiling = false;
     public float boilTimeSeconds = 0f;
 
+    [Header("=== ALCHYMIE - KOHOUTEK (Lahvička) ===")]
+    public ItemSaveData flaskItemData; // Co zrovna stojí pod kohoutkem
+    public Item flaskItemStatic;
+
     private void Update()
     {
+        // Výzkum... (ten nech jak je)
         if (isResearching && remainingTimeSeconds > 0)
         {
             remainingTimeSeconds -= Time.deltaTime;
-            if (remainingTimeSeconds <= 0)
-            {
-                FinishResearch();
-            }
+            if (remainingTimeSeconds <= 0) FinishResearch();
         }
 
+        // KOTLÍK: Žraní plynu a počítání času
         if (isBoiling)
         {
-            boilTimeSeconds += Time.deltaTime;
+            if (gameDataManager.currentGameData.player.gasSecondsLeft > 0)
+            {
+                gameDataManager.currentGameData.player.gasSecondsLeft -= Time.deltaTime;
+                boilTimeSeconds += Time.deltaTime;
+            }
+            else
+            {
+                // Došel plyn! Hořák zhasne.
+                isBoiling = false;
+                Debug.LogWarning("Došel plyn!");
+            }
         }
+    }
+
+    // Pro vyčištění kotle po uvaření/vylití
+    public void ClearCauldron()
+    {
+        cauldronItemsData.Clear();
+        cauldronItemsStatic.Clear();
+        boilTimeSeconds = 0f;
+        isBoiling = false;
     }
 
     // ==========================================
