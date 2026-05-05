@@ -57,26 +57,31 @@ public class PlantLoot : MonoBehaviour
 
     private void LootPlant()
     {
-        // Projedeme celý list vzorků, co z toho má padnout
-        foreach (Item staticItem in lootItems)
+        if (gameDataManager.currentGameData != null)
         {
-            ItemSaveData newLootItem = new ItemSaveData();
-            newLootItem.id = staticItem.id;
-            newLootItem.isOwned = true; 
-            newLootItem.level = staticItem.defaultLevel;
-            newLootItem.amount = 1; 
-
-            if (gameDataManager.currentGameData != null)
+            // 1. NEJDŘÍV ODEMKNEME KYTKU V DENÍKU (Provede se jen jednou)
+            if (plantController.plantType != PlantType.None && !gameDataManager.currentGameData.unlockedHerbarium.Contains(plantController.plantType))
             {
-                // Přidání itemu do inventáře úplně stejně jako u CorpseLoot
+                gameDataManager.currentGameData.unlockedHerbarium.Add(plantController.plantType);
+                Debug.Log($"[Deník] Nový záznam v Herbáři: {plantController.plantType}");
+            }
+
+            // 2. PAK AŽ PROJEDEME LOOT
+            foreach (Item staticItem in lootItems)
+            {
+                ItemSaveData newLootItem = new ItemSaveData();
+                newLootItem.id = staticItem.id;
+                newLootItem.isOwned = true; 
+                newLootItem.level = staticItem.defaultLevel;
+                newLootItem.amount = 1; 
+
                 gameDataManager.currentGameData.OwnedItems.Add(newLootItem);
-                
                 Debug.Log($"Lootnul jsi vzorek: {staticItem.itemName} (Uloženo do OwnedItems)");
             }
-            else
-            {
-                Debug.LogError("Kokkotte, gameDataManager.currentGameData je null! Nenačetl se ti save file.");
-            }
+        }
+        else
+        {
+            Debug.LogError("Kokkotte, gameDataManager.currentGameData je null! Nenačetl se ti save file.");
         }
     
         // Kytka byla vylootována
