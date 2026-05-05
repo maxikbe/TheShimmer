@@ -189,6 +189,10 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private TextMeshProUGUI ItemsText;
     [SerializeField] private TextMeshProUGUI SkillsText;
     [SerializeField] private TextMeshProUGUI AttacksText;
+    [SerializeField] private TextMeshProUGUI VictoryText;
+    [SerializeField] private TextMeshProUGUI GameOverText;
+    [SerializeField] private TextMeshProUGUI ContinueText;
+    [SerializeField] private TextMeshProUGUI RestartText;
 
     public void LanguageOnStart()
     {
@@ -197,6 +201,10 @@ public class TurnBasedLogic : MonoBehaviour
         ItemsText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Items" : "Předměty";
         SkillsText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Skills" : "Skily";        
         AttacksText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Attacks" : "Útoky";
+        VictoryText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Congratulation You Win!" : "Gratuluji! Vyhrál jsi!";
+        GameOverText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Expedition Died" : "Expedice skončila";
+        ContinueText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Continue" : "Pokračovat";
+        RestartText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Restart" : "Restartovat";
     }
 
     void ApplyPerksToCharacters()
@@ -1456,8 +1464,11 @@ public class TurnBasedLogic : MonoBehaviour
         gameDataManager.currentGameData.activeCombatNPCIDs.Clear();
         gameDataManager.currentGameData.activeCombatEnemyIDs.Clear();
         gameDataManager.SaveData();
+        
+    }
 
-        // TADY JE TA ZMĚNA:
+    public void ContinueGame()
+    {
         if (!string.IsNullOrEmpty(mainWorldScene))
         {
             SceneManager.LoadScene(mainWorldScene);
@@ -1467,6 +1478,7 @@ public class TurnBasedLogic : MonoBehaviour
             Debug.LogError("zapomněl jsi v Inspectoru vybrat scénu, kam se máš vrátit!");
         }
     }
+
 
     void TriggerGameOver()
     {
