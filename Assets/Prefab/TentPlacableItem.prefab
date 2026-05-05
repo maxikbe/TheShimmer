@@ -154,7 +154,6 @@ GameObject:
   - component: {fileID: 6589863774313759559}
   - component: {fileID: 2460131411534150271}
   - component: {fileID: 5856851784527482586}
-  - component: {fileID: 6012212992472463395}
   m_Layer: 15
   m_Name: TentPlacableItem
   m_TagString: Tent
@@ -272,7 +271,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.025688142, y: 0.24196672}
+  m_Offset: {x: 0.025688142, y: 0.23072287}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
@@ -282,57 +281,5 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.54862374, y: 0.22076796}
+  m_Size: {x: 0.54862374, y: 0.24325567}
   m_EdgeRadius: 0
---- !u!114 &6012212992472463395
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8128744023744595163}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.ShadowCaster2D
-  m_ShadowGroup: 0
-  m_Priority: 0
-  m_ComponentVersion: 5
-  m_HasRenderer: 1
-  m_UseRendererSilhouette: 1
-  m_CastsShadows: 1
-  m_SelfShadows: 0
-  m_AlphaCutoff: 0.1
-  m_ApplyToSortingLayers: 2969b79d4b628cd8d1f03eca39412c702f147613e5d9883175a63c68000000005167b174
-  m_ShapePath:
-  - {x: -0.27152252, y: 0.07996559, z: 0}
-  - {x: -0.08555603, y: 0.15196037, z: 0}
-  - {x: 0.26222992, y: 0.12034607, z: 0}
-  - {x: 0.23432922, y: 0.0371933, z: 0}
-  m_ShapePathHash: 901883157
-  m_InstanceId: 0
-  m_ShadowShape2DComponent: {fileID: 0}
-  m_ShadowShape2DProvider:
-    rid: -2
-  m_ShadowCastingSource: 1
-  m_ShadowMesh:
-    m_Mesh: {fileID: 0}
-    m_LocalBounds:
-      m_Center: {x: -0.0046463013, y: 0.094576836, z: 0}
-      m_Extent: {x: 0.26687622, y: 0.057383537, z: 0}
-    m_EdgeProcessing: 1
-    m_TrimEdge: 0.07
-    m_FlipX: 0
-    m_FlipY: 0
-    m_InitialTrim: 0
-  m_CastingOption: 1
-  m_PreviousTrimEdge: 0.07
-  m_PreviousEdgeProcessing: 1
-  m_PreviousShadowCastingSource: 1
-  m_PreviousShadowShape2DSource: {fileID: 5856851784527482586}
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }

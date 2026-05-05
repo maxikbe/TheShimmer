@@ -92,6 +92,12 @@ public class DoorControler : MonoBehaviour
         yield return new WaitForSeconds(transitionWaitTime);
 
         PlayerPrefs.SetString("LastSpawnPoint", spawnPointName);
+        SaveData saveDataScript = FindFirstObjectByType<SaveData>(); 
+    
+        if (saveDataScript != null)
+        {
+            saveDataScript.SaveDataFunctiomn(); 
+        }
         SceneManager.LoadScene(sceneToLoad);
     }
 }

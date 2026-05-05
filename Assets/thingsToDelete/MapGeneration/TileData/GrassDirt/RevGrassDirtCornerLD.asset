@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TileData
   tile: {fileID: 11400000, guid: 86ecf8d2893e9e04b9ebdfad516755c7, type: 2}
   validUp: 01000000090000000b0000000d000000
-  validDown: 0b000000070000000500000011000000
-  validLeft: 0c000000060000000500000011000000
+  validDown: 0b0000000700000005000000
+  validLeft: 0c0000000600000005000000
   validRight: 01000000080000000c0000000d000000
   tileID: 10
   weight: 5
