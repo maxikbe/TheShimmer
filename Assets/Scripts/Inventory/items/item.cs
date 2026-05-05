@@ -62,6 +62,7 @@ public class Item : ScriptableObject
     //Samples
     public Rarity rarity;
     public List<MobType> originMobs = new List<MobType>();
+    public List<PlantType> originPlants = new List<PlantType>();
     public float researchTimeMinutes = 5f;
     
     [Header("Alchymie a Crafting")]
@@ -89,3 +90,4 @@ public enum WeaponType { Melee, Ranged, Magic }
 public enum MagicalElement { Fire, Water, Earth, Air, Light, Dark, Alien, Star }
 public enum TurnBaseItemType {Healing, Buff, Debuff, Mana, Weakening}
 public enum MobType { None, Wolf, Bear, Companion, Merchant, Boss , Husband}
+public enum PlantType { None, YellowTree, GlowingMushroom, StrangeWeed }

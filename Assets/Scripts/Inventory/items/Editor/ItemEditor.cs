@@ -9,7 +9,7 @@ public class ItemEditor : Editor
     SerializedProperty itemName, description, itemType, icon, prefab;
     SerializedProperty isResearched, isUsable, maxStack, isTurnedBaseItem;
     SerializedProperty canBeSold, basePrice;
-    SerializedProperty rarity, originMobs, potionHeal, potionAditionalHealth, potionBonusSpeed, potionBonusStamina, potionBonusFOV, potionBonushungerSpeed, potionBonusdamage, hilightResources, researchTimeMinutes;
+    SerializedProperty rarity, originMobs, originPlants, potionHeal, potionAditionalHealth, potionBonusSpeed, potionBonusStamina, potionBonusFOV, potionBonushungerSpeed, potionBonusdamage, hilightResources, researchTimeMinutes;
     SerializedProperty HealAmount, consumeAmount, waterAmount, sleepAmount;
     SerializedProperty canBeUsedInAlchemy, isCrushable, crushedVersion, requiredCrushes;
 
@@ -36,6 +36,7 @@ public class ItemEditor : Editor
         
         rarity = serializedObject.FindProperty("rarity");
         originMobs = serializedObject.FindProperty("originMobs");
+        originPlants = serializedObject.FindProperty("originPlants");
         potionHeal = serializedObject.FindProperty("potionHeal");
         potionAditionalHealth = serializedObject.FindProperty("potionAditionalHealth");
         potionBonusSpeed = serializedObject.FindProperty("potionBonusSpeed");
@@ -201,6 +202,7 @@ public class ItemEditor : Editor
         EditorGUILayout.PropertyField(researchTimeMinutes, new GUIContent("Čas na vyzkoumání vzorku (minuty)"));
         
         EditorGUILayout.PropertyField(originMobs, new GUIContent("Původní monstra"), true);
+        EditorGUILayout.PropertyField(originPlants, new GUIContent("Původní rostliny"),  true);
         
         
         
