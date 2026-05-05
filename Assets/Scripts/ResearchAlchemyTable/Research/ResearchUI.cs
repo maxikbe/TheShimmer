@@ -34,12 +34,9 @@ public class ResearchUI : MonoBehaviour
     public TextMeshProUGUI collectButtonText;
     public Button cancelResearchButton; 
 
-    [Header("Alert Popup (Ověření zrušení)")]
-    public GameObject alertPanel; 
-    public Button alertYesButton; 
-    public Button alertNoButton;  
+    // SMAZÁNO: Všechny lokální reference na alertPanel, alertYesButton, atd.
 
-    private LabTable currentTable; // ZMĚNA: používáme LabTable místo ResearchTable
+    private LabTable currentTable; 
     private bool hideResearched = false;
 
     private ItemSaveData selectedData;
@@ -51,9 +48,8 @@ public class ResearchUI : MonoBehaviour
         if (insertButton != null) insertButton.onClick.AddListener(OnInsertClicked);
         if (collectButton != null) collectButton.onClick.AddListener(OnCollectClicked);
         
-        if (cancelResearchButton != null) cancelResearchButton.onClick.AddListener(ShowAlert);
-        if (alertYesButton != null) alertYesButton.onClick.AddListener(ConfirmCancelResearch);
-        if (alertNoButton != null) alertNoButton.onClick.AddListener(HideAlert);
+        // ZMĚNA: Tlačítko zrušení teď volá naši novou metodu PromptCancelResearch
+        if (cancelResearchButton != null) cancelResearchButton.onClick.AddListener(PromptCancelResearch);
     }
 
     private void Update()
@@ -68,7 +64,9 @@ public class ResearchUI : MonoBehaviour
     {
         currentTable = table;
         canvasPanel.SetActive(true);
-        HideAlert(); 
+        
+        // ZMĚNA: Pokud otevřeme canvas, pro jistotu schováme globální alert
+        if (AlertManager.Instance != null) AlertManager.Instance.HideAlert(); 
         
         if (currentTable.isResearching || currentTable.isFinished)
         {
@@ -83,11 +81,13 @@ public class ResearchUI : MonoBehaviour
     public void CloseCanvas()
     {
         canvasPanel.SetActive(false);
-        HideAlert();
+        
+        // ZMĚNA: Schováme globální alert, pokud by zůstal viset
+        if (AlertManager.Instance != null) AlertManager.Instance.HideAlert();
+        
         currentTable = null;
     }
 
-    // NOVÁ FUNKCE: Vypne jen vnitřek, ale hlavní okno nechá svítit
     public void HideResearchTabOnly()
     {
         if (inventoryScreen != null) inventoryScreen.SetActive(false);
@@ -256,13 +256,24 @@ public class ResearchUI : MonoBehaviour
         }
     }
 
-    private void ShowAlert() { if (alertPanel != null) alertPanel.SetActive(true); }
-    private void HideAlert() { if (alertPanel != null) alertPanel.SetActive(false); }
+    // ==========================================
+    // ALERT LOGIKA (Napojeno na AlertManager)
+    // ==========================================
+    private void PromptCancelResearch()
+    {
+        // Tohle zavolá tvůj nový univerzální panel z GameManageru!
+        if (AlertManager.Instance != null)
+        {
+            AlertManager.Instance.ShowAlert(
+                "Opravdu chceš zrušit probíhající výzkum? Vzorek se ti vrátí do batohu, ale ztratíš všechen dosavadní čas.",
+                ConfirmCancelResearch
+            );
+        }
+    }
 
     private void ConfirmCancelResearch()
     {
-        HideAlert();
-        
+        // O zavření okna se postará samotný AlertManager, my už jen řešíme kosti a data.
         if (currentTable != null && currentTable.isResearching)
         {
             ItemSaveData retrievedData = currentTable.CancelAndRetrieveSample();

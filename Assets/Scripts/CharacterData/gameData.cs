@@ -13,6 +13,14 @@ public class GameData
     public List<MerchantReputation> merchantReputations = new List<MerchantReputation>();
     public List<NPCSaveState> savedWorldNPCs = new List<NPCSaveState>(); // Tohle nahradí tvůj list enemies
     
+    
+    // DENÍK ---
+    // Záznamy v Bestiáři (Fauna)
+    public List<MobType> unlockedBestiary = new List<MobType>();
+    // Záznamy v Herbáři (Flóra)
+    public List<PlantType> unlockedHerbarium = new List<PlantType>();
+    
+    
     // QUESTY:
     public List<QuestSaveData> savedQuests = new List<QuestSaveData>();
     public string trackedQuestID = ""; // aktuálně trackovaný quest
@@ -23,4 +31,6 @@ public class GameData
     
     // VÝZKUM (Přidáno pro laboratoř):
     public List<int> unlockedResearches = new List<int>(); // Pamatuje si ID vyzkoumaných itemů
+    
+    public List<PlantSaveState> savedWorldPlants = new List<PlantSaveState>();
 }
