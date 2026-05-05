@@ -1,0 +1,22 @@
+{
+  "dialogues": [
+    {
+      "id": 0,
+      "name": "Scéna 1",
+      "lines": [
+        { "time": 0.0, "voiceId": 0, "controllerId": 0, "text": "Staletí jsme hleděli ke hvězdám a ptali se, jestli jsme sami. Představovali jsme si obrovské armády křižující tmu mezi světy. Pradávné civilizace dřímající v chladných srdcích vzdálených galaxií, čekající na probuzení. Nikdy nás nenapadla jednodušší pravda. Vesmír nevede války. Nedobývá. Roste." },
+        { "time": 29.0, "voiceId": 0, "controllerId": 0, "text": "Možná urazili miliony světelných let, aby se k nám dostali. Nebo možná... nikdy daleko nebyli. Vetkaní přímo do struktury prostoru. Do půdy. Do vzduchu. Do nás. Čekali. Ne na pozvání. Jen na ten správný okamžik k probuzení." },
+        { "time": 54.0, "voiceId": 1, "controllerId": 1, "text": "Žádné sirény. Žádná varování vypsaná na obloze. Jen tichá stopa duhového ohně — řežoucí tmou jako umírající myšlenka." },
+        { "time": 63.0, "voiceId": 1, "controllerId": 2, "text": "Když to zasáhlo starý maják v Blackwoodu... nezůstal popel. Nezůstaly trosky. Zůstalo něco mnohem horšího. Semínko. Zářivé. Trpělivé. Hladové. A svět se dál točil — zcela netušící, že jeho náhrada už začala." },
+        { "time": 75.0, "voiceId": 2, "controllerId": 3, "text": "Říkáme tomu Záře. Hranice proměnlivého světla připomínajícího rozlitý olej, která pomalu pohlcuje pobřeží. Dýchá. Rozpíná se. A konzumuje. Náš svět neničí — tráví ho. Uvnitř se tříští zákony fyziky. Čas krvácí. Záře funguje jako hranol, který láme každý živý tvor uvězněný v jejích hranicích. DNA je rozervána na kusy a sešita zpět — mozaika složená rukama, které nikdy nepoznaly slitování." },
+        { "time": 100.0, "voiceId": 3, "controllerId": 4, "text": "Vojenské drony se nevracejí. Zvířata použitá při testech se nevracejí. Dvanáct lidských expedic překročilo tu hranici. Ani jedna se nevrátila vcelku." },
+        { "time": 110.0, "voiceId": 3, "controllerId": 4, "text": "Nyní stojí na hranici Expedice 13. Pět žen. Pět rozbitých životů." },
+        { "time": 116.0, "voiceId": 3, "controllerId": 4, "text": "Lena. Buněčná bioložka pronásledovaná prázdnotou. Její manžel byl jediný, kdo kdy ze Záře vyšel živý — ale to, co se vrátilo v jeho podobě... nebyl on." },
+        { "time": 127.0, "voiceId": 3, "controllerId": 4, "text": "Dr. Ventressová. Psycholožka, která podepsala rozkazy, jež poslaly jedenáct týmů na smrt. Smrtelná diagnóza jí vzala všechno kromě jediné posedlosti — dosáhnout zdroje dřív, než ji tělo zradí." },
+        { "time": 140.0, "voiceId": 3, "controllerId": 4, "text": "Josie. Fyzička, která rozumí matematice existence, ale nedokáže v ní najít své místo. Na anomálii nehledí s hrůzou, ale s tichým smutkem člověka, který konečně našel něco, co stojí za pochopení." },
+        { "time": 153.0, "voiceId": 3, "controllerId": 4, "text": "Cass. Průzkumnice. Kráčí vstříc noční můře, protože žal ji vydlabat zevnitř — ztráta dcery pro ni udělala vnější svět cizejším, než by kdy mohla být jakákoli mimozemská pustina." },
+        { "time": 165.0, "voiceId": 3, "controllerId": 4, "text": "A Anya. Zdravotnice, která postavila svou identitu na kontrole, na záchraně životů, na hledání řádu uprostřed chaosu. Vykročí do místa, které dávno zapomnělo, co slovo život vůbec znamená." }
+      ]
+    }
+  ]
+}

@@ -9,8 +9,9 @@ public class ItemEditor : Editor
     SerializedProperty itemName, description, itemType, icon, prefab;
     SerializedProperty isResearched, isUsable, maxStack, isTurnedBaseItem;
     SerializedProperty canBeSold, basePrice;
-    SerializedProperty rarity, originMobName, potionHeal, potionAditionalHealth, potionBonusSpeed, potionBonusStamina, potionBonusFOV, potionBonushungerSpeed, potionBonusdamage, hilightResources;
+    SerializedProperty rarity, originMobs, originPlants, potionHeal, potionAditionalHealth, potionBonusSpeed, potionBonusStamina, potionBonusFOV, potionBonushungerSpeed, potionBonusdamage, hilightResources, researchTimeMinutes;
     SerializedProperty HealAmount, consumeAmount, waterAmount, sleepAmount;
+    SerializedProperty canBeUsedInAlchemy, isCrushable, crushedVersion, requiredCrushes;
 
     void OnEnable()
     {
@@ -34,7 +35,8 @@ public class ItemEditor : Editor
         basePrice = serializedObject.FindProperty("basePrice");
         
         rarity = serializedObject.FindProperty("rarity");
-        originMobName = serializedObject.FindProperty("originMobName");
+        originMobs = serializedObject.FindProperty("originMobs");
+        originPlants = serializedObject.FindProperty("originPlants");
         potionHeal = serializedObject.FindProperty("potionHeal");
         potionAditionalHealth = serializedObject.FindProperty("potionAditionalHealth");
         potionBonusSpeed = serializedObject.FindProperty("potionBonusSpeed");
@@ -43,11 +45,17 @@ public class ItemEditor : Editor
         potionBonushungerSpeed =  serializedObject.FindProperty("potionBonushungerSpeed");
         potionBonusdamage =  serializedObject.FindProperty("potionBonusdamage");
         hilightResources =  serializedObject.FindProperty("hilightResources");
+        researchTimeMinutes = serializedObject.FindProperty("researchTimeMinutes");
 
         HealAmount = serializedObject.FindProperty("HealAmount");
         consumeAmount = serializedObject.FindProperty("consumeAmount");
         waterAmount = serializedObject.FindProperty("waterAmount");
         sleepAmount = serializedObject.FindProperty("sleepAmount");
+        
+        canBeUsedInAlchemy = serializedObject.FindProperty("canBeUsedInAlchemy");
+        isCrushable = serializedObject.FindProperty("isCrushable");
+        crushedVersion = serializedObject.FindProperty("crushedVersion");
+        requiredCrushes = serializedObject.FindProperty("requiredCrushes");
     }
 
     public override void OnInspectorGUI()
@@ -87,6 +95,25 @@ public class ItemEditor : Editor
         EditorGUILayout.PropertyField(isUsable, new GUIContent("Je použitelný?"));
         EditorGUILayout.PropertyField(maxStack, new GUIContent("Max Stack"));
         EditorGUILayout.PropertyField(isTurnedBaseItem, new GUIContent("Je Turn-Based předmět?"));
+        
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+        GUIStyle alchemyHeaderStyle = new GUIStyle(EditorStyles.boldLabel);
+        alchemyHeaderStyle.normal.textColor = new Color(0.7f, 0.4f, 0.8f); 
+        EditorGUILayout.LabelField("ALCHYMIE A CRAFTING", alchemyHeaderStyle);
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        
+        EditorGUILayout.PropertyField(canBeUsedInAlchemy, new GUIContent("Lze použít v alchymii? (Inventář)"));
+        
+        EditorGUILayout.Space();
+        
+        EditorGUILayout.PropertyField(isCrushable, new GUIContent("Lze rozdrtit v hmoždíři?"));
+        if (isCrushable.boolValue)
+        {
+            EditorGUILayout.PropertyField(requiredCrushes, new GUIContent("Potřebný počet úderů"));
+            EditorGUILayout.PropertyField(crushedVersion, new GUIContent("Výsledný prach (Nadrcený Item)"));
+        }
+        EditorGUILayout.EndVertical();
 
         if (isTurnedBaseItem.boolValue)
         {
@@ -118,6 +145,8 @@ public class ItemEditor : Editor
         EditorGUILayout.PropertyField(prefab, new GUIContent("Prefab"));
 
         serializedObject.ApplyModifiedProperties();
+        
+        
     }
 
     private void DrawTurnBasedItemSettings(Item item)
@@ -170,7 +199,12 @@ public class ItemEditor : Editor
     {
         EditorGUILayout.LabelField("NASTAVENÍ VZORKU (SAMPLE)", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(rarity, new GUIContent("Rarita vzorku"));
-        EditorGUILayout.PropertyField(originMobName, new GUIContent("Původní monstrum"));
+        EditorGUILayout.PropertyField(researchTimeMinutes, new GUIContent("Čas na vyzkoumání vzorku (minuty)"));
+        
+        EditorGUILayout.PropertyField(originMobs, new GUIContent("Původní monstra"), true);
+        EditorGUILayout.PropertyField(originPlants, new GUIContent("Původní rostliny"),  true);
+        
+        
         
         EditorGUILayout.Space();
         EditorGUILayout.HelpBox("Tyto staty se hráči ukážou v UI až když bude vzorek vyzkoumaný.", MessageType.Info);

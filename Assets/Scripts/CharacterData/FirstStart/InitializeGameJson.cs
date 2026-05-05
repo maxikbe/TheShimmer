@@ -32,6 +32,8 @@ public class InitializeGameJson : MonoBehaviour
     private static Database itemDatabase;
     private static SkillDatabase skillDatabase;
 
+    public static string fileName;
+
     void Awake()
     {
         savePath = Path.Combine(Application.persistentDataPath, "Data.json");
@@ -40,13 +42,15 @@ public class InitializeGameJson : MonoBehaviour
         characterAnimationsStatic = characterAnimations;
         enemyAnimationsStatic = enemyAnimations;
         enemySpritesStatic = enemySprites;
-
-        if (!File.Exists(savePath))
-        {
-            SaveInitialData();
-        }
     }
 
+    public static void CreateSave(string FileName)
+    {
+        fileName = FileName;
+        savePath = Path.Combine(Application.persistentDataPath, FileName);
+        SaveInitialData();
+        
+    }
     public static GameData SaveInitialData()
     {
         if (itemDatabase == null || skillDatabase == null)
@@ -55,6 +59,55 @@ public class InitializeGameJson : MonoBehaviour
         }
 
         GameData data = new GameData();
+        data.settings = new SettingsSaver();
+        
+        var s = data.settings;
+
+        // GameSettings
+        s.autoSave = GameSettings.autoSave;
+        s.autoSaveTime = GameSettings.autoSaveTime;
+        s.currentDifficulty = GameSettings.currentDifficulty;
+        s.needToEat = GameSettings.needToEat;
+        s.needToDrink = GameSettings.needToDrink;
+        s.needToSleep = GameSettings.needToSleep;
+        s.staminaEnabled = GameSettings.staminaEnabled;
+        s.inventoryKapacityEnabled = GameSettings.inventoryKapacityEnabled;
+        s.inventoryKapacity = GameSettings.inventoryKapacity;
+        s.masterVolume = GameSettings.masterVolume;
+        s.musicVolume = GameSettings.musicVolume;
+        s.sfxVolume = GameSettings.sfxVolume;
+        s.ambientVolume = GameSettings.ambientVolume;
+        s.ambientVolumeEnabled = GameSettings.ambientVolumeEnabled;
+        s.sfxVolumeEnabled = GameSettings.sfxVolumeEnabled;
+        s.musicVolumeEnabled = GameSettings.musicVolumeEnabled;
+        s.currentLanguage = GameSettings.currentLanguage;
+        s.fpsShown = GameSettings.fpsShown;
+        s.pingShown = GameSettings.pingShown;
+        s.FinalSpeechVolume = GameSettings.FinalSpeechVolume;
+        s.FinalMusicVolume = GameSettings.FinalMusicVolume;
+        s.FinalSfxVolume = GameSettings.FinalSfxVolume;
+        s.FinalAmbientVolume = GameSettings.FinalAmbientVolume;
+
+        // KeyBoardSetting
+        s.keyUp = KeyBoardSetting.keyUp;
+        s.keyDown = KeyBoardSetting.keyDown;
+        s.keyLeft = KeyBoardSetting.keyLeft;
+        s.keyRight = KeyBoardSetting.keyRight;
+        s.keyRun = KeyBoardSetting.keyRun;
+        s.chooseSpecialSpell = KeyBoardSetting.chooseSpecialSpell;
+        s.chooseNormalSpell = KeyBoardSetting.chooseNormalSpell;
+        s.chooseItem = KeyBoardSetting.chooseItem;
+        s.doAccept = KeyBoardSetting.doAccept;
+        s.doBack = KeyBoardSetting.doBack;
+        s.swapUp = KeyBoardSetting.swapUp;
+        s.swapDown = KeyBoardSetting.swapDown;
+        s.swapLeft = KeyBoardSetting.swapLeft;
+        s.swapRight = KeyBoardSetting.swapRight;
+        s.swapAliveUp = KeyBoardSetting.swapAliveUp;
+        s.swapAliveDown = KeyBoardSetting.swapAliveDown;
+        s.jump = KeyBoardSetting.jump;
+        s.dodge = KeyBoardSetting.dodge;
+        s.parry = KeyBoardSetting.parry;
 
         data.characters.Add(new Character { id = 1, name = "Dr. Ventress", health = 150, maxHealth = 150, level = 1, speed = 5.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 10 });
         data.characters.Add(new Character { id = 2, name = "Lena", health = 80, maxHealth = 80, level = 1, speed = 4.5f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 20 });
@@ -158,13 +211,24 @@ public class InitializeGameJson : MonoBehaviour
                 attacks = new List<EnemyAttack> {
                     new EnemyAttack { 
                         id = 1, attackName = "Thunderous Word", totalAnimationDuration = 1.8f, 
-                        hits = new List<Hit> { new Hit { timeOffset = 0.8f, damage = 25, dodgeTimePlayer = 0.4f, dodgeType = dodgeType.normal } }, 
-                        weight = 60 
+                        hits = new List<Hit> { 
+                            new Hit { timeOffset = 0.4f, damage = 12, parryTimePlayer = 0.15f, dodgeTimePlayer = 0.35f, dodgeType = dodgeType.normal },
+                            new Hit { timeOffset = 0.8f, damage = 12, parryTimePlayer = 0.15f, dodgeTimePlayer = 0.35f, dodgeType = dodgeType.normal },
+                            new Hit { timeOffset = 1.3f, damage = 15, parryTimePlayer = 0.2f,  dodgeTimePlayer = 0.5f,  dodgeType = dodgeType.normal }
+                        }, 
+                        weight = 60,
+                        numberOfCharHits = 1
                     },
                     new EnemyAttack { 
-                        id = 2, attackName = "Static Discharge", totalAnimationDuration = 1.2f, 
-                        hits = new List<Hit> { new Hit { timeOffset = 0.4f, damage = 15, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.jump } }, 
-                        weight = 40 
+                        id = 2, attackName = "Static Discharge", totalAnimationDuration = 2.5f, 
+                        hits = new List<Hit> { 
+                            new Hit { timeOffset = 0.3f, damage = 10, parryTimePlayer = 0.1f, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.jump },
+                            new Hit { timeOffset = 0.8f, damage = 10, parryTimePlayer = 0.1f, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.jump },
+                            new Hit { timeOffset = 1.3f, damage = 10, parryTimePlayer = 0.1f, dodgeTimePlayer = 0.3f, dodgeType = dodgeType.jump },
+                            new Hit { timeOffset = 1.8f, damage = 15, parryTimePlayer = 0.15f, dodgeTimePlayer = 0.4f, dodgeType = dodgeType.jump }
+                        }, 
+                        weight = 40,
+                        numberOfCharHits = 4
                     }
                 }
             }
@@ -266,8 +330,10 @@ public class InitializeGameJson : MonoBehaviour
         data.characterAnimations = characterAnimationsStatic;
         data.enemyAnimations = enemyAnimationsStatic;
         gameDataManager.currentGameData = data;
+        gameDataManager.userDefaultName = fileName;
 
         string json = JsonUtility.ToJson(data, true);
+        Debug.Log("Vytvoření nového souboru s názvem: " + savePath);
         File.WriteAllText(savePath, json);
 
         return data;

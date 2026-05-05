@@ -64,6 +64,7 @@ public class Ghost_movement : MonoBehaviour
     private float minFollowDistance ;
     private float maxFollowDistance;
     public bool isWaiting;
+    public bool isManualWait;
     
     
     private bool isInitialized = false;
@@ -108,6 +109,7 @@ public class Ghost_movement : MonoBehaviour
         this.minFollowDistance = stats.minFollowDistance;
         this.maxFollowDistance = stats.maxFollowDistance;
         this.isWaiting = stats.isWaiting;
+        this.isManualWait = stats.isManualWait;
         
         this.viewAngle = stats.viewAngle;
         // odkaz na hmotne telo
@@ -523,30 +525,45 @@ public class Ghost_movement : MonoBehaviour
     
     private void CompanionLogic(bool canSeePlayer)
     {
+        // --- AUTO-RESUME LOGIKA ---
+        // Přečte si, že tě vidí a že čeká. Ale nově se rozběhne JEN TEHDY, když to nebyl manuální příkaz (!isManualWait)
+        if (canSeePlayer && isWaiting && !isManualWait) 
+        {
+            if (myAnimalStats != null)
+            {
+                // Voláme s isManual = false, ať si to systém neplete
+                myAnimalStats.SetWaitState(false, false); 
+            }
+            else
+            {
+                isWaiting = false; 
+                isManualWait = false;
+            }
+            Debug.Log($"{gameObject.name}: Vidím tě, Kokkotte! Ukončuji auto-čekání.");
+        }
+
+        // Pokud čeká (ať už manuálně, nebo protože tě ztratil), prostě stojí a čumí
         if (isWaiting) 
         {
-            // Zastavíme agenta, pokud má zrovna nějakou cestu
-            if (agent.hasPath) agent.ResetPath();
+            if (agent.hasPath) agent.ResetPath(); 
             return;
         }
 
         if (canSeePlayer)
         {
+            // --- STANDARDNÍ FOLLOW LOGIKA ---
             float distToPlayer = Vector3.Distance(transform.position, playerPosition.position);
 
-            // Pokud jsi moc daleko, zapíná sprint k tobě
             if (distToPlayer > maxFollowDistance)
             {
                 agent.speed = runSpeed; 
                 agent.SetDestination(playerPosition.position);
             }
-            // Pokud jsi blíž, tak jenom normálně chodí
             else if (distToPlayer > minFollowDistance)
             {
                 agent.speed = moveSpeed;
                 agent.SetDestination(playerPosition.position);
             }
-            // Pokud je v optimální vzdálenosti přímo u tebe, zastaví
             else
             {
                 if (agent.hasPath) agent.ResetPath();
@@ -554,23 +571,24 @@ public class Ghost_movement : MonoBehaviour
         }
         else
         {
-            // Ztratil tě za rohem - jde prozkoumat tvoji lastKnown pozici
-            agent.speed = moveSpeed; // Stačí chůze, nemusí sprintovat
+            // --- LOGIKA "ZTRATIL JSEM TĚ" ---
+            agent.speed = runSpeed; // Dal jsem ti sem zpátky runSpeed, ať to na to lastKnown místo dokluše rychle
             agent.SetDestination(lastKnownPlayerPos);
 
             if (!agent.pathPending && agent.remainingDistance < 0.5f)
             {
                 if (myAnimalStats != null)
                 {
-                    myAnimalStats.SetWaitState(true); 
+                    // DŮLEŽITÉ: Posíláme false! Tím dáváme najevo "zastavil jsem se sám, Kokkott mi to neřekl"
+                    myAnimalStats.SetWaitState(true, false); 
                 }
                 else
                 {
                     isWaiting = true;
+                    isManualWait = false;
                 }
                 
                 agent.ResetPath();
-                Debug.Log($"{gameObject.name}: Ztratil jsem Kokkotta. Čekám na místě.");
             }
         }
     }

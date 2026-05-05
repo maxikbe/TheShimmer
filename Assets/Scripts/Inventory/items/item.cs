@@ -61,7 +61,15 @@ public class Item : ScriptableObject
     
     //Samples
     public Rarity rarity;
-    public string originMobName; 
+    public List<MobType> originMobs = new List<MobType>();
+    public List<PlantType> originPlants = new List<PlantType>();
+    public float researchTimeMinutes = 5f;
+    
+    [Header("Alchymie a Crafting")]
+    public bool canBeUsedInAlchemy; // NOVÉ: Má se to ukázat v alchymistickém inventáři?
+    public bool isCrushable; 
+    public Item crushedVersion; 
+    public int requiredCrushes = 5;
     
     // staty pro alchymii, az kdyz isResearched == true
     public int potionHeal;
@@ -81,3 +89,5 @@ public enum ArmorType { Head, Chest, Legs, Feet, Hands, Shield }
 public enum WeaponType { Melee, Ranged, Magic }
 public enum MagicalElement { Fire, Water, Earth, Air, Light, Dark, Alien, Star }
 public enum TurnBaseItemType {Healing, Buff, Debuff, Mana, Weakening}
+public enum MobType { None, Wolf, Bear, Companion, Merchant, Boss , Husband}
+public enum PlantType { None, YellowTree, GlowingMushroom, StrangeWeed }

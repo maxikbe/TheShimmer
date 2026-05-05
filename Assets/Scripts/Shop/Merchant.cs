@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Merchant : MonoBehaviour
 {
+    
+    private NPCController myIDCard;
+    
+    
     public enum MerchantType { Weaponsmith, Pharmacist, Generalist }
     
     public MerchantType merchantType;
@@ -39,6 +43,12 @@ public class Merchant : MonoBehaviour
     {
         RestockInventory();
     }
+    
+    private void Awake()
+    {
+        myIDCard = GetComponent<NPCController>();
+    }
+    
 
     public void RestockInventory()
     {
@@ -57,9 +67,11 @@ public class Merchant : MonoBehaviour
         }
 
         // pokud je nactene a mame dost repu tak zobrazuju produkty
-        if (gameDataManager.currentGameData != null)
+        if (gameDataManager.currentGameData != null && myIDCard != null)
         {
-            MerchantReputation rep = gameDataManager.currentGameData.merchantReputations.Find(r => r.merchantID == merchantID);
+            // Reputaci teď hledáme přes Master ID z NPCControlleru
+            MerchantReputation rep = gameDataManager.currentGameData.merchantReputations
+                .Find(r => r.merchantID == myIDCard.uniqueID);
             
             if (rep != null && rep.reputationValue >= repRequiredForSecret)
             {

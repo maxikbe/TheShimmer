@@ -2,10 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NaughtyAttributes;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public struct EnemeyInfo
@@ -49,6 +51,13 @@ public struct BackgroundPicture
     public Sprite sprite;
 }
 
+[System.Serializable]
+public struct MusicEnemy
+{
+    public int ID;
+    public AudioClip music;
+}
+
 public class TurnBasedLogic : MonoBehaviour
 {
     private KeyCode keySpecial = KeyBoardSetting.chooseSpecialSpell;
@@ -67,6 +76,12 @@ public class TurnBasedLogic : MonoBehaviour
     private KeyCode keyParry = KeyBoardSetting.parry;
 
     GameData data = new GameData();
+    
+    [Header("Návratová scéna")]
+    [Scene]
+    [SerializeField] private string mainWorldScene;
+    
+    
 
     [SerializeField] private Database _databaseReference;
     [SerializeField] private SkillDatabase _skillDatabaseReference;
@@ -76,6 +91,7 @@ public class TurnBasedLogic : MonoBehaviour
     private static SkillDatabase skillDatabase;
     private static PerksDatabase perksDatabase;
 
+    [SerializeField] private TextMeshProUGUI nextAttackText;
     [SerializeField] private float baseCritChance = 0.05f;
     [SerializeField] private float critDamageMultiplier = 2f;
     [SerializeField] private Color critTextColor = new Color(1f, 0.4f, 0f);
@@ -83,8 +99,28 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private float critIndicatorDuration = 0.8f;
     [SerializeField] private AudioClip critSoundEffect;
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private Animator playerAnimator;
+    [SerializeField] private string parryAnimationTrigger = "Parry";
+    [SerializeField] private string dodgeAnimationTrigger = "Dodge";
+    [SerializeField] private Image flashImage;
+    [SerializeField] private TextMeshProUGUI EnemyName;
+    [SerializeField] private Image EnemyHealthBar;
+    [SerializeField] private SpriteRenderer BackgroundPicture;
+    [SerializeField] private GameObject chooseMenu;
+    [SerializeField] private GameObject chooserThingsMenu;
+    [SerializeField] private GameObject ChooseAttackUI;
+    [SerializeField] private GameObject button;
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private GameObject victoryPanel;
 
+    [SerializeField] private TextMeshProUGUI parryDodgePromptText;
 
+    [SerializeField] private GameObject infoUI;
+    [SerializeField] private TextMeshProUGUI infoNameText;
+    [SerializeField] private TextMeshProUGUI infoDescriptionText;
+    
+
+    public List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 2 };
     private List<Skills> currentCharacterSkills;
     private List<Character> characters;
     private Character currentCharacter;
@@ -94,9 +130,6 @@ public class TurnBasedLogic : MonoBehaviour
     private Dictionary<int, float> characterCritBonus = new Dictionary<int, float>();
     private Dictionary<int, int> characterDamageBonus = new Dictionary<int, int>();
     private Dictionary<int, int> characterArmorBonus = new Dictionary<int, int>();
-
-    public List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 1 };
-
     private int currentBackgroundPictureID = 1;
     private int currentArrow = 0;
     private bool isChoosingEnemy = false;
@@ -126,36 +159,14 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private List<CharacterAnimationData> characterAnimations = new List<CharacterAnimationData>();
     [SerializeField] private List<EnemyAnimationData> enemyAnimations = new List<EnemyAnimationData>();
 
-    [SerializeField] private Animator playerAnimator;
-    [SerializeField] private string parryAnimationTrigger = "Parry";
-    [SerializeField] private string dodgeAnimationTrigger = "Dodge";
-
-    [SerializeField] private Image flashImage;
     [SerializeField] private List<Image> FaceHolders = new List<Image>();
     [SerializeField] private List<FacesSprite> Faces = new List<FacesSprite>();
-    [SerializeField] private TextMeshProUGUI EnemyName;
-    [SerializeField] private Image EnemyHealthBar;
     [SerializeField] private List<characterBars> characterBars = new List<characterBars>();
     [SerializeField] private List<BackgroundPicture> BackgroundPictures = new List<BackgroundPicture>();
-    [SerializeField] private SpriteRenderer BackgroundPicture;
-    [SerializeField] private GameObject chooseMenu;
-    [SerializeField] private GameObject chooserThingsMenu;
-    [SerializeField] private GameObject ChooseAttackUI;
-    [SerializeField] private GameObject button;
     [SerializeField] private List<GameObject> arrowsCharacters = new List<GameObject>();
     [SerializeField] private List<GameObject> arrowsEnemies = new List<GameObject>();
     [SerializeField] private List<GameObject> enemyUIs = new List<GameObject>();
     [SerializeField] private List<GameObject> characterUIs = new List<GameObject>();
-
-    [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private GameObject victoryPanel;
-
-    [SerializeField] private TextMeshProUGUI parryDodgePromptText;
-
-    [SerializeField] private GameObject infoUI;
-    [SerializeField] private TextMeshProUGUI infoNameText;
-    [SerializeField] private TextMeshProUGUI infoDescriptionText;
-
     [SerializeField] private List<GameObject> startUIEnemys = new List<GameObject>();
     [SerializeField] private List<TextMeshProUGUI> startUIEnemysText = new List<TextMeshProUGUI>();
 
@@ -167,6 +178,34 @@ public class TurnBasedLogic : MonoBehaviour
     private int defaultPPU;
     private Coroutine activeAnimation;
     private Dictionary<Camera, Vector3> originalPositions = new Dictionary<Camera, Vector3>();
+    [SerializeField] private List<MusicEnemy> enemyMusics = new List<MusicEnemy>();
+    [SerializeField] private AudioSource musicAudioSource;
+
+    private float currentHitElapsed = 0f;
+    private float currentHitParryWindow = 0f;
+
+    [SerializeField] private TextMeshProUGUI StartGameText;
+    [SerializeField] private TextMeshProUGUI StartHeaderText;
+    [SerializeField] private TextMeshProUGUI ItemsText;
+    [SerializeField] private TextMeshProUGUI SkillsText;
+    [SerializeField] private TextMeshProUGUI AttacksText;
+    [SerializeField] private TextMeshProUGUI VictoryText;
+    [SerializeField] private TextMeshProUGUI GameOverText;
+    [SerializeField] private TextMeshProUGUI ContinueText;
+    [SerializeField] private TextMeshProUGUI RestartText;
+
+    public void LanguageOnStart()
+    {
+        StartGameText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Start Game" : "Zapnout Hru";
+        StartHeaderText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Prepare for Battle!" : "Připravte se na boj!";
+        ItemsText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Items" : "Předměty";
+        SkillsText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Skills" : "Skily";        
+        AttacksText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Attacks" : "Útoky";
+        VictoryText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Congratulation You Win!" : "Gratuluji! Vyhrál jsi!";
+        GameOverText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Expedition Died" : "Expedice skončila";
+        ContinueText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Continue" : "Pokračovat";
+        RestartText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Restart" : "Restartovat";
+    }
 
     void ApplyPerksToCharacters()
     {
@@ -246,7 +285,7 @@ public class TurnBasedLogic : MonoBehaviour
     {
         if (critIndicatorText != null)
         {
-            critIndicatorText.text = "CRITICAL!";
+            critIndicatorText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "CRITICAL!" : "KRYTÍCÍ!";
             critIndicatorText.color = critTextColor;
             critIndicatorText.gameObject.SetActive(true);
 
@@ -268,7 +307,6 @@ public class TurnBasedLogic : MonoBehaviour
         int armor = characterArmorBonus.ContainsKey(ch.id) ? characterArmorBonus[ch.id] : 0;
         return Mathf.Max(1, incomingDamage - armor);
     }
-
     public void StartTurnBasedGame()
     {
         if (starterUI != null) starterUI.SetActive(false);
@@ -314,6 +352,13 @@ public class TurnBasedLogic : MonoBehaviour
 
         ApplyPerksToCharacters();
 
+        if (gameDataManager.currentGameData.activeCombatEnemyIDs.Count > 0)
+        {
+            whatEnemiesIsFighting = new List<int>(gameDataManager.currentGameData.activeCombatEnemyIDs);
+        }
+
+        LanguageOnStart();
+
         inicializeTurnBasedGame();
         HideInfo();
     }
@@ -327,24 +372,34 @@ public class TurnBasedLogic : MonoBehaviour
         {
             if (Input.GetKeyDown(keyParry))
             {
-                lastHitWasParried = true;
-                lastHitWasDodged = false;
-                isWaitingForParryOrDodge = false;
-                ShowParryDodgeText("PARRY!");
+                if (currentHitDodgeType != dodgeType.jump)
+                {
+                    if (currentHitElapsed <= currentHitParryWindow)
+                    {
+                        lastHitWasParried = true;
+                        lastHitWasDodged = false;
+                        ShowParryDodgeText(gameDataManager.currentGameData.settings.currentLanguage == 0 ? "PARRY!" : "KRYT!");
+                    }
+                    else
+                    {
+                        ShowParryDodgeText(gameDataManager.currentGameData.settings.currentLanguage == 0 ? "TOO LATE!" : "POZDĚ!");
+                    }
+                    isWaitingForParryOrDodge = false;
+                }
             }
             else if (currentHitDodgeType == dodgeType.normal && Input.GetKeyDown(keyDodge))
             {
                 lastHitWasDodged = true;
                 lastHitWasParried = false;
                 isWaitingForParryOrDodge = false;
-                ShowParryDodgeText("DODGE!");
+                ShowParryDodgeText(gameDataManager.currentGameData.settings.currentLanguage == 0 ? "DODGE!" : "UHNUTÍ!");
             }
             else if (currentHitDodgeType == dodgeType.jump && Input.GetKeyDown(keyJump))
             {
                 lastHitWasDodged = true;
                 lastHitWasParried = false;
                 isWaitingForParryOrDodge = false;
-                ShowParryDodgeText("JUMP DODGE!");
+                ShowParryDodgeText(gameDataManager.currentGameData.settings.currentLanguage == 0 ? "JUMP DODGE!" : "SKOK!");
             }
             return;
         }
@@ -440,6 +495,31 @@ public class TurnBasedLogic : MonoBehaviour
             var enemyData = enemeyInfos.FirstOrDefault(e => e.ID == whatEnemiesIsFighting[i]);
             startUIEnemysText[i].text = enemyData.name;
         }
+        for (int i = 0; i < currentEnemy.Count; i++)
+        {
+            if (i >= enemyUIs.Count || enemyUIs[i] == null) continue;
+            var enemyData = enemeyInfos.FirstOrDefault(e => e.ID == currentEnemy[i].id);
+            if (enemyData.sprite == null) continue;
+            var sr = enemyUIs[i].GetComponent<SpriteRenderer>();
+            if (sr != null) sr.sprite = enemyData.sprite;
+        }
+
+        if (musicAudioSource != null && enemyMusics.Count > 0 && currentEnemy.Count > 0)
+        {
+            int middleIndex = currentEnemy.Count / 2;
+            int middleEnemyID = currentEnemy[middleIndex].id;
+            MusicEnemy matchedMusic = enemyMusics.FirstOrDefault(m => m.ID == middleEnemyID);
+
+            if (matchedMusic.music != null)
+            {
+                float volume = 1f;
+                volume = gameDataManager.currentGameData.settings.FinalMusicVolume;
+                musicAudioSource.clip = matchedMusic.music;
+                musicAudioSource.volume = volume;
+                musicAudioSource.loop = true;
+                musicAudioSource.Play();
+            }
+        }
     }
 
     void onTurnbasedStart()
@@ -463,10 +543,12 @@ public class TurnBasedLogic : MonoBehaviour
                         attackName = a.attackName,
                         totalAnimationDuration = a.totalAnimationDuration,
                         weight = a.weight,
+                        numberOfCharHits = a.numberOfCharHits,
                         hits = a.hits.Select(h => new Hit
                         {
                             timeOffset = h.timeOffset,
                             damage = h.damage,
+                            parryTimePlayer = h.parryTimePlayer,
                             dodgeTimePlayer = h.dodgeTimePlayer,
                             dodgeType = h.dodgeType
                         }).ToList(),
@@ -478,6 +560,13 @@ public class TurnBasedLogic : MonoBehaviour
             .ToList();
 
         Debug.Log("Current enemy: " + string.Join(", ", currentEnemy.Select(e => e.name)));
+        foreach (var e in currentEnemy)
+        {
+            Debug.Log($"Enemy: {e.name}, attacks: {e.attacks.Count}");
+            foreach (var a in e.attacks)
+                Debug.Log($"  Attack: {a.attackName}, hits: {a.hits.Count}, numberOfCharHits: {a.numberOfCharHits}");
+        }
+        
     }
 
     void createTurnOrder()
@@ -642,25 +731,55 @@ public class TurnBasedLogic : MonoBehaviour
     {
         isAnimating = true;
 
-        Enemy enemy = currentEnemy[enemyIndex];
-        Debug.Log("Nepřítelův tah: " + enemy.name);
+    Enemy enemy = currentEnemy[enemyIndex];
+    Debug.Log("Nepřítelův tah: " + enemy.name);
 
-        List<Character> alivePlayers = characters.Where(c => !c.isDead).ToList();
-        if (alivePlayers.Count == 0) { isAnimating = false; TriggerGameOver(); yield break; }
+    EnemyAttack chosenAttack = ChooseEnemyAttack(enemy);
+    if (chosenAttack == null) { isAnimating = false; nextTurn(); yield break; }
 
-        Character target = alivePlayers[Random.Range(0, alivePlayers.Count)];
-        int playerIndex = characters.IndexOf(target);
+    List<Character> alivePlayers = characters.Where(c => !c.isDead).ToList();
+    if (alivePlayers.Count == 0) { isAnimating = false; TriggerGameOver(); yield break; }
 
-        EnemyAttack chosenAttack = ChooseEnemyAttack(enemy);
+    int hitCount = Mathf.Min(chosenAttack.numberOfCharHits, alivePlayers.Count);
+    List<Character> targets = new List<Character>();
+    List<int> playerIndices = new List<int>();
+
+    List<Character> pool = new List<Character>(alivePlayers);
+    for (int t = 0; t < hitCount; t++)
+    {
+        int pick = Random.Range(0, pool.Count);
+        targets.Add(pool[pick]);
+        playerIndices.Add(characters.IndexOf(pool[pick]));
+        pool.RemoveAt(pick);
+    }
+
+    if (playerIndices.Count == 0) { isAnimating = false; nextTurn(); yield break; }
+    int primaryPlayerIndex = playerIndices[0];
+
+    if (enemyIndex >= enemyPosition.Count || primaryPlayerIndex >= playerPosition.Count)
+    {
+        Debug.LogError($"Position out of range: enemyIndex={enemyIndex}, primaryPlayerIndex={primaryPlayerIndex}");
+        isAnimating = false; nextTurn(); yield break;
+    }
+
+        
         if (chosenAttack == null) { isAnimating = false; nextTurn(); yield break; }
 
-        Debug.Log($"{enemy.name} útočí '{chosenAttack.attackName}' na {target.name}");
+        Debug.Log($"{enemy.name} útočí '{chosenAttack.attackName}' na {string.Join(", ", targets.Select(t => t.name))}");
+
+        if (nextAttackText != null)
+        {
+            nextAttackText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Enemy is Attacking: " + chosenAttack.attackName : "Nepřítel útočí: " + chosenAttack.attackName;
+            nextAttackText.gameObject.SetActive(true);
+        }
+        yield return new WaitForSeconds(2f);
+        if (nextAttackText != null) nextAttackText.gameObject.SetActive(false);
 
         yield return StartCoroutine(SwitchToCameraAndWait(8));
         yield return StartCoroutine(MoveObject(
             enemyPosition[enemyIndex],
             defaultEnemyPositions[enemyIndex],
-            getAnimationPositions(enemyIndex, playerIndex, false),
+            getAnimationPositions(enemyIndex, primaryPlayerIndex, false),
             0.25f));
 
         List<Hit> sortedHits = chosenAttack.hits.OrderBy(h => h.timeOffset).ToList();
@@ -680,36 +799,33 @@ public class TurnBasedLogic : MonoBehaviour
             isWaitingForParryOrDodge = true;
 
             string prompt = hit.dodgeType == dodgeType.jump
-                ? $"[{keyJump}] JUMP  |  [{keyParry}] PARRY"
-                : $"[{keyDodge}] DODGE  |  [{keyParry}] PARRY";
+                ? (gameDataManager.currentGameData.settings.currentLanguage == 0 ? $"[{keyJump}] JUMP" : $"[{keyJump}] SKOK")
+                : (gameDataManager.currentGameData.settings.currentLanguage == 0 ? $"[{keyDodge}] DODGE  |  [{keyParry}] PARRY" : $"[{keyDodge}] UHNI  |  [{keyParry}] KRYJ");
             ShowParryDodgeText(prompt);
 
-            float parryWindow = hit.dodgeTimePlayer;
-            float dodgeWindow = hit.dodgeTimePlayer * 2f;
-            float elapsed = 0f;
+            float parryWindow = hit.parryTimePlayer;
+            float dodgeWindow = hit.dodgeTimePlayer;
+            currentHitElapsed = 0f;
+            currentHitParryWindow = parryWindow;
 
-            while (isWaitingForParryOrDodge && elapsed < dodgeWindow)
+            while (isWaitingForParryOrDodge && currentHitElapsed < dodgeWindow)
             {
-                elapsed += Time.deltaTime;
+                currentHitElapsed += Time.deltaTime;
                 yield return null;
             }
 
             isWaitingForParryOrDodge = false;
             HideParryDodgeText();
-
-            if (lastHitWasParried && elapsed > parryWindow)
-                lastHitWasParried = false;
-
+    
             if (lastHitWasParried)
             {
                 if (playerAnimator != null) playerAnimator.SetTrigger(parryAnimationTrigger);
-
                 int reflectDmg = Mathf.Max(1, hit.damage / 2);
                 enemy.health -= reflectDmg;
                 if (enemy.health < 0) enemy.health = 0;
                 updateEnemyHealthBar();
-                Debug.Log($"PARRY! {target.name} vrátil {reflectDmg} damage na {enemy.name}");
-                ShowParryDodgeText($"PARRY! +{reflectDmg}");
+                Debug.Log($"PARRY! vrátil {reflectDmg} damage na {enemy.name}");
+                ShowParryDodgeText(gameDataManager.currentGameData.settings.currentLanguage == 0 ? $"PARRY! +{reflectDmg}" : $"VYKRYTO! +{reflectDmg}");
                 yield return new WaitForSeconds(0.5f);
                 HideParryDodgeText();
             }
@@ -717,30 +833,38 @@ public class TurnBasedLogic : MonoBehaviour
             {
                 if (playerAnimator != null) playerAnimator.SetTrigger(dodgeAnimationTrigger);
                 dodgedHitsCount++;
-                Debug.Log($"DODGE! ({dodgedHitsCount}/{totalHitsInAttack})");
+
+                if (hit.dodgeType == dodgeType.jump)
+                {
+                    int reflectDmg = Mathf.Max(1, hit.damage / 2);
+                    enemy.health -= reflectDmg;
+                    if (enemy.health < 0) enemy.health = 0;
+                    updateEnemyHealthBar();
+                    Debug.Log($"JUMP DODGE! vrátil {reflectDmg} damage na {enemy.name}");
+                    ShowParryDodgeText(gameDataManager.currentGameData.settings.currentLanguage == 0 ? $"JUMP! +{reflectDmg}" : $"SKOK! +{reflectDmg}");
+                    yield return new WaitForSeconds(0.5f);
+                    HideParryDodgeText();
+                }
+                else
+                {
+                    ShowParryDodgeText(gameDataManager.currentGameData.settings.currentLanguage == 0 ? "PERFECT DODGE!" : "PERFEKTNÍ ÚHYB!");
+                    yield return new WaitForSeconds(0.5f);
+                    HideParryDodgeText();
+                }
             }
             else
             {
-                int finalDmg = ReduceByArmor(target, hit.damage);
-                target.health -= finalDmg;
-                if (target.health < 0) target.health = 0;
+                foreach (Character target in targets)
+                {
+                    int finalDmg = ReduceByArmor(target, hit.damage);
+                    target.health -= finalDmg;
+                    if (target.health < 0) target.health = 0;
+                    Debug.Log($"HIT! {target.name} -{finalDmg} HP → {target.health}/{target.maxHealth}");
+                }
                 updateCharacterBars();
-                Debug.Log($"HIT! {target.name} -{finalDmg} HP (armor reduced from {hit.damage}) → {target.health}/{target.maxHealth}");
             }
 
             yield return new WaitForSeconds(0.1f);
-        }
-
-        if (dodgedHitsCount == totalHitsInAttack && totalHitsInAttack > 0)
-        {
-            int totalDmg = chosenAttack.hits.Sum(h => h.damage);
-            enemy.health -= totalDmg;
-            if (enemy.health < 0) enemy.health = 0;
-            updateEnemyHealthBar();
-            Debug.Log($"PERFECT DODGE! {target.name} vrátil {totalDmg} damage na {enemy.name}!");
-            ShowParryDodgeText($"PERFECT DODGE!\n+{totalDmg}");
-            yield return new WaitForSeconds(0.9f);
-            HideParryDodgeText();
         }
 
         if (enemy.health <= 0)
@@ -751,11 +875,15 @@ public class TurnBasedLogic : MonoBehaviour
             Debug.Log(enemy.name + " zemřel od counter-attacku!");
         }
 
-        if (target.health <= 0)
+        foreach (Character target in targets)
         {
-            UpdateTurnOrder(target.id, false);
-            HandlePlayerDeath(playerIndex);
-            Debug.Log(target.name + " zemřel!");
+            if (target.health <= 0)
+            {
+                int playerIndex = characters.IndexOf(target);
+                UpdateTurnOrder(target.id, false);
+                HandlePlayerDeath(playerIndex);
+                Debug.Log(target.name + " zemřel!");
+            }
         }
 
         yield return new WaitForSeconds(0.2f);
@@ -1180,7 +1308,9 @@ public class TurnBasedLogic : MonoBehaviour
             Skills capturedSkill = skill;
             GameObject skillButton = Instantiate(button, chooserThingsMenu.transform);
             skillButton.GetComponentInChildren<TextMeshProUGUI>().text =
-                $"{capturedSkill.name} ({capturedSkill.manaCost} MP)";
+            gameDataManager.currentGameData.settings.currentLanguage == 0
+                ? $"{capturedSkill.name} ({capturedSkill.manaCost} MP)"
+                : $"{capturedSkill.name} ({capturedSkill.manaCost} MP)"; 
 
             Button btn = skillButton.GetComponent<Button>();
             btn.interactable = capturedSkill.manaCost <= currentCharacter.mana;
@@ -1192,7 +1322,10 @@ public class TurnBasedLogic : MonoBehaviour
 
             EventTrigger trigger = skillButton.AddComponent<EventTrigger>();
             EventTrigger.Entry enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-            enter.callback.AddListener((d) => { ShowInfo(capturedSkill.name, "Typ: " + capturedSkill.type.ToString() + "\nMana: " + capturedSkill.manaCost); });
+            enter.callback.AddListener((d) => { ShowInfo(capturedSkill.name, 
+                gameDataManager.currentGameData.settings.currentLanguage == 0 
+                    ? "Type: " + capturedSkill.type.ToString() + "\nMana: " + capturedSkill.manaCost
+                    : "Typ: " + capturedSkill.type.ToString() + "\nMana: " + capturedSkill.manaCost); });
             trigger.triggers.Add(enter);
             EventTrigger.Entry exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
             exit.callback.AddListener((d) => { HideInfo(); });
@@ -1313,9 +1446,39 @@ public class TurnBasedLogic : MonoBehaviour
         if (isBattleOver) return;
         isBattleOver = true;
         StopAllCoroutines();
+    
         Debug.Log("=== VÍTĚZSTVÍ! ===");
         if (victoryPanel != null) victoryPanel.SetActive(true);
+
+        // Tvůj kód pro uložení stavu NPC...
+        foreach (string uniqueID in gameDataManager.currentGameData.activeCombatNPCIDs)
+        {
+            var state = gameDataManager.currentGameData.savedWorldNPCs.Find(n => n.uniqueID == uniqueID);
+            if (state != null)
+            {
+                state.isDead = true;
+                state.isInCombat = false;
+            }
+        }
+    
+        gameDataManager.currentGameData.activeCombatNPCIDs.Clear();
+        gameDataManager.currentGameData.activeCombatEnemyIDs.Clear();
+        gameDataManager.SaveData();
+        
     }
+
+    public void ContinueGame()
+    {
+        if (!string.IsNullOrEmpty(mainWorldScene))
+        {
+            SceneManager.LoadScene(mainWorldScene);
+        }
+        else
+        {
+            Debug.LogError("zapomněl jsi v Inspectoru vybrat scénu, kam se máš vrátit!");
+        }
+    }
+
 
     void TriggerGameOver()
     {
@@ -1324,6 +1487,15 @@ public class TurnBasedLogic : MonoBehaviour
         StopAllCoroutines();
         Debug.Log("=== GAME OVER ===");
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
+
+        foreach (string uniqueID in gameDataManager.currentGameData.activeCombatNPCIDs)
+        {
+            var state = gameDataManager.currentGameData.savedWorldNPCs.Find(n => n.uniqueID == uniqueID);
+            if (state != null) state.isInCombat = false;
+        }
+        gameDataManager.currentGameData.activeCombatNPCIDs.Clear();
+        gameDataManager.currentGameData.activeCombatEnemyIDs.Clear();
+        gameDataManager.SaveData();
     }
 
     void SetActiveCamera(int cameraID)

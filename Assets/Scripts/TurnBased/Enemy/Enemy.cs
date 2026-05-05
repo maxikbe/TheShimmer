@@ -13,7 +13,8 @@ public class Hit
 {
     public float timeOffset; 
     public int damage;       
-    public float dodgeTimePlayer;
+    public float parryTimePlayer;  
+    public float dodgeTimePlayer; 
     public dodgeType dodgeType;
 }
 
@@ -25,7 +26,8 @@ public class EnemyAttack
     public float totalAnimationDuration; 
     public List<Hit> hits = new List<Hit>();
     public List<EnemyAnimationData> animations = new List<EnemyAnimationData>();
-    [Range(0, 100)] public float weight;
+    public float weight;
+    public int numberOfCharHits;
 }
 
 [System.Serializable]
