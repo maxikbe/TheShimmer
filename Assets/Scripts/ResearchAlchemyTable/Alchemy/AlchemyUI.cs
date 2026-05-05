@@ -21,15 +21,13 @@ public class AlchemyUI : MonoBehaviour
     public TextMeshProUGUI tooltipDescText;
 
     [Header("Pravá Strana - Hmoždíř (Mortar)")]
+    public GameObject pestleObject; // NOVÉ: Přetáhneš sem obrázek tyčky
     public Image mortarItemIcon;
-    public Button crushButton; 
-    public TextMeshProUGUI crushButtonText;
     public Slider crushProgressBar;
     public Button collectMortarButton; 
 
     private void Start()
     {
-        if (crushButton != null) crushButton.onClick.AddListener(CrushItem);
         if (collectMortarButton != null) collectMortarButton.onClick.AddListener(CollectFromMortar);
         HideTooltip(); 
     }
@@ -140,8 +138,8 @@ public class AlchemyUI : MonoBehaviour
             mortarItemIcon.color = new Color(1, 1, 1, 0); // Úplně průhledná (neviditelná)
             
             if (crushProgressBar != null) crushProgressBar.value = 0;
-            if (crushButton != null) crushButton.interactable = false;
             if (collectMortarButton != null) collectMortarButton.interactable = false;
+            if (pestleObject != null) pestleObject.SetActive(false);
         }
         else
         {
@@ -157,18 +155,18 @@ public class AlchemyUI : MonoBehaviour
 
             if (!currentTable.mortarItemStatic.isCrushable)
             {
-                if (crushButton != null) crushButton.interactable = false;
-                if (crushButtonText != null) crushButtonText.text = "Hotovo!";
+                // Už nelze drtit (je to prach nebo alkohol) -> schováme tlouk
+                if (pestleObject != null) pestleObject.SetActive(false);
             }
             else
             {
-                if (crushButton != null) crushButton.interactable = true;
-                if (crushButtonText != null) crushButtonText.text = $"Bouchej! ({currentTable.currentCrushes}/{currentTable.mortarItemStatic.requiredCrushes})";
+                // Je to drtitelné -> ukážeme tlouk
+                if (pestleObject != null) pestleObject.SetActive(true);
             }
         }
     }
 
-    private void CrushItem()
+    public void ManualCrush() // ZMĚNA: public, aby to mohl volat PestleDrag
     {
         if (currentTable == null || currentTable.mortarItemData == null || !currentTable.mortarItemStatic.isCrushable) return;
 
@@ -181,6 +179,8 @@ public class AlchemyUI : MonoBehaviour
                 currentTable.mortarItemData.id = currentTable.mortarItemStatic.crushedVersion.id;
                 currentTable.mortarItemStatic = currentTable.mortarItemStatic.crushedVersion;
                 currentTable.currentCrushes = 0; 
+                
+                // ZDE SE V BUDOUCNU ODEMKNE MOŽNOST VYTAŽENÍ!
             }
         }
 
