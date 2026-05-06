@@ -74,6 +74,7 @@ public class MainMenu : MonoBehaviour
             fileName = fileName.EndsWith(".json") 
                 ? fileName.Substring(0, fileName.Length - 5) 
                 : fileName;
+            fileName = fileName.Length > 20 ? fileName.Substring(0, 30) + "..." : fileName;
             if (fileName.StartsWith("unity")) continue;
 
             GameObject btn = Instantiate(saveButtonPrefab, scrollContent);
