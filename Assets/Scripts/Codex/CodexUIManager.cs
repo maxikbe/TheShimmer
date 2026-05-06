@@ -21,6 +21,11 @@ public class CodexUIManager : MonoBehaviour
     public Button tabHerbariumBtn;
     public Button tabSamplesBtn;
     public Button tabRecipesBtn;
+    public Button closeBtn; // PŘIDÁNO: Tlačítko s křížkem
+
+    [Header("Zvýraznění Tlačítek")]
+    public Color activeTabColor = Color.white; // Barva, když jsi na stránce (světlá)
+    public Color inactiveTabColor = new Color(0.5f, 0.5f, 0.5f, 1f); // Barva ostatních (šedá)
 
     [Header("Stránky (Panely)")]
     public GameObject pageBestiary;
@@ -89,6 +94,9 @@ public class CodexUIManager : MonoBehaviour
         if (tabHerbariumBtn != null) tabHerbariumBtn.onClick.AddListener(() => SwitchTab(1));
         if (tabSamplesBtn != null) tabSamplesBtn.onClick.AddListener(() => SwitchTab(2));
         if (tabRecipesBtn != null) tabRecipesBtn.onClick.AddListener(() => SwitchTab(3));
+        
+        // PŘIDÁNO: Když se klikne na křížek, zavře se kodex
+        if (closeBtn != null) closeBtn.onClick.AddListener(CloseCodex); 
 
         CloseCodex();
     }
@@ -117,27 +125,39 @@ public class CodexUIManager : MonoBehaviour
 
     public void SwitchTab(int tabIndex)
     {
+        // 1. Vypneme všechny stránky
         pageBestiary.SetActive(false);
         pageHerbarium.SetActive(false);
         pageSamples.SetActive(false);
         pageRecipes.SetActive(false);
 
+        // 2. Obarvíme všechna tlačítka na neaktivní (šedou)
+        if (tabBestiaryBtn != null) tabBestiaryBtn.GetComponent<Image>().color = inactiveTabColor;
+        if (tabHerbariumBtn != null) tabHerbariumBtn.GetComponent<Image>().color = inactiveTabColor;
+        if (tabSamplesBtn != null) tabSamplesBtn.GetComponent<Image>().color = inactiveTabColor;
+        if (tabRecipesBtn != null) tabRecipesBtn.GetComponent<Image>().color = inactiveTabColor;
+
+        // 3. Zapneme tu správnou stránku a obarvíme její tlačítko!
         switch (tabIndex)
         {
             case 0:
                 pageBestiary.SetActive(true);
+                if (tabBestiaryBtn != null) tabBestiaryBtn.GetComponent<Image>().color = activeTabColor;
                 RefreshBestiary(); 
                 break;
             case 1:
                 pageHerbarium.SetActive(true);
+                if (tabHerbariumBtn != null) tabHerbariumBtn.GetComponent<Image>().color = activeTabColor;
                 RefreshHerbarium(); 
                 break;
             case 2:
                 pageSamples.SetActive(true);
+                if (tabSamplesBtn != null) tabSamplesBtn.GetComponent<Image>().color = activeTabColor;
                 RefreshSamples(); 
                 break;
             case 3:
                 pageRecipes.SetActive(true);
+                if (tabRecipesBtn != null) tabRecipesBtn.GetComponent<Image>().color = activeTabColor;
                 RefreshRecipes(); 
                 break;
         }
@@ -242,10 +262,23 @@ public class CodexUIManager : MonoBehaviour
     // Univerzální spawn dropů z monster/kytek s proklikem do Vzorkovníku
     private void SpawnDropItemUI(Item itemToSpawn, Transform targetContainer)
     {
+        if (itemToSpawn == null) return; // Bezpečnostní pojistka
+
         GameObject dropSlot = Instantiate(detailDropItemPrefab, targetContainer);
-        Image icon = dropSlot.transform.Find("Icon").GetComponent<Image>();
-        icon.sprite = itemToSpawn.icon;
         
+        // BEZPEČNÉ HLEDÁNÍ IKONY
+        Transform iconTransform = dropSlot.transform.Find("Icon");
+        if (iconTransform != null)
+        {
+            Image icon = iconTransform.GetComponent<Image>();
+            if (icon != null) icon.sprite = itemToSpawn.icon;
+        }
+        else
+        {
+            Debug.LogWarning("V tvém prefabu chybí objekt s názvem 'Icon'! Přejmenuj obrázek v prefabu na 'Icon'.");
+        }
+        
+        // BEZPEČNÉ HLEDÁNÍ TEXTU
         TextMeshProUGUI dropName = dropSlot.GetComponentInChildren<TextMeshProUGUI>();
         if (dropName != null) dropName.text = itemToSpawn.itemName;
 
@@ -358,17 +391,27 @@ public class CodexUIManager : MonoBehaviour
     private void SpawnVisualBox(string boxName, Sprite boxIcon, Transform targetContainer)
     {
         GameObject box = Instantiate(detailDropItemPrefab, targetContainer);
-        Image icon = box.transform.Find("Icon").GetComponent<Image>();
-        if (boxIcon != null) 
+        
+        // BEZPEČNÉ HLEDÁNÍ IKONY
+        Transform iconTransform = box.transform.Find("Icon");
+        if (iconTransform != null)
         {
-            icon.sprite = boxIcon;
-            icon.color = Color.white;
-        }
-        else 
-        {
-            icon.color = new Color(1, 1, 1, 0); 
+            Image icon = iconTransform.GetComponent<Image>();
+            if (icon != null)
+            {
+                if (boxIcon != null) 
+                {
+                    icon.sprite = boxIcon;
+                    icon.color = Color.white;
+                }
+                else 
+                {
+                    icon.color = new Color(1, 1, 1, 0); 
+                }
+            }
         }
 
+        // BEZPEČNÉ HLEDÁNÍ TEXTU
         TextMeshProUGUI text = box.GetComponentInChildren<TextMeshProUGUI>();
         if (text != null) text.text = boxName;
 
@@ -392,6 +435,7 @@ public class CodexUIManager : MonoBehaviour
             int researchedSamples = 0;
 
             // 1. Zjistíme stav vzorků v receptu
+            // 1. Zjistíme stav vzorků v receptu
             foreach (Item ingredient in recipe.requiredIngredients)
             {
                 if (ingredient.itemType == ItemType.Sample)
@@ -404,9 +448,12 @@ public class CodexUIManager : MonoBehaviour
                 }
             }
 
-            // 2. Pokud jsme vyzkoumali alespoň 1 vzorek, ukážeme recept v seznamu
-            if (totalSamples > 0 && researchedSamples > 0)
+            // --- TADY JE TA ZMĚNA ---
+            // 2. Recept ukážeme, pokud nemá ŽÁDNÉ vzorky (totalSamples == 0), 
+            //    NEBO pokud má vzorky a známe aspoň jeden (researchedSamples > 0).
+            if (totalSamples == 0 || researchedSamples > 0)
             {
+                // Pokud je vzorků 0, tak 0 == 0 je true -> rovnou se to bere jako plně objevené!
                 bool isFullyDiscovered = (totalSamples == researchedSamples);
                 
                 GameObject newEntry = Instantiate(recipeEntryPrefab, recipesListContainer);
@@ -441,14 +488,38 @@ public class CodexUIManager : MonoBehaviour
         if (isFullyDiscovered)
         {
             // MÁME VŠE - UKÁŽEME VŠE!
-            detailRecipeNameText.text = recipe.resultPotion.itemName;
-            detailRecipeLargeImage.sprite = recipe.resultPotion.icon;
+            detailRecipeNameText.text = recipe.resultPotion.itemName; 
+            detailRecipeLargeImage.sprite = recipe.resultPotion.icon; 
             detailRecipeLargeImage.color = Color.white;
-            detailRecipeStatsText.text = "Plně objevený recept.\nVšechny biologické složky stabilizovány.";
 
-            foreach (Item ingredient in recipe.requiredIngredients)
+            // --- VYTÁHNUTÍ STATŮ Z VÝSLEDNÉHO ITEMU ---
+            Item potion = recipe.resultPotion; //
+            string statsText = "Účinky lektvaru:\n";
+
+            if (potion != null)
             {
-                // Zde můžeme použít starou funkci z Vzorkovníku a ukázat normálně i s proklikem
+                // Základní obnova (z tvého nastavení konzumace)
+                if (potion.HealAmount > 0) statsText += $"+{potion.HealAmount} Obnova HP\n"; 
+                if (potion.consumeAmount > 0) statsText += $"+{potion.consumeAmount} Obnova Jídla\n"; 
+                if (potion.waterAmount > 0) statsText += $"+{potion.waterAmount} Obnova Vody\n"; 
+                if (potion.sleepAmount > 0) statsText += $"+{potion.sleepAmount} Obnova Spánku\n"; 
+
+                // Alchymistické bonusy
+                if (potion.potionAditionalHealth > 0) statsText += $"+{potion.potionAditionalHealth} Bonusové Max HP\n"; 
+                if (potion.potionBonusStamina > 0) statsText += $"+{potion.potionBonusStamina} Max Stamina\n"; 
+                if (potion.potionBonusSpeed > 0) statsText += $"+{potion.potionBonusSpeed} Rychlost pohybu\n"; 
+                if (potion.potionBonusdamage > 0) statsText += $"+{potion.potionBonusdamage} Poškození\n"; 
+                if (potion.potionBonusFOV > 0) statsText += $"+{potion.potionBonusFOV} Zorné pole\n"; 
+                
+                // Pokud by lektvar nedělal vůbec nic:
+                if (statsText == "Účinky lektvaru:\n") statsText += "Žádné zjevné účinky.";
+            }
+
+            detailRecipeStatsText.text = statsText;
+            // ------------------------------------------
+
+            foreach (Item ingredient in recipe.requiredIngredients) 
+            {
                 SpawnDropItemUI(ingredient, detailRecipeIngredientsContainer);
             }
         }
