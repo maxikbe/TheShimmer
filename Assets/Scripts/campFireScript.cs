@@ -49,21 +49,21 @@ public class campFireScript : MonoBehaviour
     {
         if (isPlayerNearby)
         {
-            if (woodFuel < maxWoodFuel && Input.GetKeyDown(KeyCode.E))
+            if (woodFuel < maxWoodFuel && Input.GetKeyDown(KeyBoardSetting.Interact))
             {
                 AddWood();
             }
 
-            if (!campFireIsLit && Input.GetKey(KeyCode.L))
+            if (!campFireIsLit && Input.GetKey(KeyBoardSetting.LightenUp))
             {
                 HandleHoldInteraction("Lighting... ", LightFire);
             }
-            else if (Input.GetKey(KeyCode.F))
+            else if (Input.GetKey(KeyBoardSetting.Pack))
             {
                 HandleHoldInteraction("Destroying... ", DestroyFire);
             }
             
-            if (Input.GetKeyUp(KeyCode.L) || Input.GetKeyUp(KeyCode.F))
+            if (Input.GetKeyUp(KeyBoardSetting.LightenUp) || Input.GetKeyUp(KeyBoardSetting.Pack))
             {
                 holdTimer = 0f;
                 if (interactUIHOLDText != null) interactUIHOLDText.text = TextContent;

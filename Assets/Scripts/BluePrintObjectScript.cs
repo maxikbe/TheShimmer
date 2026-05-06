@@ -37,12 +37,12 @@ public class BluePrintObjectScript : MonoBehaviour
 
     void Update()
     {
-        if (isPlayerNearby && Input.GetKeyDown(KeyCode.E))
+        if (isPlayerNearby && Input.GetKeyDown(KeyBoardSetting.Interact))
         {
             TryAddMaterials();
         }
 
-        if (isPlayerNearby && Input.GetKey(KeyCode.F))
+        if (isPlayerNearby && Input.GetKey(KeyBoardSetting.Pack))
         {
             holdTimer += Time.deltaTime;
             if (interactUIHOLDText != null) 
@@ -55,7 +55,7 @@ public class BluePrintObjectScript : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        else if (Input.GetKeyUp(KeyCode.F))
+        else if (Input.GetKeyUp(KeyBoardSetting.Pack))
         {
             holdTimer = 0f;
             if (interactUIHOLDText != null) interactUIHOLDText.text = TextContent;

@@ -22,7 +22,7 @@ public class Tent : MonoBehaviour
     {
         if (isPlayerNearby)
         {
-            if (Input.GetKey(KeyCode.F))
+            if (Input.GetKey(KeyBoardSetting.Pack))
             {
                 holdTimer += Time.deltaTime;
 

@@ -51,8 +51,8 @@ public class CharPicker : MonoBehaviour
         if (isAnimating) return;
 
         int direction = 0;
-        if (Input.GetKeyDown(KeyCode.RightArrow)) direction = 1;
-        else if (Input.GetKeyDown(KeyCode.LeftArrow)) direction = -1;
+        if (Input.GetKeyDown(KeyBoardSetting.MenuRight)) direction = 1;
+        else if (Input.GetKeyDown(KeyBoardSetting.MenuLeft)) direction = -1;
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll > 0f) direction = -1; 

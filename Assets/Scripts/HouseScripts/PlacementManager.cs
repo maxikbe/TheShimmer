@@ -37,7 +37,7 @@ public class PlacementManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T) && !hasPlacedTent)
+        if (Input.GetKeyDown(KeyBoardSetting.Tent) && !hasPlacedTent)
         {
             isBuilding = !isBuilding;
             ghostPreview.SetActive(isBuilding);

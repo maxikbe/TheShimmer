@@ -24,7 +24,7 @@ public class BuildingManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyBoardSetting.Craft))
         {
             craftingMenu.SetActive(!craftingMenu.activeSelf);
         }

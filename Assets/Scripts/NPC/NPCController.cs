@@ -47,7 +47,7 @@ public class NPCController : MonoBehaviour
     private void Update()
     {
         // Hlídáme, jestli je hráč v zóně a zmáčknul E
-        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
+        if (isPlayerInRange && Input.GetKeyDown(KeyBoardSetting.Interact))
         {
             Interact();
         }

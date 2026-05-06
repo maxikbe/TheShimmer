@@ -8,7 +8,7 @@ public class PauseMenuCursor : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyBoardSetting.Pause))
         {
             if (isPaused)
                 Resume();

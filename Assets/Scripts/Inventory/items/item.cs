@@ -80,6 +80,17 @@ public class Item : ScriptableObject
     public double potionBonushungerSpeed;
     public int potionBonusdamage;
     public bool hilightResources;
+    
+    public bool DropsFromMob(MobType mobToCheck)
+    {
+        return originMobs != null && originMobs.Contains(mobToCheck);
+    }
+    
+    // Tuto funkci použije deník, aby zjistil, jestli z této kytky padá tento item
+    public bool DropsFromPlant(PlantType plantToCheck)
+    {
+        return originPlants != null && originPlants.Contains(plantToCheck);
+    }
 
 }
 

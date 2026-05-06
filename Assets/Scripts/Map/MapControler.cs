@@ -43,8 +43,8 @@ public class MapControler : MonoBehaviour, IDragHandler, IScrollHandler
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.G)) mapUI.SetActive(true);
-        if (Input.GetKeyUp(KeyCode.G)) mapUI.SetActive(false);
+        if (Input.GetKeyDown(KeyBoardSetting.Map)) mapUI.SetActive(true);
+        if (Input.GetKeyUp(KeyBoardSetting.Map)) mapUI.SetActive(false);
 
         if (mapUI.activeSelf)
         {
