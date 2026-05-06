@@ -63,6 +63,19 @@ public class CodexUIManager : MonoBehaviour
     public TextMeshProUGUI detailSampleStatsText;
     public Transform detailSampleSourcesContainer; // "Získává se z:"
     public Transform detailSampleUsesContainer;    // "Využití v alchymii:"
+    
+    
+    
+    [Header("=== RECEPTY: LEVÁ STRANA ===")]
+    public Transform recipesListContainer;
+    public GameObject recipeEntryPrefab;
+
+    [Header("=== RECEPTY: PRAVÁ STRANA ===")]
+    public GameObject recipeDetailPanel;
+    public TextMeshProUGUI detailRecipeNameText;
+    public Image detailRecipeLargeImage;
+    public TextMeshProUGUI detailRecipeStatsText;
+    public Transform detailRecipeIngredientsContainer;
 
     private void Awake()
     {
@@ -82,7 +95,7 @@ public class CodexUIManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.J))
+        if (Input.GetKeyDown(KeyCode.C))
         {
             if (codexCanvas.activeSelf) CloseCodex();
             else OpenCodex();
@@ -364,7 +377,111 @@ public class CodexUIManager : MonoBehaviour
     }
 
     // ==========================================
-    // PLACEHOLDER PRO RECEPTY
+    // LOGIKA PRO RECEPTY (The Annihilation Puzzle)
     // ==========================================
-    private void RefreshRecipes() { }
+    private void RefreshRecipes()
+    {
+        foreach (Transform child in recipesListContainer) Destroy(child.gameObject);
+        recipeDetailPanel.SetActive(false);
+
+        if (gameDataManager.currentGameData == null) return;
+
+        foreach (PotionRecipe recipe in allPotionRecipes)
+        {
+            int totalSamples = 0;
+            int researchedSamples = 0;
+
+            // 1. Zjistíme stav vzorků v receptu
+            foreach (Item ingredient in recipe.requiredIngredients)
+            {
+                if (ingredient.itemType == ItemType.Sample)
+                {
+                    totalSamples++;
+                    if (gameDataManager.currentGameData.unlockedResearches.Contains(ingredient.id))
+                    {
+                        researchedSamples++;
+                    }
+                }
+            }
+
+            // 2. Pokud jsme vyzkoumali alespoň 1 vzorek, ukážeme recept v seznamu
+            if (totalSamples > 0 && researchedSamples > 0)
+            {
+                bool isFullyDiscovered = (totalSamples == researchedSamples);
+                
+                GameObject newEntry = Instantiate(recipeEntryPrefab, recipesListContainer);
+                RecipeEntry entryScript = newEntry.GetComponent<RecipeEntry>();
+                if (entryScript != null) entryScript.Setup(recipe, this, isFullyDiscovered);
+            }
+        }
+    }
+
+    public void ShowRecipeDetails(PotionRecipe recipe)
+    {
+        recipeDetailPanel.SetActive(true);
+
+        int totalSamples = 0;
+        int researchedSamples = 0;
+
+        foreach (Item ingredient in recipe.requiredIngredients)
+        {
+            if (ingredient.itemType == ItemType.Sample)
+            {
+                totalSamples++;
+                if (gameDataManager.currentGameData.unlockedResearches.Contains(ingredient.id))
+                    researchedSamples++;
+            }
+        }
+
+        bool isFullyDiscovered = (totalSamples == researchedSamples);
+
+        // Vyčistíme kontejner na ingredience
+        foreach (Transform child in detailRecipeIngredientsContainer) Destroy(child.gameObject);
+
+        if (isFullyDiscovered)
+        {
+            // MÁME VŠE - UKÁŽEME VŠE!
+            detailRecipeNameText.text = recipe.resultPotion.itemName;
+            detailRecipeLargeImage.sprite = recipe.resultPotion.icon;
+            detailRecipeLargeImage.color = Color.white;
+            detailRecipeStatsText.text = "Plně objevený recept.\nVšechny biologické složky stabilizovány.";
+
+            foreach (Item ingredient in recipe.requiredIngredients)
+            {
+                // Zde můžeme použít starou funkci z Vzorkovníku a ukázat normálně i s proklikem
+                SpawnDropItemUI(ingredient, detailRecipeIngredientsContainer);
+            }
+        }
+        else
+        {
+            // ČÁSTEČNÝ VÝZKUM - TAJÍME DATA!
+            detailRecipeNameText.text = "Neznámý lektvar";
+            detailRecipeLargeImage.sprite = recipe.resultPotion.icon;
+            detailRecipeLargeImage.color = Color.black; // Zatmavíme hlavní obrázek
+            detailRecipeStatsText.text = "Recept je nekompletní. Objevte další vzorky z mutovaných organizmů pro dokončení syntézy.";
+
+            foreach (Item ingredient in recipe.requiredIngredients)
+            {
+                if (ingredient.itemType == ItemType.Sample)
+                {
+                    if (gameDataManager.currentGameData.unlockedResearches.Contains(ingredient.id))
+                    {
+                        // Tento vzorek známe - ukážeme ho normálně
+                        SpawnDropItemUI(ingredient, detailRecipeIngredientsContainer);
+                    }
+                    else
+                    {
+                        // Tento vzorek NEZNÁME - ukážeme černou siluetu a schováme název
+                        SpawnVisualBox("???", ingredient.icon, detailRecipeIngredientsContainer);
+                        
+                        // Najdeme ten vygenerovaný box a přebarvíme ho na černo
+                        Transform lastBox = detailRecipeIngredientsContainer.GetChild(detailRecipeIngredientsContainer.childCount - 1);
+                        Image icon = lastBox.Find("Icon").GetComponent<Image>();
+                        if (icon != null) icon.color = Color.black;
+                    }
+                }
+                // Pokud to není vzorek (je to uhlí, voda, atd.) a recept není hotový -> VŮBEC HO NEVYKRESLÍME (Skryto)
+            }
+        }
+    }
 }
