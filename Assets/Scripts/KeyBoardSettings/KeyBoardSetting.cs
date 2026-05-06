@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using System.Reflection;
 
 public class KeyBoardSetting : MonoBehaviour
 {
@@ -47,5 +49,24 @@ public class KeyBoardSetting : MonoBehaviour
     public static KeyCode dodge = KeyCode.D;
     public static KeyCode parry = KeyCode.F;
 
+    
+    
+    public static Dictionary<string, KeyCode> defaultKeysBackup = new Dictionary<string, KeyCode>();
+
+    // Statický konstruktor - spustí se dřív, než se načtou savy z gameDataManageru!
+    static KeyBoardSetting()
+    {
+        // Wallhack: Oskenujeme tenhle skript a najdeme všechny proměnné typu KeyCode
+        FieldInfo[] fields = typeof(KeyBoardSetting).GetFields(BindingFlags.Public | BindingFlags.Static);
+        
+        foreach (FieldInfo field in fields)
+        {
+            if (field.FieldType == typeof(KeyCode))
+            {
+                // Uložíme si přesný název proměnné (např. "keyUp") a její výchozí klávesu (např. KeyCode.W)
+                defaultKeysBackup.Add(field.Name, (KeyCode)field.GetValue(null));
+            }
+        }
+    }
     
 }
