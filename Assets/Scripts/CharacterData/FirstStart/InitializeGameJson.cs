@@ -94,6 +94,23 @@ public class InitializeGameJson : MonoBehaviour
         s.keyLeft = KeyBoardSetting.keyLeft;
         s.keyRight = KeyBoardSetting.keyRight;
         s.keyRun = KeyBoardSetting.keyRun;
+
+        s.Pause = KeyBoardSetting.Pause;
+        s.MenuRight = KeyBoardSetting.MenuRight;
+        s.MenuLeft = KeyBoardSetting.MenuLeft;
+        s.Cancel = KeyBoardSetting.Cancel;
+        s.TBinventory = KeyBoardSetting.TBinventory;
+        s.NormalInventory = KeyBoardSetting.NormalInventory;
+        s.Journal = KeyBoardSetting.Journal;
+        s.Codex = KeyBoardSetting.Codex;
+        s.Interact = KeyBoardSetting.Interact;
+        s.Craft = KeyBoardSetting.Craft;
+        s.Tent = KeyBoardSetting.Tent;
+        s.Pack = KeyBoardSetting.Pack;
+        s.Map = KeyBoardSetting.Map;
+        s.InspectItem = KeyBoardSetting.InspectItem;
+        s.LightenUp = KeyBoardSetting.LightenUp;
+
         s.chooseSpecialSpell = KeyBoardSetting.chooseSpecialSpell;
         s.chooseNormalSpell = KeyBoardSetting.chooseNormalSpell;
         s.chooseItem = KeyBoardSetting.chooseItem;

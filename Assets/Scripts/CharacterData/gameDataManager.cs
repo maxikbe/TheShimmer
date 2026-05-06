@@ -101,17 +101,44 @@ public class gameDataManager : MonoBehaviour
         GameSettings.sfxVolumeEnabled = s.sfxVolumeEnabled;
         GameSettings.musicVolumeEnabled = s.musicVolumeEnabled;
 
-        // Klávesnice
+        // Klávesnice (Přepisuje herní nastavení daty ze savu)
         KeyBoardSetting.keyUp = s.keyUp;
         KeyBoardSetting.keyDown = s.keyDown;
         KeyBoardSetting.keyLeft = s.keyLeft;
         KeyBoardSetting.keyRight = s.keyRight;
         KeyBoardSetting.keyRun = s.keyRun;
+
+        KeyBoardSetting.Pause = s.Pause;
+        KeyBoardSetting.MenuRight = s.MenuRight;
+        KeyBoardSetting.MenuLeft = s.MenuLeft;
+        KeyBoardSetting.Cancel = s.Cancel;
+        KeyBoardSetting.TBinventory = s.TBinventory;
+        KeyBoardSetting.NormalInventory = s.NormalInventory;
+        KeyBoardSetting.Journal = s.Journal;
+        KeyBoardSetting.Codex = s.Codex;
+        KeyBoardSetting.Interact = s.Interact;
+        KeyBoardSetting.Craft = s.Craft;
+        KeyBoardSetting.Tent = s.Tent;
+        KeyBoardSetting.Pack = s.Pack;
+        KeyBoardSetting.Map = s.Map;
+        KeyBoardSetting.InspectItem = s.InspectItem;
+        KeyBoardSetting.LightenUp = s.LightenUp;
+
+        KeyBoardSetting.chooseSpecialSpell = s.chooseSpecialSpell;
+        KeyBoardSetting.chooseNormalSpell = s.chooseNormalSpell;
+        KeyBoardSetting.chooseItem = s.chooseItem;
+        KeyBoardSetting.doAccept = s.doAccept;
+        KeyBoardSetting.doBack = s.doBack;
+        KeyBoardSetting.swapUp = s.swapUp;
+        KeyBoardSetting.swapDown = s.swapDown;
+        KeyBoardSetting.swapLeft = s.swapLeft;
+        KeyBoardSetting.swapRight = s.swapRight;
+        KeyBoardSetting.swapAliveUp = s.swapAliveUp;
+        KeyBoardSetting.swapAliveDown = s.swapAliveDown;
+
         KeyBoardSetting.jump = s.jump;
         KeyBoardSetting.dodge = s.dodge;
         KeyBoardSetting.parry = s.parry;
-        KeyBoardSetting.doAccept = s.doAccept;
-        KeyBoardSetting.doBack = s.doBack;
     }
 
     public static void CaptureCurrentSettings()
@@ -125,10 +152,41 @@ public class gameDataManager : MonoBehaviour
         s.masterVolume = GameSettings.masterVolume;
         s.currentLanguage = GameSettings.currentLanguage;
 
+        // Ukládá aktuální herní nastavení do JSON paměti
         s.keyUp = KeyBoardSetting.keyUp;
         s.keyDown = KeyBoardSetting.keyDown;
         s.keyLeft = KeyBoardSetting.keyLeft;
         s.keyRight = KeyBoardSetting.keyRight;
+        s.keyRun = KeyBoardSetting.keyRun;
+
+        s.Pause = KeyBoardSetting.Pause;
+        s.MenuRight = KeyBoardSetting.MenuRight;
+        s.MenuLeft = KeyBoardSetting.MenuLeft;
+        s.Cancel = KeyBoardSetting.Cancel;
+        s.TBinventory = KeyBoardSetting.TBinventory;
+        s.NormalInventory = KeyBoardSetting.NormalInventory;
+        s.Journal = KeyBoardSetting.Journal;
+        s.Codex = KeyBoardSetting.Codex;
+        s.Interact = KeyBoardSetting.Interact;
+        s.Craft = KeyBoardSetting.Craft;
+        s.Tent = KeyBoardSetting.Tent;
+        s.Pack = KeyBoardSetting.Pack;
+        s.Map = KeyBoardSetting.Map;
+        s.InspectItem = KeyBoardSetting.InspectItem;
+        s.LightenUp = KeyBoardSetting.LightenUp;
+
+        s.chooseSpecialSpell = KeyBoardSetting.chooseSpecialSpell;
+        s.chooseNormalSpell = KeyBoardSetting.chooseNormalSpell;
+        s.chooseItem = KeyBoardSetting.chooseItem;
+        s.doAccept = KeyBoardSetting.doAccept;
+        s.doBack = KeyBoardSetting.doBack;
+        s.swapUp = KeyBoardSetting.swapUp;
+        s.swapDown = KeyBoardSetting.swapDown;
+        s.swapLeft = KeyBoardSetting.swapLeft;
+        s.swapRight = KeyBoardSetting.swapRight;
+        s.swapAliveUp = KeyBoardSetting.swapAliveUp;
+        s.swapAliveDown = KeyBoardSetting.swapAliveDown;
+
         s.jump = KeyBoardSetting.jump;
         s.dodge = KeyBoardSetting.dodge;
         s.parry = KeyBoardSetting.parry;

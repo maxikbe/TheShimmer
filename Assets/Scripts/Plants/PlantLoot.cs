@@ -23,7 +23,7 @@ public class PlantLoot : MonoBehaviour
     private void Update()
     {
         // Hlídáme, jestli je hráč v zóně a zmáčknul E
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && Input.GetKeyDown(KeyBoardSetting.Interact))
         {
             if (plantController.isLooted)
             {

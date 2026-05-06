@@ -32,7 +32,7 @@ public class gramophoneScript : MonoBehaviour
 
     private void Update()
     {
-        if (isPlayerInTrigger && Input.GetKeyDown(KeyCode.E))
+        if (isPlayerInTrigger && Input.GetKeyDown(KeyBoardSetting.Interact))
         {
             ToggleMusic();
         }

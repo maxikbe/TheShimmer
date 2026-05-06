@@ -34,17 +34,37 @@ public class SettingsSaver
     public KeyCode keyLeft;
     public KeyCode keyRight;
     public KeyCode keyRun;
+    
+    // ingame use
+    public KeyCode Pause;
+    public KeyCode MenuRight;
+    public KeyCode MenuLeft;
+    public KeyCode Cancel;
+    public KeyCode TBinventory;
+    public KeyCode NormalInventory;
+    public KeyCode Journal;
+    public KeyCode Codex;
+    public KeyCode Interact;
+    public KeyCode Craft;
+    public KeyCode Tent;
+    public KeyCode Pack;
+    public KeyCode Map;
+    public KeyCode InspectItem;
+    public KeyCode LightenUp;
+
+    // TurnBased ShortCuts
+    public KeyCode chooseSpecialSpell;
+    public KeyCode chooseNormalSpell;
+    public KeyCode chooseItem;
+    public KeyCode doAccept;
+    public KeyCode doBack;
     public KeyCode swapUp;
     public KeyCode swapDown;
     public KeyCode swapLeft;
     public KeyCode swapRight;
     public KeyCode swapAliveUp;
     public KeyCode swapAliveDown;
-    public KeyCode chooseSpecialSpell;
-    public KeyCode chooseNormalSpell;
-    public KeyCode chooseItem;
-    public KeyCode doAccept;
-    public KeyCode doBack;
+
     public KeyCode jump;
     public KeyCode dodge;
     public KeyCode parry;

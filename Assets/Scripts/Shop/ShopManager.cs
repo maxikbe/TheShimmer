@@ -97,13 +97,13 @@ public class ShopManager : MonoBehaviour
     {
         if (shopPanel.activeSelf && hoveredSlot != null)
         {
-            if (Input.GetKeyDown(KeyCode.F) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyBoardSetting.InspectItem) || Input.GetMouseButtonDown(1))
             {
                 ShowInspectWindow(hoveredSlot);
             }
         }
 
-        if (inspectPanel.activeSelf && (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.F)))
+        if (inspectPanel.activeSelf && (Input.GetKeyDown(KeyBoardSetting.Cancel) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyBoardSetting.InspectItem)))
         {
             inspectPanel.SetActive(false);
         }

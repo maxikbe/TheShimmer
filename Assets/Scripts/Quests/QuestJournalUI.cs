@@ -22,7 +22,7 @@ public class QuestJournalUI : MonoBehaviour
     void Update()
     {
         // otevirani journalu pomoci J
-        if (Input.GetKeyDown(KeyCode.J))
+        if (Input.GetKeyDown(KeyBoardSetting.Journal))
         {
             if (journalPanel.activeSelf) CloseJournal();
             else OpenJournal();

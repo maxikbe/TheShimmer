@@ -103,7 +103,7 @@ public class CodexUIManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyBoardSetting.Codex))
         {
             if (codexCanvas.activeSelf) CloseCodex();
             else OpenCodex();

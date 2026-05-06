@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class KeyBoardSetting : MonoBehaviour
 {
@@ -7,8 +8,26 @@ public class KeyBoardSetting : MonoBehaviour
     public static KeyCode keyLeft = KeyCode.A;
     public static KeyCode keyRight = KeyCode.D;
     public static KeyCode keyRun = KeyCode.LeftShift;
+    
+    //ingame use (setting, inventory,...)
+    public static KeyCode Pause =  KeyCode.Escape;
+    public static KeyCode MenuRight = KeyCode.RightArrow;
+    public static KeyCode MenuLeft = KeyCode.LeftArrow;
+    public static KeyCode Cancel = KeyCode.Escape;
+    
     public static KeyCode TBinventory = KeyCode.Tab;
     public static KeyCode NormalInventory = KeyCode.I;
+    
+    public static KeyCode Journal =  KeyCode.J;
+    public static KeyCode Codex = KeyCode.B;
+    public static KeyCode Interact = KeyCode.E;
+    public static KeyCode Craft = KeyCode.C;
+    public static KeyCode Tent =  KeyCode.T;
+    public static KeyCode Pack =  KeyCode.F;
+    public static KeyCode Map = KeyCode.G;
+    public static KeyCode InspectItem = KeyCode.F;
+    public static KeyCode LightenUp = KeyCode.L;
+    
 
     // TurnBased ShortCuts
     public static KeyCode chooseSpecialSpell = KeyCode.Q; 

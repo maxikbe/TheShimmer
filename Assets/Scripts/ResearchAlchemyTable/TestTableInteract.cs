@@ -21,7 +21,7 @@ public class TestTableInteract : MonoBehaviour
 
     private void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && Input.GetKeyDown(KeyBoardSetting.Interact))
         {
             if (uiManager != null)
             {
