@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class MobData
 {
     public MobType mobType; // Např. Wolf, Bear
-    public Sprite journalSprite; // Ten hezký obrázek pro Bestiář
+    public Sprite codexSprite; // Ten hezký obrázek pro Bestiář
     public string displayName; // Např. "Zmutovaný Medvěd"
     [TextArea(5, 10)]
     public string description; // Ten Witcher-style lore text

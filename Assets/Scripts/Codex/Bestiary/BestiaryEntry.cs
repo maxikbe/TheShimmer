@@ -10,9 +10,9 @@ public class BestiaryEntry : MonoBehaviour
     public Button myButton;
 
     private MobType myMob;
-    private JournalUIManager myManager;
+    private CodexUIManager myManager;
 
-    public void Setup(MobType mob, JournalUIManager manager)
+    public void Setup(MobType mob, CodexUIManager manager)
     {
         myMob = mob;
         myManager = manager;

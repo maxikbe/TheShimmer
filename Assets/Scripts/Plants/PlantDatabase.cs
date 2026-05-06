@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class PlantData
 {
     public PlantType plantType; // Z tvého enumu
-    public Sprite journalSprite; // Fotka do deníku
+    public Sprite codexSprite; // Fotka do deníku
     public string displayName; // Hezký název
     [TextArea(5, 10)]
     public string description; // Zápisky biologa

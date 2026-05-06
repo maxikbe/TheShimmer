@@ -1,6 +1,6 @@
 using UnityEngine;
 [System.Serializable]
-public class SettingsSaver 
+public class SettingsSaver2
 {
     // GameSettings
     public bool autoSave;

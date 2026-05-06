@@ -9,9 +9,9 @@ public class SampleEntry : MonoBehaviour
     public Button myButton;
 
     private Item mySample;
-    private JournalUIManager myManager;
+    private CodexUIManager myManager;
 
-    public void Setup(Item sample, JournalUIManager manager)
+    public void Setup(Item sample, CodexUIManager manager)
     {
         mySample = sample;
         myManager = manager;

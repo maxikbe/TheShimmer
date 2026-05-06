@@ -3,9 +3,9 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-public class JournalUIManager : MonoBehaviour
+public class CodexUIManager : MonoBehaviour
 {
-    public static JournalUIManager Instance;
+    public static CodexUIManager Instance;
 
     [Header("Odkazy na Systém")]
     public Database itemDatabase;
@@ -14,7 +14,7 @@ public class JournalUIManager : MonoBehaviour
     public List<PotionRecipe> allPotionRecipes; // Sem v Inspektoru přetáhneš všechny své recepty!
 
     [Header("Hlavní Okno")]
-    public GameObject journalCanvas;
+    public GameObject codexCanvas;
 
     [Header("Tlačítka (Záložky)")]
     public Button tabBestiaryBtn;
@@ -77,28 +77,28 @@ public class JournalUIManager : MonoBehaviour
         if (tabSamplesBtn != null) tabSamplesBtn.onClick.AddListener(() => SwitchTab(2));
         if (tabRecipesBtn != null) tabRecipesBtn.onClick.AddListener(() => SwitchTab(3));
 
-        CloseJournal();
+        CloseCodex();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.J))
         {
-            if (journalCanvas.activeSelf) CloseJournal();
-            else OpenJournal();
+            if (codexCanvas.activeSelf) CloseCodex();
+            else OpenCodex();
         }
     }
 
-    public void OpenJournal()
+    public void OpenCodex()
     {
-        journalCanvas.SetActive(true);
+        codexCanvas.SetActive(true);
         Time.timeScale = 0f;
         SwitchTab(0);
     }
 
-    public void CloseJournal()
+    public void CloseCodex()
     {
-        journalCanvas.SetActive(false);
+        codexCanvas.SetActive(false);
         Time.timeScale = 1f;
     }
 
@@ -158,7 +158,7 @@ public class JournalUIManager : MonoBehaviour
         {
             detailMobNameText.text = visualData.displayName;
             detailMobLoreText.text = visualData.description; 
-            detailMobLargeImage.sprite = visualData.journalSprite;
+            detailMobLargeImage.sprite = visualData.codexSprite;
             detailMobLargeImage.color = Color.white;
         }
         else
@@ -206,7 +206,7 @@ public class JournalUIManager : MonoBehaviour
         {
             detailPlantNameText.text = visualData.displayName;
             detailPlantLoreText.text = visualData.description; 
-            detailPlantLargeImage.sprite = visualData.journalSprite;
+            detailPlantLargeImage.sprite = visualData.codexSprite;
             detailPlantLargeImage.color = Color.white;
         }
         else
@@ -312,7 +312,7 @@ public class JournalUIManager : MonoBehaviour
                 foreach(MobType m in sampleItem.originMobs) 
                 {
                     MobData md = mobDatabase.GetMobData(m); 
-                    if (md != null) SpawnVisualBox(md.displayName, md.journalSprite, detailSampleSourcesContainer);
+                    if (md != null) SpawnVisualBox(md.displayName, md.codexSprite, detailSampleSourcesContainer);
                 }
             }
             if (sampleItem.originPlants != null)
@@ -320,7 +320,7 @@ public class JournalUIManager : MonoBehaviour
                 foreach(PlantType p in sampleItem.originPlants) 
                 {
                     PlantData pd = plantDatabase.GetPlantData(p); 
-                    if (pd != null) SpawnVisualBox(pd.displayName, pd.journalSprite, detailSampleSourcesContainer);
+                    if (pd != null) SpawnVisualBox(pd.displayName, pd.codexSprite, detailSampleSourcesContainer);
                 }
             }
 

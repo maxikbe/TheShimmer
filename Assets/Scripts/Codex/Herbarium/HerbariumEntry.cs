@@ -9,9 +9,9 @@ public class HerbariumEntry : MonoBehaviour
     public Button myButton;
 
     private PlantType myPlant;
-    private JournalUIManager myManager;
+    private CodexUIManager myManager;
 
-    public void Setup(PlantType plant, JournalUIManager manager, PlantDatabase plantDB)
+    public void Setup(PlantType plant, CodexUIManager manager, PlantDatabase plantDB)
     {
         myPlant = plant;
         myManager = manager;
@@ -20,9 +20,9 @@ public class HerbariumEntry : MonoBehaviour
         if (data != null)
         {
             plantNameText.text = !string.IsNullOrEmpty(data.displayName) ? data.displayName : plant.ToString();
-            if (data.journalSprite != null)
+            if (data.codexSprite != null)
             {
-                plantIcon.sprite = data.journalSprite;
+                plantIcon.sprite = data.codexSprite;
                 plantIcon.color = Color.white;
             }
         }
