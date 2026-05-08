@@ -129,7 +129,7 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: The_Marrow_Butterfly
     originalName: 
-    pivot: {x: 0.51452285, y: -0.026785715}
+    pivot: {x: 0.4854772, y: -0.026785715}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -167,7 +167,7 @@ ScriptedImporter:
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 4
+        x: 11
         y: 3
         width: 241
         height: 112

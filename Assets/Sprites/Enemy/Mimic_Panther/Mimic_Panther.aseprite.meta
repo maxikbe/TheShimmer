@@ -129,7 +129,7 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: Mimic_Panther
     originalName: 
-    pivot: {x: 0.5964912, y: -0.16853932}
+    pivot: {x: 0.4, y: -0.18390806}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -137,8 +137,8 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 171
-      height: 89
+      width: 170
+      height: 87
     spriteID: d8ce95c79717d614494dd64e51c0adda
     spriteBone: []
     spriteOutline: []
@@ -167,10 +167,10 @@ ScriptedImporter:
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 26
-        y: 15
-        width: 171
-        height: 89
+        x: 60
+        y: 16
+        width: 170
+        height: 87
       spriteId: d8ce95c79717d614494dd64e51c0adda
     linkedCells: []
     tileCells: []

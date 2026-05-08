@@ -44,6 +44,7 @@ MonoBehaviour:
   HealAmount: 0
   consumeAmount: 0
   waterAmount: 0
+  sleepAmount: 0
   durability: 0
   armorType: 0
   Armor: 0
@@ -51,3 +52,19 @@ MonoBehaviour:
   turnBaseItemType: 0
   turnBaseItemEffectAmount: 0
   turnBaseItemDuration: 0
+  rarity: 0
+  originMobs: 
+  originPlants: 
+  researchTimeMinutes: 5
+  canBeUsedInAlchemy: 0
+  isCrushable: 0
+  crushedVersion: {fileID: 0}
+  requiredCrushes: 5
+  potionHeal: 0
+  potionAditionalHealth: 0
+  potionBonusSpeed: 0
+  potionBonusStamina: 0
+  potionBonusFOV: 0
+  potionBonushungerSpeed: 0
+  potionBonusdamage: 0
+  hilightResources: 0

@@ -129,7 +129,7 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: Bear1
     originalName: 
-    pivot: {x: 0.49787232, y: -0.019867549}
+    pivot: {x: 0.50212765, y: -0.019867549}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -167,7 +167,7 @@ ScriptedImporter:
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 11
+        x: 10
         y: 3
         width: 235
         height: 151

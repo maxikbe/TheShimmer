@@ -193,6 +193,7 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private TextMeshProUGUI GameOverText;
     [SerializeField] private TextMeshProUGUI ContinueText;
     [SerializeField] private TextMeshProUGUI RestartText;
+    [SerializeField] private TextMeshProUGUI BackButtonText;
 
     public void LanguageOnStart()
     {
@@ -205,6 +206,7 @@ public class TurnBasedLogic : MonoBehaviour
         GameOverText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Expedition Died" : "Expedice skončila";
         ContinueText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Continue" : "Pokračovat";
         RestartText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Restart" : "Restartovat";
+        BackButtonText.text = gameDataManager.currentGameData.settings.currentLanguage == 0 ? "Back" : "Zpět";
     }
 
     void ApplyPerksToCharacters()

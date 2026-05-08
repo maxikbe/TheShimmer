@@ -129,7 +129,7 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: Crocodile
     originalName: 
-    pivot: {x: 0.50829875, y: -0.03}
+    pivot: {x: 0.49170125, y: -0.03}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -167,7 +167,7 @@ ScriptedImporter:
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 10
+        x: 14
         y: 3
         width: 241
         height: 100

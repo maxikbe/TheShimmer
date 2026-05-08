@@ -129,7 +129,7 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: The_Mycelium_Howler
     originalName: 
-    pivot: {x: 0.48672566, y: -0.024}
+    pivot: {x: 0.5132743, y: -0.024}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -167,7 +167,7 @@ ScriptedImporter:
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 18
+        x: 12
         y: 3
         width: 226
         height: 125
