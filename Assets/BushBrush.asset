@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e3dc1bb75900504491d1d1080bcb5b8, type: 3}
+  m_Name: BushBrush
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::RandomGameObjectBrush
+  m_Cells:
+  - m_GameObject: {fileID: 3600369703596272523, guid: 22ef013e733badb44a240f11d5a6efed, type: 3}
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    m_Orientation: {x: 0, y: 0, z: 0, w: 1}
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Pivot: {x: 0, y: 0, z: 0}
+  m_CanChangeZPosition: 0
+  hiddenGridLayout:
+    cellSize: {x: 1, y: 1, z: 1}
+    cellGap: {x: 0, y: 0, z: 0}
+    cellLayout: 0
+    cellSwizzle: 0
+  hiddenGrid: {fileID: 0}
+  m_Anchor: {x: 0.5, y: 0.5, z: 0}
+  prefabs:
+  - {fileID: 689784976932467048, guid: 8fc46ba3618caac40ae1b9c9bd4f1f48, type: 3}
+  - {fileID: 4826080745609392467, guid: 4cd85793ed6eae046ba8b3ae2ce7a630, type: 3}
+  - {fileID: 6773292251541555094, guid: e5eb6b8ee5265a149a487d56df48255c, type: 3}
+  - {fileID: 6339727628133189578, guid: a0af33e14f63fda40b8eceaa52fad906, type: 3}
+  - {fileID: 138980773682092688, guid: 5b5c6da678a09d24ab22f7f3cad7233a, type: 3}
+  - {fileID: 3600369703596272523, guid: 22ef013e733badb44a240f11d5a6efed, type: 3}
+  - {fileID: 5149782335527520242, guid: 6d4b4c857c6607046bb73e9c266121a2, type: 3}
+  radius: 20
+  density: 0.0005
+  minScale: 2
+  maxScale: 5
+  randomRotation: 0
