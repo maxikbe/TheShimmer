@@ -1,12 +1,21 @@
 using UnityEngine;
-using System.Collections.Generic; // Přidáno pro List
+using System.Collections.Generic;
 
-// Nová třída pro podmínky!
 [System.Serializable]
 public class QuestCondition
 {
     public QuestData quest;
-    public QuestState requiredState; // např. musí být "Completed", aby se volba ukázala
+    public QuestState requiredState; 
+}
+
+// NOVÉ: Podmínka inventáře
+[System.Serializable]
+public class ItemCondition
+{
+    public Item requiredItem; // Co musí mít
+    public int requiredAmount = 1; // Kolik kusů
+    [Tooltip("Má se item odevzdat (zničit z báglu) po kliknutí?")]
+    public bool consumeItem = true; 
 }
 
 public enum CommandType { None, WaitHere, FollowMe, AllWait, AllFollow }
@@ -17,14 +26,18 @@ public class DialogueChoice
     public bool opensShop;
     public string choiceText; 
     public DialogueNode nextNode; 
+    
+    [Header("Quest Logika a Svět")]
     public QuestData questToStart; 
+    public QuestData questToAdvance; // Posune probíhající quest dál
+    public bool triggerCombat; // Speedrun tlačítko (začne fight)
     
     [Header("Příkazy pro NPC")]
-    public CommandType npcCommand; // Nová proměnná pro příkazy
+    public CommandType npcCommand; 
     
-    [Header("Witcher Podmínky")]
-    // Seznam podmínek, které musí být splněny. Pokud je prázdný, ukáže se vždycky.
+    [Header("Podmínky pro zobrazení tlačítka")]
     public List<QuestCondition> conditions = new List<QuestCondition>(); 
+    public List<ItemCondition> itemConditions = new List<ItemCondition>(); // Tlačítko se ukáže jen, když máš loot
 }
 
 [CreateAssetMenu(fileName = "NewDialogueNode", menuName = "Dialogue/Dialogue Node")]
