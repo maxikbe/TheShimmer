@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e3dc1bb75900504491d1d1080bcb5b8, type: 3}
+  m_Name: TreeBrush
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::RandomGameObjectBrush
+  m_Cells:
+  - m_GameObject: {fileID: 2051661932605908713, guid: 17e674d682bd8bc4aab2d2da0ac8483e, type: 3}
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    m_Orientation: {x: 0, y: 0, z: 0, w: 1}
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Pivot: {x: 0, y: 0, z: 0}
+  m_CanChangeZPosition: 0
+  hiddenGridLayout:
+    cellSize: {x: 1, y: 1, z: 1}
+    cellGap: {x: 0, y: 0, z: 0}
+    cellLayout: 0
+    cellSwizzle: 0
+  hiddenGrid: {fileID: 0}
+  m_Anchor: {x: 0.5, y: 0.5, z: 0}
+  prefabs:
+  - {fileID: 2051661932605908713, guid: 17e674d682bd8bc4aab2d2da0ac8483e, type: 3}
+  - {fileID: 8281271519587891452, guid: 7a447706b47d4ce42a370ae3dd411a28, type: 3}
+  - {fileID: 4316452975972073770, guid: 41f5e312ce5611f4e93bcda3149053bb, type: 3}
+  - {fileID: 2848750954005093412, guid: dc8afa877deda9845b24367e211f9a18, type: 3}
+  - {fileID: 4767165702359881305, guid: dbe56aa4e6ee216469bda3b6f3157b79, type: 3}
+  - {fileID: 646514704865709546, guid: 30874850fe305504cb6c04ec37586ec7, type: 3}
+  - {fileID: 6840254930597135883, guid: 711d7991a022d664c8fb6823f698328f, type: 3}
+  - {fileID: 5721076232915734872, guid: 4876bf899925fdc4d99aa5c0772762e7, type: 3}
+  radius: 25
+  density: 0.002
+  minScale: 2
+  maxScale: 5
+  randomRotation: 0
