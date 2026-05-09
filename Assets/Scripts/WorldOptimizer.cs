@@ -11,7 +11,6 @@ public class WorldOptimizer : MonoBehaviour
     private bool isReady = false;
     public String nameContainer;
 
-    // Queue for smooth activation
     private Queue<GameObject> activationQueue = new Queue<GameObject>();
 
     IEnumerator Start()
@@ -34,7 +33,6 @@ public class WorldOptimizer : MonoBehaviour
         treeContainer = foundContainer.transform;
         treeContainer.gameObject.SetActive(false);
 
-        // FAST LOAD: Process 5000 chunks per frame
         int counter = 0;
         foreach (Transform child in treeContainer)
         {
@@ -65,13 +63,11 @@ public class WorldOptimizer : MonoBehaviour
             Vector3 chunkPos = chunk.transform.GetChild(0).position;
             bool shouldBeActive = (pPos - chunkPos).sqrMagnitude < sqrDist;
 
-            // Instead of SetActive(true) immediately, we queue it
             if (shouldBeActive && !chunk.activeSelf)
             {
                 if (!activationQueue.Contains(chunk))
                     activationQueue.Enqueue(chunk);
             }
-            // Deactivation is usually fast, so we do it immediately
             else if (!shouldBeActive && chunk.activeSelf)
             {
                 chunk.SetActive(false);
@@ -89,8 +85,6 @@ public class WorldOptimizer : MonoBehaviour
                 if (chunk != null)
                 {
                     chunk.SetActive(true);
-                    // This is the secret: wait 1 frame after every chunk 
-                    // to let the GPU breathe.
                     yield return null; 
                 }
             }
