@@ -18,8 +18,8 @@ MonoBehaviour:
   icon: {fileID: -3891365969354099759, guid: 00e3b37620db7af4093f6bc3a420ff9f, type: 3}
   prefab: {fileID: 0}
   description: Sweet and refreshing. Reminds you of childhood summers.
-  isResearched: 0
-  isUsable: 0
+  isResearched: 1
+  isUsable: 1
   isTurnedBaseItem: 0
   canBeSold: 1
   basePrice: 0
@@ -53,7 +53,13 @@ MonoBehaviour:
   turnBaseItemEffectAmount: 0
   turnBaseItemDuration: 0
   rarity: 0
-  originMobName: 
+  originMobs: 
+  originPlants: 
+  researchTimeMinutes: 5
+  canBeUsedInAlchemy: 0
+  isCrushable: 0
+  crushedVersion: {fileID: 0}
+  requiredCrushes: 5
   potionHeal: 0
   potionAditionalHealth: 0
   potionBonusSpeed: 0

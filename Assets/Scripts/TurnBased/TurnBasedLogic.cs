@@ -120,7 +120,7 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private TextMeshProUGUI infoDescriptionText;
     
 
-    public List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 2 };
+    public static List<int> whatEnemiesIsFighting = new List<int> { 1, 1, 2 };
     private List<Skills> currentCharacterSkills;
     private List<Character> characters;
     private Character currentCharacter;

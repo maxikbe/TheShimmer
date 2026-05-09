@@ -18,8 +18,8 @@ MonoBehaviour:
   icon: {fileID: -1154947519123426653, guid: 734cd94df4c521f4ea1aa310a85d293c, type: 3}
   prefab: {fileID: 0}
   description: Chemical-tasting powder mix. Your muscles will thank you later.
-  isResearched: 0
-  isUsable: 0
+  isResearched: 1
+  isUsable: 1
   isTurnedBaseItem: 0
   canBeSold: 1
   basePrice: 0
@@ -43,8 +43,8 @@ MonoBehaviour:
   magicalElement: 0
   HealAmount: 0
   consumeAmount: 0
-  waterAmount: 0
-  sleepAmount: 0
+  waterAmount: 50
+  sleepAmount: 10
   durability: 0
   armorType: 0
   Armor: 0
@@ -53,7 +53,13 @@ MonoBehaviour:
   turnBaseItemEffectAmount: 0
   turnBaseItemDuration: 0
   rarity: 0
-  originMobName: 
+  originMobs: 
+  originPlants: 
+  researchTimeMinutes: 5
+  canBeUsedInAlchemy: 0
+  isCrushable: 0
+  crushedVersion: {fileID: 0}
+  requiredCrushes: 5
   potionHeal: 0
   potionAditionalHealth: 0
   potionBonusSpeed: 0

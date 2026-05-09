@@ -18,8 +18,8 @@ MonoBehaviour:
   icon: {fileID: -495271787323640913, guid: 7d8013ba07de9954093019e9fa22cc32, type: 3}
   prefab: {fileID: 0}
   description: High-density calories. Will leave you gasping for a drink.
-  isResearched: 0
-  isUsable: 0
+  isResearched: 1
+  isUsable: 1
   isTurnedBaseItem: 0
   canBeSold: 1
   basePrice: 0
@@ -53,7 +53,13 @@ MonoBehaviour:
   turnBaseItemEffectAmount: 0
   turnBaseItemDuration: 0
   rarity: 0
-  originMobName: 
+  originMobs: 
+  originPlants: 
+  researchTimeMinutes: 5
+  canBeUsedInAlchemy: 0
+  isCrushable: 0
+  crushedVersion: {fileID: 0}
+  requiredCrushes: 5
   potionHeal: 0
   potionAditionalHealth: 0
   potionBonusSpeed: 0

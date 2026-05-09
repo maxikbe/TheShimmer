@@ -18,8 +18,8 @@ MonoBehaviour:
   icon: {fileID: -9133981527234656834, guid: d21542da7afd75e4aba18390be510c38, type: 3}
   prefab: {fileID: 0}
   description: Caffeine and taurine. Your heart rate might become a problem later.
-  isResearched: 0
-  isUsable: 0
+  isResearched: 1
+  isUsable: 1
   isTurnedBaseItem: 0
   canBeSold: 1
   basePrice: 50
@@ -53,7 +53,13 @@ MonoBehaviour:
   turnBaseItemEffectAmount: 0
   turnBaseItemDuration: 0
   rarity: 0
-  originMobName: 
+  originMobs: 
+  originPlants: 
+  researchTimeMinutes: 5
+  canBeUsedInAlchemy: 0
+  isCrushable: 0
+  crushedVersion: {fileID: 0}
+  requiredCrushes: 5
   potionHeal: 0
   potionAditionalHealth: 0
   potionBonusSpeed: 0

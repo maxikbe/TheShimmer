@@ -18,8 +18,8 @@ MonoBehaviour:
   icon: {fileID: -3549665926095703295, guid: 1909238c399a71f489bf66821a64db86, type: 3}
   prefab: {fileID: 0}
   description: Chunky texture. It feels... alive as it goes down.
-  isResearched: 0
-  isUsable: 0
+  isResearched: 1
+  isUsable: 1
   isTurnedBaseItem: 0
   canBeSold: 1
   basePrice: 0
@@ -53,7 +53,13 @@ MonoBehaviour:
   turnBaseItemEffectAmount: 0
   turnBaseItemDuration: 0
   rarity: 0
-  originMobName: 
+  originMobs: 
+  originPlants: 
+  researchTimeMinutes: 5
+  canBeUsedInAlchemy: 0
+  isCrushable: 0
+  crushedVersion: {fileID: 0}
+  requiredCrushes: 5
   potionHeal: 0
   potionAditionalHealth: 0
   potionBonusSpeed: 0

@@ -5,7 +5,7 @@ using System.IO;
 public class CharpickerStatsHolder : MonoBehaviour
 {
     [SerializeField] private TMP_Text nazevHrace;
-    [SerializeField] private TMP_Text stat1, stat2, stat3, stat4, stat5;
+    [SerializeField] private TMP_Text[] statList;
     
     private string savePath;
     private GameData loadedData;
@@ -30,15 +30,45 @@ public class CharpickerStatsHolder : MonoBehaviour
         LoadDataIntoMemory();
 
         if (loadedData == null || loadedData.characters == null) return;
+        bool isCzech = gameDataManager.currentGameData.settings.currentLanguage != 0;
+        Character character = loadedData.characters.Find(c => c.id == currentId + 1);
 
-      Character postava = loadedData.characters.Find(c => c.id == currentId + 1);
-
-        if (postava != null)
+        if (character != null)
         {
-            if (nazevHrace != null) nazevHrace.text = postava.name;
-            if (stat1 != null) stat1.text = "HP: " + postava.health;
-            if (stat2 != null) stat2.text = "LVL: " + postava.level;
-            if (stat3 != null) stat3.text = "Speed: " + postava.speed;
+            if (nazevHrace != null) nazevHrace.text = (isCzech ? "Aktuální postava: " : "Current Character choosed: ") + character.name;
+            for (int i = 0; i < statList.Length; i++)
+            {
+                if (statList[i] != null)
+                {
+                    switch (i)
+                    {
+                        case 0:
+                            statList[i].text = (isCzech ? "Vaši obecné informace: " : "Your general info: ");
+                            break;
+                        case 1:
+                            statList[i].text = (isCzech ? "Vylepšení zbraně: " : "Gun Upgraders: ") + gameDataManager.currentGameData.player.numberOfGunUpgraders;
+                            break;
+                        case 2:
+                            statList[i].text = (isCzech ? "Materiály: " : "Materials: ") + gameDataManager.currentGameData.player.numberOfMaterial;
+                            break;
+                        case 3:
+                            statList[i].text = (isCzech ? "Mince: " : "Coins: ") + gameDataManager.currentGameData.player.numberOfCoins;
+                            break;
+                        case 4:
+                            statList[i].text = (isCzech ? "Žízeň: " : "Thirst: ") + gameDataManager.currentGameData.player.thirstLevel;
+                            break;
+                        case 5:
+                            statList[i].text = (isCzech ? "Hlad: " : "Hunger: ") + gameDataManager.currentGameData.player.hungerLevel;
+                            break;
+                        case 6:
+                            statList[i].text = (isCzech ? "Výdrž: " : "Stamina: ") + gameDataManager.currentGameData.player.staminaLevel;
+                            break;
+                        case 7:
+                            statList[i].text = (isCzech ? "Spánek: " : "Sleep: ") + gameDataManager.currentGameData.player.sleepLevel;
+                            break;
+                    }
+                }
+            }
         }
     }
 }

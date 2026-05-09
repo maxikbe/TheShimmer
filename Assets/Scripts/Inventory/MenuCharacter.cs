@@ -30,6 +30,7 @@ public class MenuCharacter : MonoBehaviour
     [SerializeField] private TMP_Text[] perkChooseText;
     [SerializeField] private Image perkChooseIcon;
     [SerializeField] private GameObject[] perkPickerButtons;
+    bool isCzech;
 
     void Awake()
     {
@@ -47,6 +48,7 @@ public class MenuCharacter : MonoBehaviour
         {
             charPicker = FindFirstObjectByType<CharPicker>(FindObjectsInactive.Include);
         }
+        isCzech = gameDataManager.currentGameData.settings.currentLanguage != 0;
     }
 
     void Update()
@@ -65,11 +67,22 @@ public class MenuCharacter : MonoBehaviour
     private void addCharInfo(Character character)
     {
         if (character == null) return;
-        charText[0].text = character.name;
-        charText[1].text = "Level: " + character.level.ToString();
+        charText[0].text = (isCzech ? "Jméno postavy: " : "Char Name: ") + character.name;
+        charText[1].text = (isCzech ? "Level: " : "Level: ") + character.level.ToString();
         charText[2].text = "HP: " + character.health.ToString();
-        charText[3].text = "Speed: " + character.speed.ToString();
-        charText[4].text = "Perk Upgrade: " + character.perkUpgradersNumber.ToString();
+        charText[3].text = (isCzech ? "Rychlost: " : "Speed: ") + character.speed.ToString();
+        charText[4].text = (isCzech ? "Vylepšení perku: " : "Perk Upgrade: ") + character.perkUpgradersNumber.ToString();
+        charText[5].text = (isCzech ? "Max HP: " : "Max HP: ") + character.maxHealth.ToString();
+        charText[6].text = (isCzech ? "Mana: " : "Mana: ") + character.mana.ToString();
+        charText[7].text = "XP: " + character.ExperiencePoints.ToString();
+        charText[8].text = (isCzech ? "Šance na krit: " : "Crit Chance: ") + character.critChance.ToString() + "%";
+        charText[9].text = (isCzech ? "Vylepšení zbraně: " : "Gun Upgraders: ") + gameDataManager.currentGameData.player.numberOfGunUpgraders.ToString();
+        charText[10].text = (isCzech ? "Materiály: " : "Materials: ") + gameDataManager.currentGameData.player.numberOfMaterial.ToString();
+        charText[11].text = (isCzech ? "Mince: " : "Coins: ") + gameDataManager.currentGameData.player.numberOfCoins.ToString();
+        charText[12].text = (isCzech ? "Žízeň: " : "Thirst: ") + gameDataManager.currentGameData.player.thirstLevel.ToString();
+        charText[13].text = (isCzech ? "Hlad: " : "Hunger: ") + gameDataManager.currentGameData.player.hungerLevel.ToString();
+        charText[14].text = (isCzech ? "Výdrž: " : "Stamina: ") + gameDataManager.currentGameData.player.staminaLevel.ToString();
+        charText[15].text = (isCzech ? "Spánek: " : "Sleep: ") + gameDataManager.currentGameData.player.sleepLevel.ToString();
     }
 
     private void UpdateCharacterUI()
@@ -177,10 +190,12 @@ public class MenuCharacter : MonoBehaviour
     private void addGunInfo(Item itemInfo, ItemSaveData itemSaveData)
     {
         if (itemInfo == null || itemSaveData == null) return;
-        gunChooseText[0].text = "Level: " + itemSaveData.level;
-        gunChooseText[1].text = "Amount: " + itemSaveData.amount;
-        gunChooseText[2].text = "Damage: " + itemInfo.Damage;
-        gunChooseText[3].text = "Fire Rate: " + itemInfo.weaponType; 
+        gunChooseText[0].text = (isCzech ? "Název zbraně: " : "Weapon Name: ") + itemInfo.itemName;
+        gunChooseText[1].text = (isCzech ? "Typ zbraně: " : "Weapon Type: ") + itemInfo.weaponType;
+        gunChooseText[2].text = (isCzech ? "Poškození: " : "Damage: ") + itemInfo.Damage;
+        gunChooseText[3].text = (isCzech ? "Popis: " : "Description: ") + itemInfo.description;
+        gunChooseText[4].text = (isCzech ? "Úroveň: " : "Level: ") + itemSaveData.level;
+        gunChooseText[5].text = (isCzech ? "Množství: " : "Amount: ") + itemSaveData.amount;
     }
     
     private void addPickablePerks()
@@ -278,9 +293,10 @@ public class MenuCharacter : MonoBehaviour
 
     private void addPerkInfo(Perks perk)
     {
-        perkChooseText[0].text = perk.perkName;
-        perkChooseText[1].text = perk.perkType.ToString();
-        perkChooseText[2].text = perk.description;
+        perkChooseText[0].text = (isCzech ? "Název perku: " : "Perk Name: ") + perk.perkName;
+        perkChooseText[1].text = (isCzech ? "Typ perku: " : "Perk Type: ") + perk.perkType.ToString();
+        perkChooseText[2].text = (isCzech ? "Popis: " : "Description: ") + perk.description;
+        perkChooseText[3].text = (isCzech ? "Úroveň: " : "Level: ") + perk.levelOfPerk;
         perkChooseIcon.sprite = perk.icon;
     }
 

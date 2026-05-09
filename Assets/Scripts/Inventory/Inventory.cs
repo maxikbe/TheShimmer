@@ -88,21 +88,63 @@ public class Inventory : MonoBehaviour
     {
         statsTitle.text = item.itemName;
         string enumTypeName = item.itemType.ToString();
+        bool isCzech = gameDataManager.currentGameData.settings.currentLanguage != 0;
     
-        string dynamicInfo = $"<b>Level: {saveItem.level} | Amount: {saveItem.amount}</b>\n\n";
-        
+        string dynamicInfo = $"<b>{(isCzech ? "Level" : "Level")}: {saveItem.level} | {(isCzech ? "Množství" : "Amount")}: {saveItem.amount}</b>\n\n";
+
+
         switch (item.itemType)
         {
             case ItemType.Weapon:
-                statsDescription.text = dynamicInfo + $"Damage: {item.Damage}\nFire Rate: {item.FireRate}\nRange: {item.Range}";
+                statsDescription.text = dynamicInfo +
+                    $"{(isCzech ? "Poškození" : "Damage")}: {item.Damage}\n" +
+                    $"{(isCzech ? "Rychlost střelby" : "Fire Rate")}: {item.FireRate}\n" +
+                    $"{(isCzech ? "Dosah" : "Range")}: {item.Range}\n" +
+                    $"{(isCzech ? "Typ zbraně" : "Weapon Type")}: {item.weaponType}" +
+                    (item.isMagical ? $"\n{(isCzech ? "Element" : "Element")}: {item.magicalElement}" : "") +
+                    (item.weaponType == WeaponType.Ranged ? $"\n{(isCzech ? "Kapacita munice" : "Ammo Capacity")}: {item.AmmoCapacity}\n{(isCzech ? "Čas přebíjení" : "Reload Time")}: {item.ReloadTime}" : "");
                 break;
+
             case ItemType.Armor:
-                statsDescription.text = dynamicInfo + $"Armor: {item.Armor}\nDurability: {item.durability}";
+                statsDescription.text = dynamicInfo +
+                    $"{(isCzech ? "Obrana" : "Armor")}: {item.Armor}\n" +
+                    $"{(isCzech ? "Odolnost" : "Durability")}: {item.durability}\n" +
+                    $"{(isCzech ? "Slot" : "Slot")}: {item.armorType}";
                 break;
+
             case ItemType.Healing:
             case ItemType.Consumable:
-                statsDescription.text = dynamicInfo + $"Heal: {item.HealAmount}\nUses: {saveItem.amount}";
+                statsDescription.text = dynamicInfo +
+                    $"{(isCzech ? "Obnova HP" : "HP adding")}: {item.HealAmount}\n" +
+                    $"{(isCzech ? "Obnova jídla" : "Food adding")}: {item.consumeAmount}\n" +
+                    $"{(isCzech ? "Obnova vody" : "Water adding")}: {item.waterAmount}\n" +
+                    $"{(isCzech ? "Obnova spánku" : "Sleep adding")}: {item.sleepAmount}";
                 break;
+
+            case ItemType.Sample:
+                if (item.isResearched)
+                {
+                    statsDescription.text = dynamicInfo +
+                        $"{(isCzech ? "Rarita" : "Rarity")}: {item.rarity}\n" +
+                        (item.potionHeal > 0 ? $"{(isCzech ? "Obnova HP" : "HP Heal")}: {item.potionHeal}\n" : "") +
+                        (item.potionAditionalHealth > 0 ? $"{(isCzech ? "Bonusové HP" : "Bonus HP")}: {item.potionAditionalHealth}\n" : "") +
+                        (item.potionBonusSpeed > 0 ? $"{(isCzech ? "Bonusová rychlost" : "Bonus Speed")}: {item.potionBonusSpeed}\n" : "") +
+                        (item.potionBonusStamina > 0 ? $"{(isCzech ? "Bonusová stamina" : "Bonus Stamina")}: {item.potionBonusStamina}\n" : "") +
+                        (item.potionBonusFOV > 0 ? $"{(isCzech ? "Bonusové FOV" : "Bonus FOV")}: {item.potionBonusFOV}\n" : "") +
+                        (item.potionBonushungerSpeed != 0 ? $"{(isCzech ? "Rychlost hladu" : "Hunger Speed")}: {item.potionBonushungerSpeed}\n" : "") +
+                        (item.potionBonusdamage > 0 ? $"{(isCzech ? "Bonusové poškození" : "Bonus Damage")}: {item.potionBonusdamage}\n" : "") +
+                        (item.hilightResources ? $"{(isCzech ? "Zvýrazňuje suroviny" : "Highlights Resources")}\n" : "") +
+                        $"{(isCzech ? "Čas výzkumu" : "Research Time")}: {item.researchTimeMinutes} min";
+                }
+                else
+                {
+                    statsDescription.text = dynamicInfo +
+                        $"{(isCzech ? "Rarita" : "Rarity")}: {item.rarity}\n" +
+                        $"{(isCzech ? "[Ještě nevyzkoumaný]" : "[Not yet researched]")}\n" +
+                        $"{(isCzech ? "Čas výzkumu" : "Research Time")}: {item.researchTimeMinutes} min";
+                }
+                break;
+
             default:
                 statsDescription.text = dynamicInfo + item.description;
                 break;

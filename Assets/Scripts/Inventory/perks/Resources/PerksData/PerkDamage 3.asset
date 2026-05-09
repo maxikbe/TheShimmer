@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acece1a3b4ec344069fdcabb50ac70cf, type: 3}
   m_Name: PerkDamage 3
   m_EditorClassIdentifier: Assembly-CSharp::Perks
-  id: 200
+  id: 203
   perkName: Damage
   perkType: 1
-  addingAmount: 20
+  addingAmount: 50
   description: 
   icon: {fileID: -1782125611099640547, guid: eb5130fcaab154f6a8a92f8272f84352, type: 3}
-  levelOfPerk: 1
+  levelOfPerk: 3
