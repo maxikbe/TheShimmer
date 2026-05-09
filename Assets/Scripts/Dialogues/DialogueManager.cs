@@ -39,16 +39,15 @@ public class DialogueManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // --- PŘÍPRAVA PRO COMPANION LOGIKU ---
         Animal_movement[] allCompanions = FindObjectsOfType<Animal_movement>();
         Animal_movement currentAnimal = currentNPCObject != null ? currentNPCObject.GetComponent<Animal_movement>() : null;
 
         // vytvori tlacitka pro kazdou choice
         foreach (DialogueChoice choice in node.choices)
         {
-            // --- KONTROLA PODMÍNEK (ZAKLÍNAČSKÝ UPDATE) ---
             bool canShowChoice = true;
 
+            // 1. KONTROLA QUESTŮ
             if (choice.conditions != null && choice.conditions.Count > 0)
             {
                 foreach (QuestCondition condition in choice.conditions)
@@ -61,27 +60,44 @@ public class DialogueManager : MonoBehaviour
                 }
             }
 
-            // --- KONTROLA COMPANION TLAČÍTEK (DYNAMICKÉ SKRÝVÁNÍ) ---
+            // 2. KONTROLA ITEMŮ V INVENTÁŘI
+            if (canShowChoice && choice.itemConditions != null && choice.itemConditions.Count > 0)
+            {
+                if (gameDataManager.currentGameData == null) canShowChoice = false;
+                else
+                {
+                    foreach (ItemCondition itemCond in choice.itemConditions)
+                    {
+                        if (itemCond.requiredItem == null) continue;
+
+                        ItemSaveData foundItem = gameDataManager.currentGameData.OwnedItems.Find(i => i.id == itemCond.requiredItem.id && i.isOwned);
+                        
+                        if (foundItem == null || foundItem.amount < itemCond.requiredAmount)
+                        {
+                            canShowChoice = false; // Nemáš loot, volbu vůbec neukážeme
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 3. KONTROLA COMPANION TLAČÍTEK
             if (canShowChoice && choice.npcCommand != CommandType.None)
             {
                 switch (choice.npcCommand)
                 {
                     case CommandType.WaitHere:
-                        // Zobrazí se jen když zvíře NEČEKÁ
                         if (currentAnimal == null || currentAnimal.IsWaiting()) canShowChoice = false;
                         break;
                     case CommandType.FollowMe:
-                        // Zobrazí se jen když zvíře ČEKÁ
                         if (currentAnimal == null || !currentAnimal.IsWaiting()) canShowChoice = false;
                         break;
                     case CommandType.AllWait:
-                        // Zobrazí se jen pokud aspoň někdo NEČEKÁ
                         bool anyoneFollowing = false;
                         foreach (var c in allCompanions) if (c.behavior == Ghost_movement.MobBehavior.Companion && !c.IsWaiting()) anyoneFollowing = true;
                         if (!anyoneFollowing) canShowChoice = false;
                         break;
                     case CommandType.AllFollow:
-                        // Zobrazí se jen pokud aspoň někdo ČEKÁ
                         bool anyoneWaiting = false;
                         foreach (var c in allCompanions) if (c.behavior == Ghost_movement.MobBehavior.Companion && c.IsWaiting()) anyoneWaiting = true;
                         if (!anyoneWaiting) canShowChoice = false;
@@ -89,50 +105,62 @@ public class DialogueManager : MonoBehaviour
                 }
             }
 
-            // Pokud podmínky neprošly, přeskočíme zbytek kódu a jdeme na další volbu
             if (!canShowChoice) continue;
-            // ----------------------------------------------
 
+            // Vytvoření samotného tlačítka
             GameObject newButton = Instantiate(buttonPrefab, buttonContainer);
             newButton.GetComponentInChildren<TextMeshProUGUI>().text = choice.choiceText;
 
             newButton.GetComponent<Button>().onClick.AddListener(() => 
             {
-                if (choice.npcCommand != CommandType.None)
+                // Odevzdání itemů z inventáře
+                if (choice.itemConditions != null && gameDataManager.currentGameData != null)
                 {
-                    // Posíláme přímo GameObject toho, s kým mluvíme
-                    ExecuteCompanionCommand(choice.npcCommand, currentNPCObject); 
+                    foreach (ItemCondition itemCond in choice.itemConditions)
+                    {
+                        if (itemCond.consumeItem && itemCond.requiredItem != null)
+                        {
+                            ItemSaveData invItem = gameDataManager.currentGameData.OwnedItems.Find(i => i.id == itemCond.requiredItem.id && i.isOwned);
+                            if (invItem != null)
+                            {
+                                invItem.amount -= itemCond.requiredAmount;
+                                if (invItem.amount <= 0) invItem.isOwned = false; // Už ho nemá
+                                Debug.Log($"Item odevzdán: {itemCond.requiredItem.itemName}");
+                            }
+                        }
+                    }
+                    gameDataManager.SaveData(); // Save inventáře
+                }
+
+                if (choice.npcCommand != CommandType.None) ExecuteCompanionCommand(choice.npcCommand, currentNPCObject); 
+                
+                // SPEEDRUN START FIGHTU
+                if (choice.triggerCombat && currentNPCObject != null)
+                {
+                    Animal_movement npcAnimal = currentNPCObject.GetComponent<Animal_movement>();
+                    if (npcAnimal != null)
+                    {
+                        npcAnimal.MakeAggressive(); // Hodí NPC do agresivního stavu
+                        dialoguePanel.SetActive(false);
+                        return; 
+                    }
                 }
                 
+                // Posouvání a zapínání questů
+                if (choice.questToStart != null) QuestManager.Instance.StartQuest(choice.questToStart);
+                if (choice.questToAdvance != null) QuestManager.Instance.AdvanceQuest(choice.questToAdvance);
+
                 if (choice.opensShop)
                 {
                     dialoguePanel.SetActive(false);
-
-                    if (currentMerchant != null)
-                    {
-                        ShopManager.Instance.OpenShop(currentMerchant);
-                    }
-                    else
-                    {
-                        Debug.Log("Někdo se snaží obchodovat s někým, kdo není prodejce");
-                    }
-                    return;
+                    // V původním kódu je currentMerchant definovaný mimo, u tebe taky.
+                    // Jen bacha, jestli máš referenci správně.
+                    ShopManager.Instance.OpenShop(currentMerchant);
                 }
                 else
                 {
-                    if (choice.questToStart != null)
-                    {
-                        QuestManager.Instance.StartQuest(choice.questToStart);
-                    }
-
-                    if (choice.nextNode != null)
-                    {
-                        ContinueDialogue(choice.nextNode); 
-                    }
-                    else
-                    {
-                        dialoguePanel.SetActive(false);
-                    }
+                    if (choice.nextNode != null) ContinueDialogue(choice.nextNode); 
+                    else dialoguePanel.SetActive(false);
                 }
             });
         }
