@@ -18,12 +18,16 @@ public class TimeAndLight : MonoBehaviour
     public int currectDay = 1;
     public TextMeshProUGUI dayTextUI;
 
+    void Awake()
+    {
+        if (globalLight == null) globalLight = GetComponent<Light2D>();
+    }
+
     void Start()
     {
         currentTime = gameDataManager.currentGameData.player.time;
         currectDay = gameDataManager.currentGameData.player.dayNumber;
         dayTextUI.text = currectDay.ToString();
-        if (globalLight == null) globalLight = GetComponent<Light2D>();
     }
 
     void Update()
