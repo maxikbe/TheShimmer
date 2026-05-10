@@ -55,6 +55,7 @@ public class InitializeGameJson : MonoBehaviour
     {
         if (itemDatabase == null || skillDatabase == null)
         {
+            Debug.LogError("CRITICAL: Databáze jsou null! Snažíš se savovat dřív, než projel Awake() v InitializeGameJson!");
             return null;
         }
 

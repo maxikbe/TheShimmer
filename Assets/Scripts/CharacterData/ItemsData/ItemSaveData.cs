@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-[Serializable] 
+[System.Serializable] 
 public class ItemSaveData
 {
     public int id;
