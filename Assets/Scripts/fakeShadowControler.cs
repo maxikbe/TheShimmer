@@ -28,7 +28,6 @@ public class FakeShadowController : MonoBehaviour
         if (timeSystem == null || shadowObject == null || shadowRenderer == null) return;
 
         float time = timeSystem.currentTime;
-        Debug.Log(time);
 
         if (time >= sunriseTime && time <= sunsetTime)
         {
