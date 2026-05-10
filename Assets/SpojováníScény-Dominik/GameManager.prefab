@@ -1,0 +1,415 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3768200015886597605
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1534134265965258255}
+  - component: {fileID: 8545329751365706368}
+  - component: {fileID: 8755189117473276540}
+  - component: {fileID: 5108253342520536551}
+  - component: {fileID: 6030265235670706659}
+  - component: {fileID: 6792379774829064976}
+  - component: {fileID: 5173437030375772602}
+  - component: {fileID: 7668289920330231843}
+  - component: {fileID: 4990262684545358827}
+  - component: {fileID: 7711946748839251742}
+  - component: {fileID: 1838443049160957742}
+  - component: {fileID: 3236993865174160505}
+  - component: {fileID: 2586162070174773454}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1534134265965258255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.7494, y: -9.2324, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8545329751365706368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9dfc7d70bc21364f895c477b2ca222d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
+  dialoguePanel: {fileID: 0}
+  npcNameText: {fileID: 0}
+  dialogueText: {fileID: 0}
+  buttonPrefab: {fileID: 2870102492191220181, guid: 223c024b3f992424a8c3c83b3f6343d4, type: 3}
+  buttonContainer: {fileID: 0}
+--- !u!114 &8755189117473276540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab13d216c28c2074a8ff7ef24cde088d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuestManager
+  questDatabase: {fileID: 11400000, guid: 65fac097b96844c458bb07d43540411a, type: 2}
+  activeQuests: []
+  trackedQuest: {fileID: 0}
+  trackerPanel: {fileID: 0}
+  trackerNameText: {fileID: 0}
+  trackerObjectiveText: {fileID: 0}
+--- !u!114 &5108253342520536551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82049639e7cc91549a525689c2ef821c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuestJournalUI
+  journalPanel: {fileID: 0}
+  mainQuestListContainer: {fileID: 0}
+  sideQuestListContainer: {fileID: 0}
+  questButtonPrefab: {fileID: 6956986969801561060, guid: 0e7b56aba7fbfbb46a92a5bd5ee0cc30, type: 3}
+  detailTitleText: {fileID: 0}
+  detailDescriptionText: {fileID: 0}
+  trackButton: {fileID: 0}
+--- !u!114 &6030265235670706659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9288a8cf083ae459a85995a5e29404a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::gameDataManager
+--- !u!114 &6792379774829064976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dd0660c6b8af53448ad2056e835a25d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShopManager
+  currentCartMode: 0
+  shopPanel: {fileID: 0}
+  playerInventoryContainer: {fileID: 0}
+  merchantInventoryContainer: {fileID: 0}
+  itemSlotPrefab: {fileID: 7443932510832265335, guid: 174aadcbc88cbc643baeab1a08aa1c50, type: 3}
+  cartToggleButton: {fileID: 0}
+  shopCloseButton: {fileID: 0}
+  cartWindow: {fileID: 0}
+  cartContainer: {fileID: 0}
+  cartTotalValueText: {fileID: 0}
+  cartMiniTotalText: {fileID: 0}
+  removeAllItemsButton: {fileID: 0}
+  directTradeButton: {fileID: 0}
+  startHaggleButton: {fileID: 0}
+  hagglePanel: {fileID: 0}
+  haggleSlider: {fileID: 0}
+  merchantOfferText: {fileID: 0}
+  playerOfferText: {fileID: 0}
+  patienceText: {fileID: 0}
+  submitOfferButton: {fileID: 0}
+  tooltipPanel: {fileID: 0}
+  tooltipName: {fileID: 0}
+  tooltipPrice: {fileID: 0}
+  tooltipType: {fileID: 0}
+  tooltipIcon: {fileID: 0}
+  inspectPanel: {fileID: 0}
+  inspectName: {fileID: 0}
+  inspectDescription: {fileID: 0}
+  inspectStats: {fileID: 0}
+  inspectIcon: {fileID: 0}
+  itemDatabase: {fileID: 11400000, guid: 46cb4fc9262c68247b11436a4bba6c81, type: 2}
+--- !u!114 &5173437030375772602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0191462d73e7d814392062ce02689a3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResearchUI
+  database: {fileID: 11400000, guid: 46cb4fc9262c68247b11436a4bba6c81, type: 2}
+  canvasPanel: {fileID: 0}
+  inventoryScreen: {fileID: 0}
+  sampleContainer: {fileID: 0}
+  slotPrefab: {fileID: 7443932510832265335, guid: b4115b0d9599baf46a99a2a23dab64d3, type: 3}
+  toggleHideButton: {fileID: 0}
+  toggleHideText: {fileID: 0}
+  detailNameText: {fileID: 0}
+  detailDescText: {fileID: 0}
+  detailIcon: {fileID: 0}
+  insertButton: {fileID: 0}
+  progressScreen: {fileID: 0}
+  activeItemNameText: {fileID: 0}
+  activeItemIcon: {fileID: 0}
+  progressBar: {fileID: 0}
+  timeRemainingText: {fileID: 0}
+  percentageText: {fileID: 0}
+  collectButton: {fileID: 0}
+  collectButtonText: {fileID: 0}
+  cancelResearchButton: {fileID: 0}
+--- !u!114 &7668289920330231843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44beb5c1dfc868148ba83b30c7cf123a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LabUIManager
+  researchManager: {fileID: 5173437030375772602}
+  alchemyManager: {fileID: 4990262684545358827}
+  btnLeft: {fileID: 0}
+  btnRight: {fileID: 0}
+  currentModeText: {fileID: 0}
+--- !u!114 &4990262684545358827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca8f81fab97a38b43b72160d73a6a8bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AlchemyUI
+  database: {fileID: 11400000, guid: 46cb4fc9262c68247b11436a4bba6c81, type: 2}
+  currentTable: {fileID: 0}
+  alchemyScreenPanel: {fileID: 0}
+  inventoryContainer: {fileID: 0}
+  dragSlotPrefab: {fileID: 7443932510832265335, guid: 2abedded59f71224289eac7c89c64b27, type: 3}
+  tooltipIcon: {fileID: 0}
+  tooltipNameText: {fileID: 0}
+  tooltipDescText: {fileID: 0}
+  pestleObject: {fileID: 0}
+  mortarItemIcon: {fileID: 0}
+  crushProgressBar: {fileID: 0}
+  gasRemainingText: {fileID: 0}
+  boilTimeText: {fileID: 0}
+  toggleGasButton: {fileID: 0}
+  toggleGasButtonText: {fileID: 0}
+  flaskSlotIcon: {fileID: 0}
+  faucetButton: {fileID: 0}
+  allRecipes:
+  - {fileID: 11400000, guid: b5630e9aa3502dd4993094a53d40a87a, type: 2}
+--- !u!114 &7711946748839251742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff4ad730537f4e42906c1aeea84910c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AlertManager
+  alertPanel: {fileID: 0}
+  alertMessageText: {fileID: 0}
+  yesButton: {fileID: 0}
+  noButton: {fileID: 0}
+--- !u!114 &1838443049160957742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e8d4a637a4993347b0b2d8b0b9755e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JournalUIManager
+  itemDatabase: {fileID: 11400000, guid: 46cb4fc9262c68247b11436a4bba6c81, type: 2}
+  mobDatabase: {fileID: 11400000, guid: 9663d360a8168934a999fa97a4039cda, type: 2}
+  plantDatabase: {fileID: 11400000, guid: f1f1170b1ac1b1c4eb3e56018882f607, type: 2}
+  allPotionRecipes:
+  - {fileID: 11400000, guid: b5630e9aa3502dd4993094a53d40a87a, type: 2}
+  codexCanvas: {fileID: 0}
+  tabBestiaryBtn: {fileID: 0}
+  tabHerbariumBtn: {fileID: 0}
+  tabSamplesBtn: {fileID: 0}
+  tabRecipesBtn: {fileID: 0}
+  closeBtn: {fileID: 0}
+  activeTabColor: {r: 1, g: 1, b: 1, a: 1}
+  inactiveTabColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pageBestiary: {fileID: 0}
+  pageHerbarium: {fileID: 0}
+  pageSamples: {fileID: 0}
+  pageRecipes: {fileID: 0}
+  bestiaryListContainer: {fileID: 0}
+  bestiaryEntryPrefab: {fileID: 6256259163079505521, guid: 9b8d299817242ad49a8c60f8e86786a7, type: 3}
+  bestiaryDetailPanel: {fileID: 0}
+  detailMobNameText: {fileID: 0}
+  detailMobLargeImage: {fileID: 0}
+  detailMobLoreText: {fileID: 0}
+  detailDropsContainer: {fileID: 0}
+  detailDropItemPrefab: {fileID: 8901105081699473347, guid: 5582a480a90290148987467f1b2b44cc, type: 3}
+  herbariumListContainer: {fileID: 0}
+  herbariumEntryPrefab: {fileID: 6256259163079505521, guid: 46c5838056140494cb84ea74e70f486a, type: 3}
+  herbariumDetailPanel: {fileID: 0}
+  detailPlantNameText: {fileID: 0}
+  detailPlantLargeImage: {fileID: 0}
+  detailPlantLoreText: {fileID: 0}
+  detailPlantDropsContainer: {fileID: 8143700176942385678, guid: 5582a480a90290148987467f1b2b44cc, type: 3}
+  samplesListContainer: {fileID: 0}
+  sampleEntryPrefab: {fileID: 6256259163079505521, guid: da98b93d3e5d8f44db24bf6785ea8f6f, type: 3}
+  sampleDetailPanel: {fileID: 0}
+  detailSampleNameText: {fileID: 0}
+  detailSampleLargeImage: {fileID: 0}
+  detailSampleStatusText: {fileID: 0}
+  detailSampleStatsText: {fileID: 0}
+  detailSampleSourcesContainer: {fileID: 0}
+  detailSampleUsesContainer: {fileID: 0}
+  recipesListContainer: {fileID: 0}
+  recipeEntryPrefab: {fileID: 6256259163079505521, guid: b29e0047fa2be024c8197fe5fd12c49f, type: 3}
+  recipeDetailPanel: {fileID: 0}
+  detailRecipeNameText: {fileID: 0}
+  detailRecipeLargeImage: {fileID: 0}
+  detailRecipeStatsText: {fileID: 0}
+  detailRecipeIngredientsContainer: {fileID: 0}
+--- !u!114 &3236993865174160505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5837972afb57eac4db20ca4dcf75719d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeybindingManager
+  keybinds:
+  - variableName: keyUp
+    displayName: Move Up
+  - variableName: keyDown
+    displayName: Move Down
+  - variableName: keyLeft
+    displayName: Move Left
+  - variableName: keyRight
+    displayName: Move Right
+  - variableName: keyRun
+    displayName: Sprint
+  - variableName: Pause
+    displayName: Pause
+  - variableName: MenuRight
+    displayName: Menu Right
+  - variableName: MenuLeft
+    displayName: Menu Left
+  - variableName: Cancel
+    displayName: Cancel
+  - variableName: TBinventory
+    displayName: Combat Inventory
+  - variableName: NormalInventory
+    displayName: Inventory
+  - variableName: Journal
+    displayName: Journal
+  - variableName: Codex
+    displayName: Codex
+  - variableName: Interact
+    displayName: Interact
+  - variableName: Craft
+    displayName: Crafting
+  - variableName: Tent
+    displayName: Pitch Tent
+  - variableName: Pack
+    displayName: Pack Up
+  - variableName: Map
+    displayName: Map
+  - variableName: InspectItem
+    displayName: Inspect Item
+  - variableName: LightenUp
+    displayName: Flashlight
+  - variableName: chooseSpecialSpell
+    displayName: Special Spell
+  - variableName: chooseNormalSpell
+    displayName: Normal Spell
+  - variableName: chooseItem
+    displayName: Choose Item
+  - variableName: doAccept
+    displayName: Confirm
+  - variableName: doBack
+    displayName: Back
+  - variableName: swapUp
+    displayName: Swap Up
+  - variableName: swapDown
+    displayName: Swap Down
+  - variableName: swapLeft
+    displayName: Swap Left
+  - variableName: swapRight
+    displayName: Swap Right
+  - variableName: swapAliveUp
+    displayName: Next Character
+  - variableName: swapAliveDown
+    displayName: Previous Character
+  - variableName: jump
+    displayName: Jump
+  - variableName: dodge
+    displayName: Dodge
+  - variableName: parry
+    displayName: Parry
+  keybindRowPrefab: {fileID: 2024616542560752764, guid: 07760d0a889811743888f25a3027cce5, type: 3}
+  contentPanel: {fileID: 0}
+--- !u!114 &2586162070174773454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3768200015886597605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8415b4171163bc346955ba1fb5b5865f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameSettingsUIManager
+  settingsPanel: {fileID: 0}
+  autoSaveToggle: {fileID: 0}
+  needToEatToggle: {fileID: 0}
+  staminaToggle: {fileID: 0}
+  fpsToggle: {fileID: 0}
+  masterVolumeSlider: {fileID: 0}
+  musicVolumeSlider: {fileID: 0}
+  sfxVolumeSlider: {fileID: 0}
+  difficultyDropdown: {fileID: 0}
+  languageDropdown: {fileID: 0}
