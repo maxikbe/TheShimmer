@@ -24,5 +24,5 @@ MonoBehaviour:
   isDefault: 0
   mustBeActivedSkillID: 3
   icon: {fileID: 3398788723163697671, guid: 31820135c3b8e4f43ad493efff674506, type: 3}
-  gridX: 0
-  gridY: 3
+  gridX: 3
+  gridY: 2

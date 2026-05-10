@@ -42,7 +42,7 @@ public class LongPressHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         if (isPointerDown && !longPressTriggered)
         {
-            pointerDownTimer += Time.deltaTime;
+            pointerDownTimer += Time.unscaledDeltaTime; 
 
             if (pointerDownTimer > delayBeforeStart)
             {
@@ -56,8 +56,13 @@ public class LongPressHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 if (pointerDownTimer >= delayBeforeStart + requiredHoldTime)
                 {
                     longPressTriggered = true;
+                    
+                    if (gameObject.activeInHierarchy) 
+                    {
+                        StartCoroutine(SuccessFlash());
+                    }
+                    
                     onLongPress?.Invoke();
-                    StartCoroutine(SuccessFlash());
                 }
             }
         }
@@ -69,9 +74,12 @@ public class LongPressHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             fillImage.fillAmount = 1;
             fillImage.color = successColor;
-            yield return new WaitForSeconds(0.2f);
-            fillImage.color = originalFillColor;
-            fillImage.fillAmount = 0;
+            yield return new WaitForSecondsRealtime(0.2f); 
+            if (fillImage != null)
+            {
+                fillImage.color = originalFillColor;
+                fillImage.fillAmount = 0;
+            }
         }
     }
 
