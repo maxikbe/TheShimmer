@@ -143,6 +143,7 @@ public class gameDataManager : MonoBehaviour
 
     public static void CaptureCurrentSettings()
     {
+
         if (currentGameData.settings == null) currentGameData.settings = new SettingsSaver();
         var s = currentGameData.settings;
 
