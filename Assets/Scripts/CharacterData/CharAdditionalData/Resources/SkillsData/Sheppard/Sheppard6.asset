@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 193bd8f41614b8c4c8cb3b1221b6c1d6, type: 3}
   m_Name: Sheppard6
   m_EditorClassIdentifier: Assembly-CSharp::Skills
-  id: 6
+  id: 26
   characterID: 3
   skillName: Breach
   description: 

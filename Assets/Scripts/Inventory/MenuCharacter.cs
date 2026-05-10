@@ -139,6 +139,31 @@ public class MenuCharacter : MonoBehaviour
             gameDataManager.currentGameData.characters = loadedData.characters;
         }
     }
+
+    public void UpgradeCurrentGun()
+    {
+        if (loadedData == null || currentGunID <= 0) return;
+
+        ItemSaveData gunSaveData = loadedData.OwnedItems.Find(i => i.id == currentGunID);
+        Item baseItemInfo = FindItemInDatabase(currentGunID);
+
+        if (gunSaveData == null || baseItemInfo == null) return;
+
+        int cost = ((gunSaveData.level - 1) / 10) + 1;
+
+        if (loadedData.player.numberOfGunUpgraders >= cost)
+        {
+            loadedData.player.numberOfGunUpgraders -= cost;
+            gunSaveData.level++;
+
+            gameDataManager.currentGameData.player = loadedData.player;
+            gameDataManager.currentGameData.OwnedItems = loadedData.OwnedItems;
+
+            addGunInfo(baseItemInfo, gunSaveData);
+            UpdateCharacterUI();
+            addPickableButtons();
+        }
+    }
     
     private void addPickableButtons()
     {
@@ -204,12 +229,17 @@ public class MenuCharacter : MonoBehaviour
     private void addGunInfo(Item itemInfo, ItemSaveData itemSaveData)
     {
         if (itemInfo == null || itemSaveData == null) return;
+        
+        int cost = ((itemSaveData.level - 1) / 10) + 1; 
+        
         gunChooseText[0].text = (isCzech ? "Název zbraně: " : "Weapon Name: ") + itemInfo.itemName;
         gunChooseText[1].text = (isCzech ? "Typ zbraně: " : "Weapon Type: ") + itemInfo.weaponType;
         gunChooseText[2].text = (isCzech ? "Poškození: " : "Damage: ") + itemInfo.Damage;
         gunChooseText[3].text = (isCzech ? "Popis: " : "Description: ") + itemInfo.description;
         gunChooseText[4].text = (isCzech ? "Úroveň: " : "Level: ") + itemSaveData.level;
         gunChooseText[5].text = (isCzech ? "Množství: " : "Amount: ") + itemSaveData.amount;
+        gunChooseText[6].text = (isCzech ? "Potřeba na Vylepšení: " : "Upgraders needed: ") + cost;
+        gunChooseText[7].text = (isCzech ? "Počet vylepšení: " : "Upgrades: ") + loadedData.player.numberOfGunUpgraders;
     }
     
     private void addPickablePerks()
@@ -481,7 +511,6 @@ public class MenuCharacter : MonoBehaviour
         }
         else save.isResearched = true;
 
-        gameDataManager.SaveData();
         BuildTree();
         addCharInfo(character); 
     }

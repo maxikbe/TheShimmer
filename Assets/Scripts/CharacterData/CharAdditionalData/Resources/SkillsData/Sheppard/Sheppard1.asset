@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 193bd8f41614b8c4c8cb3b1221b6c1d6, type: 3}
   m_Name: Sheppard1
   m_EditorClassIdentifier: Assembly-CSharp::Skills
-  id: 1
+  id: 21
   characterID: 3
   skillName: Suppression
   description: 

@@ -466,6 +466,7 @@ public class TurnBasedLogic : MonoBehaviour
         createTurnOrder();
         updateEnemyHealthBar();
         updateCharacterBars();
+        CalculateWeaponsDamage();
         RefreshAllUIs();
 
         foreach (var info in camerasInfo)
@@ -521,6 +522,36 @@ public class TurnBasedLogic : MonoBehaviour
                 musicAudioSource.volume = volume;
                 musicAudioSource.loop = true;
                 musicAudioSource.Play();
+            }
+        }
+    }
+    void CalculateWeaponsDamage()
+    {
+        if (gameDataManager.currentGameData == null || itemDatabase == null) return;
+
+        foreach (Character ch in characters)
+        {
+            if (ch.pickedItemID <= 0)
+            {
+                Debug.Log($"[Weapons] {ch.name}: nemá zbraň (pickedItemID={ch.pickedItemID})");
+                continue;
+            }
+
+            ItemSaveData savedWeapon = gameDataManager.currentGameData.OwnedItems
+                .FirstOrDefault(i => i.id == ch.pickedItemID);
+            Item baseWeapon = itemDatabase.GetItemByID(ch.pickedItemID);
+
+            Debug.Log($"[Weapons] {ch.name}: pickedItemID={ch.pickedItemID} | savedWeapon={(savedWeapon != null ? savedWeapon.id.ToString() : "NULL")} | baseWeapon={(baseWeapon != null ? baseWeapon.itemName : "NULL")}");
+
+            if (savedWeapon != null && baseWeapon != null)
+            {
+                int oldAttack = ch.attack;
+                ch.attack = Mathf.RoundToInt(baseWeapon.Damage * (1f + (savedWeapon.level - 1) * 0.1f));
+                Debug.Log($"[Weapons] {ch.name}: attack {oldAttack} → {ch.attack} (level={savedWeapon.level}, baseDmg={baseWeapon.Damage})");
+            }
+            else
+            {
+                Debug.LogWarning($"[Weapons] {ch.name}: přeskočeno — savedWeapon nebo baseWeapon je NULL");
             }
         }
     }
@@ -1025,12 +1056,6 @@ public class TurnBasedLogic : MonoBehaviour
                 yield return new WaitForSeconds(0.1f);
 
                 int damage = currentCharacter.attack;
-                if (itemDatabase != null)
-                {
-                    Item weapon = itemDatabase.GetItemByID(currentCharacter.pickedItemID);
-                    if (weapon != null) damage = (int)weapon.Damage;
-                }
-
                 damage += GetDamageBonus(currentCharacter);
 
                 bool isCrit = RollCrit(currentCharacter);
