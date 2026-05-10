@@ -54,7 +54,7 @@ public class MainMenu : MonoBehaviour
     public void NewGame()
     {
         string randomFileName = System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + UnityEngine.Random.Range(100, 999);
-        InitializeGameJson.CreateSave(randomFileName);
+        InitializeGameJson.CreateSave(randomFileName + ".json");
         
         PlayerPrefs.SetString("SaveToLoad", randomFileName + ".json");
         gameDataManager.userDefaultName = randomFileName;
