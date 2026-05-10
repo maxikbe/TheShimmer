@@ -5,14 +5,18 @@ public class Skills : ScriptableObject
 {
     public int id;
     public int characterID;
-    public string name;
+    public string skillName;
     public string description;
     public skillType type;
     public int amount;
-    public int skillLevel;
     public int pointsToResearch;
     public int animationID;
     public int manaCost;
+    public bool isDefault;
+    public int mustBeActivedSkillID;
+    public Sprite icon;
+    public int gridX;
+    public int gridY;
 }
 
 public enum skillType { Damage, Heal, Buff, Mana}

@@ -11,8 +11,9 @@ public class Character
     public int level;
     public int mana = 0;
     public float speed; 
-    public float ExperiencePoints;
+    public int ExperiencePoints;
     public int critChance;
+    public int currentEXP;
     
     public int attack;
     public int defense;

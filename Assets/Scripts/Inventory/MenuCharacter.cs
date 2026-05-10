@@ -4,13 +4,16 @@ using TMPro;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.EventSystems;
 
 public class MenuCharacter : MonoBehaviour
 {
     public int characterId; 
     CharPicker charPicker;
     private static Database itemDatabase;
+    private static SkillDatabase skillDatabase;
     [SerializeField] private Database _databaseReference; 
+    [SerializeField] private SkillDatabase _skillDatabaseReference;
     private GameData loadedData => gameDataManager.currentGameData;
 
     private int lastProcessedId = -1;
@@ -32,6 +35,15 @@ public class MenuCharacter : MonoBehaviour
     [SerializeField] private GameObject[] perkPickerButtons;
     bool isCzech;
 
+    [SerializeField] private GameObject skillNodePrefab;
+    [SerializeField] private Transform skillTreeContent; 
+    [SerializeField] private TMP_Text xpText;
+    [SerializeField] private TMP_Text[] skillInfoTexts;
+    private Skills[] allSkills;
+    private int skillCharacterID;
+    private List<SkillSaveData> savedSkills;
+
+
     void Awake()
     {
         // Pokud data v manageru ještě nejsou, zkusíme je načíst
@@ -40,6 +52,8 @@ public class MenuCharacter : MonoBehaviour
             gameDataManager.LoadData();
         }
         itemDatabase = _databaseReference;
+        skillDatabase = _skillDatabaseReference;
+        savedSkills = gameDataManager.currentGameData.Skills;
     }
 
     void Start()
@@ -71,7 +85,7 @@ public class MenuCharacter : MonoBehaviour
         charText[1].text = (isCzech ? "Level: " : "Level: ") + character.level.ToString();
         charText[2].text = "HP: " + character.health.ToString();
         charText[3].text = (isCzech ? "Rychlost: " : "Speed: ") + character.speed.ToString();
-        charText[4].text = (isCzech ? "Vylepšení perku: " : "Perk Upgrade: ") + character.perkUpgradersNumber.ToString();
+        charText[4].text = (isCzech ? "Aktuální zkušenosti: " : "Current Experience: ") + character.currentEXP.ToString() + "/ 100";
         charText[5].text = (isCzech ? "Max HP: " : "Max HP: ") + character.maxHealth.ToString();
         charText[6].text = (isCzech ? "Mana: " : "Mana: ") + character.mana.ToString();
         charText[7].text = "XP: " + character.ExperiencePoints.ToString();
@@ -100,8 +114,8 @@ public class MenuCharacter : MonoBehaviour
                 addCharInfo(postava);
                 addPickableButtons();
                 addPickablePerks();
+                BuildTree(); 
 
-                // Okamžité vykreslení ikon v UI slotech postavy
                 Perks[] allPerksFromResources = Resources.LoadAll<Perks>("PerksData");
                 UpdateSlotUI(1, postava.pickePerkID1, allPerksFromResources);
                 UpdateSlotUI(2, postava.pickePerkID2, allPerksFromResources);
@@ -314,4 +328,163 @@ public class MenuCharacter : MonoBehaviour
             }
         }
     }
+
+    private void BuildTree()
+    {
+        skillCharacterID = characterId + 1;
+        foreach (Transform child in skillTreeContent) Destroy(child.gameObject);
+
+        allSkills = skillDatabase.GetAllSkills()
+                            .Where(s => s.characterID == skillCharacterID)
+                            .OrderBy(s => s.id)
+                            .ToArray();
+
+        Character character = gameDataManager.currentGameData.characters
+                                .Find(c => c.id == skillCharacterID);
+        if (character == null) return;
+
+        xpText.text = "XP: " + character.ExperiencePoints;
+
+        // Vypni GridLayoutGroup — pozice řídíme ručně
+        GridLayoutGroup grid = skillTreeContent.GetComponent<GridLayoutGroup>();
+        if (grid != null) grid.enabled = false;
+
+        foreach (Skills skill in allSkills)
+        {
+            SpawnNode(skill, character);
+        }
+    }
+
+    private void SpawnNode(Skills skill, Character character)
+    {
+        SkillSaveData saveData = savedSkills?.Find(s => s.id == skill.id);
+        bool isResearched = saveData?.isResearched ?? false;
+        bool isUnlockable = IsUnlockable(skill, character);
+
+        GameObject node = Instantiate(skillNodePrefab, skillTreeContent);
+
+        float cellW = 120f;
+        float cellH = 120f;
+
+        RectTransform rt = node.GetComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = new Vector2(
+            skill.gridX * cellW + cellW / 2f,
+            -(skill.gridY * cellH + cellH / 2f)
+        );
+        rt.sizeDelta = new Vector2(cellW - 10f, cellH - 10f);
+
+        // Icon
+        Transform iconTransform = node.transform.Find("Icon");
+        if (iconTransform != null)
+            iconTransform.GetComponent<Image>().sprite = skill.icon;
+        else
+            Debug.LogWarning($"[SkillTree] 'Icon' child not found on node for skill id={skill.id}");
+
+        // Cost text
+        TMP_Text costText = node.GetComponentInChildren<TMP_Text>();
+        costText.text = isResearched ? "" : skill.pointsToResearch + "";
+
+        // Opacity
+        float alpha = (isResearched || isUnlockable) ? 1f : 0.35f;
+        foreach (Graphic g in node.GetComponentsInChildren<Graphic>())
+            g.color = new Color(g.color.r, g.color.g, g.color.b, alpha);
+
+        // Button
+        Button btn = node.GetComponent<Button>();
+        btn.transition = Selectable.Transition.None;
+        btn.interactable = isUnlockable && !isResearched;
+        btn.onClick.AddListener(() => ResearchSkill(skill, character));
+
+        // Hover — zobraz info o skillu
+        EventTrigger trigger = node.GetComponent<EventTrigger>() ?? node.AddComponent<EventTrigger>();
+
+        EventTrigger.Entry onEnter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+        onEnter.callback.AddListener(_ => ShowSkillInfo(skill, isResearched, isUnlockable, character));
+        trigger.triggers.Add(onEnter);
+
+        EventTrigger.Entry onExit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+        onExit.callback.AddListener(_ => ClearSkillInfo());
+        trigger.triggers.Add(onExit);
+    }
+
+    private void ShowSkillInfo(Skills skill, bool isResearched, bool isUnlockable, Character character)
+    {
+        if (skillInfoTexts == null || skillInfoTexts.Length == 0) return;
+
+        // skillInfoTexts[0] — název
+        if (skillInfoTexts.Length > 0 && skillInfoTexts[0] != null)
+            skillInfoTexts[0].text = skill.skillName;
+
+        // skillInfoTexts[1] — cena / stav
+        if (skillInfoTexts.Length > 1 && skillInfoTexts[1] != null)
+        {
+            if (isResearched)
+                skillInfoTexts[1].text = isCzech ? "Již odemčeno" : "Already researched";
+            else
+                skillInfoTexts[1].text = (isCzech ? "Cena: " : "Cost: ") + skill.pointsToResearch + " XP";
+        }
+
+        // skillInfoTexts[2] — popis
+        if (skillInfoTexts.Length > 2 && skillInfoTexts[2] != null)
+            skillInfoTexts[2].text = skill.description;
+
+        // skillInfoTexts[3] — dostupnost
+        if (skillInfoTexts.Length > 3 && skillInfoTexts[3] != null)
+        {
+            if (isResearched)
+                skillInfoTexts[3].text = "";
+            else if (isUnlockable)
+                skillInfoTexts[3].text = isCzech ? "✓ Lze odemknout" : "✓ Can be unlocked";
+            else if (character.ExperiencePoints < skill.pointsToResearch)
+                skillInfoTexts[3].text = (isCzech ? "✗ Nedostatek XP (máš " : "✗ Not enough XP (you have ")
+                                        + character.ExperiencePoints + " XP)";
+            else
+                skillInfoTexts[3].text = isCzech ? "✗ Nejprve odemkni předchozí skill" : "✗ Unlock previous skill first";
+        }
+    }
+
+    private void ClearSkillInfo()
+    {
+        if (skillInfoTexts == null) return;
+        foreach (TMP_Text t in skillInfoTexts)
+            if (t != null) t.text = "";
+    }
+
+    private bool IsUnlockable(Skills skill, Character character)
+    {
+        // Má dost XP?
+        if (character.ExperiencePoints < skill.pointsToResearch) return false;
+
+        // Jsou parent skills odemčené?
+        if (skill.mustBeActivedSkillID != 0)
+        {
+            SkillSaveData parent = savedSkills?.Find(s => s.id == skill.mustBeActivedSkillID);
+            if (parent == null || !parent.isResearched) return false;
+        }
+
+        return true;
+    }
+
+    private void ResearchSkill(Skills skill, Character character)
+    {
+        character.ExperiencePoints -= skill.pointsToResearch;
+
+        SkillSaveData save = gameDataManager.currentGameData.Skills
+                                .Find(s => s.id == skill.id);
+        if (save == null)
+        {
+            gameDataManager.currentGameData.Skills.Add(
+                new SkillSaveData { id = skill.id, isResearched = true }
+            );
+        }
+        else save.isResearched = true;
+
+        gameDataManager.SaveData();
+        BuildTree();
+        addCharInfo(character); 
+    }
+
+
 }

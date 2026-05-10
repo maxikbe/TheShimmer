@@ -6,7 +6,7 @@ public class ButtonManager : MonoBehaviour
     [SerializeField] private GameObject inventoryMenuUI;
     [SerializeField] private GameObject characterMenuUI;
     [SerializeField] private GameObject NavbarUI;
-
+    
 
     public void openCharPicker()
     {
@@ -36,11 +36,13 @@ public class ButtonManager : MonoBehaviour
     [SerializeField] private GameObject MainGrid;
     [SerializeField] private GameObject GunChooseGrid;
     [SerializeField] private GameObject PerksChooseGrid;
+      [SerializeField] private GameObject SkillTreeGrid;
     public void OpenMainGrid()
     {
         MainGrid.SetActive(true);
         GunChooseGrid.SetActive(false);
         PerksChooseGrid.SetActive(false);
+        SkillTreeGrid.SetActive(false);
     }
 
     public void OpenGunChooseGrid()
@@ -48,6 +50,7 @@ public class ButtonManager : MonoBehaviour
         MainGrid.SetActive(false);
         GunChooseGrid.SetActive(true);
         PerksChooseGrid.SetActive(false);
+        SkillTreeGrid.SetActive(false);
     }
 
     public void OpenPerksChooseGrid()
@@ -55,6 +58,14 @@ public class ButtonManager : MonoBehaviour
         MainGrid.SetActive(false);
         GunChooseGrid.SetActive(false);
         PerksChooseGrid.SetActive(true);
+        SkillTreeGrid.SetActive(false);
     } 
+    public void OpenSkillTreeGrid()
+    {
+        MainGrid.SetActive(false);
+        GunChooseGrid.SetActive(false);
+        PerksChooseGrid.SetActive(false);
+        SkillTreeGrid.SetActive(true);
+    }
 
 }

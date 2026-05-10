@@ -6,8 +6,7 @@ using System.IO;
 public class SkillSaveData
 {
     public int id;
-    public int characterID;
-    public int skillLevel;
+    public bool isResearched;
 }
 
 public class InitializeGameJson : MonoBehaviour
@@ -127,11 +126,11 @@ public class InitializeGameJson : MonoBehaviour
         s.dodge = KeyBoardSetting.dodge;
         s.parry = KeyBoardSetting.parry;
 
-        data.characters.Add(new Character { id = 1, name = "Dr. Ventress", health = 150, maxHealth = 150, level = 1, speed = 5.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 10 });
-        data.characters.Add(new Character { id = 2, name = "Lena", health = 80, maxHealth = 80, level = 1, speed = 4.5f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 20 });
-        data.characters.Add(new Character { id = 3, name = "Cass Sheppard", health = 100, maxHealth = 100, level = 1, speed = 7.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 15 });
-        data.characters.Add(new Character { id = 4, name = "Josie Radek", health = 90, maxHealth = 90, level = 1, speed = 8.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 25 });
-        data.characters.Add(new Character { id = 5, name = "Anya Thorensen", health = 200, maxHealth = 200, level = 1, speed = 3.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 5 });
+        data.characters.Add(new Character { id = 1, name = "Dr. Ventress", health = 150, maxHealth = 150, level = 1, speed = 5.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 10, currentEXP = 0 });
+        data.characters.Add(new Character { id = 2, name = "Lena", health = 80, maxHealth = 80, level = 1, speed = 4.5f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 20, currentEXP = 0 });
+        data.characters.Add(new Character { id = 3, name = "Cass Sheppard", health = 100, maxHealth = 100, level = 1, speed = 7.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 15, currentEXP = 0 });
+        data.characters.Add(new Character { id = 4, name = "Josie Radek", health = 90, maxHealth = 90, level = 1, speed = 8.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 25, currentEXP = 0 });
+        data.characters.Add(new Character { id = 5, name = "Anya Thorensen", health = 200, maxHealth = 200, level = 1, speed = 3.0f, perkUpgradersNumber = 1, pickePerkID1 = 0, pickePerkID2 = 0, pickePerkID3 = 0, mana = 0, critChance = 5, currentEXP = 0 });
 
         List<Item> allItemsFromDB = itemDatabase.GetAllItems();
         List<Skills> allSkillsFromDB = skillDatabase.GetAllSkills();
@@ -183,9 +182,7 @@ public class InitializeGameJson : MonoBehaviour
         {
             SkillSaveData newSaveSkill = new SkillSaveData();
             newSaveSkill.id = skill.id;
-            newSaveSkill.characterID = skill.characterID;
-            newSaveSkill.skillLevel = skill.skillLevel;
-
+            newSaveSkill.isResearched = skill.isDefault; 
             data.Skills.Add(newSaveSkill);
         }
 

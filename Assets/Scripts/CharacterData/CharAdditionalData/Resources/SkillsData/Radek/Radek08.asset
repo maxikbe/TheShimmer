@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 193bd8f41614b8c4c8cb3b1221b6c1d6, type: 3}
+  m_Name: Radek08
+  m_EditorClassIdentifier: Assembly-CSharp::Skills
+  id: 8
+  characterID: 4
+  skillName: Overgrowth
+  description: 
+  type: 1
+  amount: 500
+  pointsToResearch: 6
+  animationID: 0
+  manaCost: 8
+  isDefault: 0
+  mustBeActivedSkillID: 5
+  icon: {fileID: 3858395337471486975, guid: df7bef7bc13faad4a8c993e7b014152a, type: 3}
+  gridX: 4
+  gridY: 4

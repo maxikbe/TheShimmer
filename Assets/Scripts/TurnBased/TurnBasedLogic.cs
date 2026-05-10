@@ -108,6 +108,7 @@ public class TurnBasedLogic : MonoBehaviour
     [SerializeField] private SpriteRenderer BackgroundPicture;
     [SerializeField] private GameObject chooseMenu;
     [SerializeField] private GameObject chooserThingsMenu;
+    [SerializeField] private GameObject chooserThingsContent;
     [SerializeField] private GameObject ChooseAttackUI;
     [SerializeField] private GameObject button;
     [SerializeField] private GameObject gameOverPanel;
@@ -1043,7 +1044,8 @@ public class TurnBasedLogic : MonoBehaviour
                 if (targetEnemy.health < 0) targetEnemy.health = 0;
 
                 int charIndex = characters.IndexOf(currentCharacter);
-                characters[charIndex].mana = (int)Mathf.Min(characters[charIndex].mana + 5, 10);
+                int manaToAdd = Random.Range(2, 5); 
+                characters[charIndex].mana = (int)Mathf.Min(characters[charIndex].mana + manaToAdd, 10);
 
                 updateEnemyHealthBar();
                 updateCharacterBars();
@@ -1302,17 +1304,17 @@ public class TurnBasedLogic : MonoBehaviour
         if (currentCharacter == null || skillDatabase == null) return;
 
         currentCharacterSkills = skillDatabase.GetAllSkills()
-            .Where(s => s.characterID == currentCharacter.id)
+            .Where(s => s.characterID == currentCharacter.id && gameDataManager.currentGameData.Skills.Any(gs => gs.id == s.id && gs.isResearched))
             .ToList();
 
         foreach (var skill in currentCharacterSkills)
         {
             Skills capturedSkill = skill;
-            GameObject skillButton = Instantiate(button, chooserThingsMenu.transform);
+            GameObject skillButton = Instantiate(button, chooserThingsContent.transform);
             skillButton.GetComponentInChildren<TextMeshProUGUI>().text =
             gameDataManager.currentGameData.settings.currentLanguage == 0
-                ? $"{capturedSkill.name} ({capturedSkill.manaCost} MP)"
-                : $"{capturedSkill.name} ({capturedSkill.manaCost} MP)"; 
+                ? $"{capturedSkill.skillName}"
+                : $"{capturedSkill.skillName}"; 
 
             Button btn = skillButton.GetComponent<Button>();
             btn.interactable = capturedSkill.manaCost <= currentCharacter.mana;
@@ -1324,10 +1326,10 @@ public class TurnBasedLogic : MonoBehaviour
 
             EventTrigger trigger = skillButton.AddComponent<EventTrigger>();
             EventTrigger.Entry enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-            enter.callback.AddListener((d) => { ShowInfo(capturedSkill.name, 
+            enter.callback.AddListener((d) => { ShowInfo(capturedSkill.skillName, 
                 gameDataManager.currentGameData.settings.currentLanguage == 0 
-                    ? "Type: " + capturedSkill.type.ToString() + "\nMana: " + capturedSkill.manaCost
-                    : "Typ: " + capturedSkill.type.ToString() + "\nMana: " + capturedSkill.manaCost); });
+                    ? "Type: " + capturedSkill.type.ToString() + "\nMana: " + capturedSkill.manaCost + "\nDescription: " + capturedSkill.description
+                    : "Typ: " + capturedSkill.type.ToString() + "\nMana: " + capturedSkill.manaCost + "\nPopis: " + capturedSkill.description); }); 
             trigger.triggers.Add(enter);
             EventTrigger.Entry exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
             exit.callback.AddListener((d) => { HideInfo(); });
@@ -1348,7 +1350,7 @@ public class TurnBasedLogic : MonoBehaviour
         foreach (var item in usableItems)
         {
             Item capturedItem = item;
-            GameObject itemButton = Instantiate(button, chooserThingsMenu.transform);
+            GameObject itemButton = Instantiate(button, chooserThingsContent.transform);
             itemButton.GetComponentInChildren<TextMeshProUGUI>().text = capturedItem.itemName;
 
             Button btn = itemButton.GetComponent<Button>();
@@ -1372,7 +1374,7 @@ public class TurnBasedLogic : MonoBehaviour
 
     public void handleSkillItemClosing()
     {
-        foreach (Transform child in chooserThingsMenu.transform)
+        foreach (Transform child in chooserThingsContent.transform)
             Destroy(child.gameObject);
         chooserThingsMenu.SetActive(false);
         infoUI.SetActive(false);

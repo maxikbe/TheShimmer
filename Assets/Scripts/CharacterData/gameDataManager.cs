@@ -8,6 +8,11 @@ public class gameDataManager : MonoBehaviour
     private static string savePath;
     public static string userDefaultName = "Data";
 
+    public static void saveTester()
+    {
+        SaveData("Data.json", false);
+    }
+
     void Awake()
     {
         savePath = Path.Combine(Application.persistentDataPath, "Data.json");
