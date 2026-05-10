@@ -40,14 +40,20 @@ public class NPCController : MonoBehaviour
 
     public void Interact()
     {
+        // Necromancer check: mrtvoly nemluví (pokud zrovna nehrajeme Dark Souls)
+        if (isDead) return;
+
         Merchant myMerchant = GetComponent<Merchant>();
         FindObjectOfType<DialogueManager>().StartConversation(npcName, startingNode, myMerchant, gameObject);
+        
+        // A když už se začne kecat, schováme ten "[E]" nápis, ať tam nestraší
+        InteractionManager.HideInteraction();
     }
     
     private void Update()
     {
-        // Hlídáme, jestli je hráč v zóně a zmáčknul E
-        if (isPlayerInRange && Input.GetKeyDown(KeyBoardSetting.Interact))
+        // Hlídáme, jestli je hráč v zóně, zmáčknul E a hlavně jestli to NPC ještě dýchá!
+        if (isPlayerInRange && !isDead && Input.GetKeyDown(KeyBoardSetting.Interact))
         {
             Interact();
         }
@@ -59,7 +65,7 @@ public class NPCController : MonoBehaviour
         if (collision.CompareTag("Player") && startingNode != null && !isDead)
         {
             isPlayerInRange = true;
-            Debug.Log("Můžeš interagovat! Zmáčkni 'E' pro pokec s " + npcName);
+            InteractionManager.ShowInteraction("[E] Start Conversation");
         }
     }
 
@@ -69,7 +75,7 @@ public class NPCController : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             isPlayerInRange = false;
-            Debug.Log("Už jsi moc daleko od " + npcName + ", smůla.");
+            InteractionManager.HideInteraction();
         }
     }
 }

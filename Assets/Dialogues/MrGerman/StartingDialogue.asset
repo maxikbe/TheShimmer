@@ -24,3 +24,12 @@ MonoBehaviour:
     npcCommand: 0
     conditions: []
     itemConditions: []
+  - opensShop: 0
+    choiceText: Maybe later
+    nextNode: {fileID: 0}
+    questToStart: {fileID: 0}
+    questToAdvance: {fileID: 0}
+    triggerCombat: 0
+    npcCommand: 0
+    conditions: []
+    itemConditions: []

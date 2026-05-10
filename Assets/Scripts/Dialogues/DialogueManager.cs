@@ -16,15 +16,24 @@ public class DialogueManager : MonoBehaviour
     private string currentSpeakerName;
     private Merchant currentMerchant;
     private GameObject currentNPCObject; // Uložení aktuálního NPC pro Companion příkazy
+    public static bool isDialogueActive = false;
 
     // Vola script na NPC pro start konverzace (přidán parametr npcObject)
     public void StartConversation(string npcName, DialogueNode firstNode, Merchant merchant = null, GameObject npcObject = null)
     {
+        isDialogueActive = true;
+        
         currentSpeakerName = npcName; 
         currentMerchant = merchant;
         currentNPCObject = npcObject; // Zapamatujeme si, kdo to je
         
         ContinueDialogue(firstNode);
+    }
+    
+    private void CloseDialogue()
+    {
+        dialoguePanel.SetActive(false);
+        isDialogueActive = false; // Odemkne hráče
     }
 
     public void ContinueDialogue(DialogueNode node)
@@ -141,7 +150,7 @@ public class DialogueManager : MonoBehaviour
                     if (npcAnimal != null)
                     {
                         npcAnimal.MakeAggressive(); // Hodí NPC do agresivního stavu
-                        dialoguePanel.SetActive(false);
+                        CloseDialogue();
                         return; 
                     }
                 }
@@ -152,7 +161,7 @@ public class DialogueManager : MonoBehaviour
 
                 if (choice.opensShop)
                 {
-                    dialoguePanel.SetActive(false);
+                    CloseDialogue();
                     // V původním kódu je currentMerchant definovaný mimo, u tebe taky.
                     // Jen bacha, jestli máš referenci správně.
                     ShopManager.Instance.OpenShop(currentMerchant);
@@ -160,7 +169,7 @@ public class DialogueManager : MonoBehaviour
                 else
                 {
                     if (choice.nextNode != null) ContinueDialogue(choice.nextNode); 
-                    else dialoguePanel.SetActive(false);
+                    else CloseDialogue();
                 }
             });
         }
