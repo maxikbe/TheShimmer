@@ -9,7 +9,11 @@ public class SaveData : MonoBehaviour
 
     void Start()
     {
-        playerObject = gameObject.transform.parent.gameObject;
+        if (transform.parent != null) {
+            playerObject = transform.parent.gameObject;
+        } else {
+            Debug.LogError("None Player Obj found!");
+        }
         tent = GameObject.FindWithTag("Tent");
     }
     public void SaveDataFunctiomn()
