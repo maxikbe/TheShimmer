@@ -25,7 +25,7 @@ public class CorpseLoot : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             playerInRange = true;
-            Debug.Log("Zmačkni 'E' pro lootování!");
+            InteractionManager.ShowInteraction("[E] Loot");
         }
     }
 
@@ -33,6 +33,7 @@ public class CorpseLoot : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
+            InteractionManager.HideInteraction();
             playerInRange = false;
         }
     }
@@ -58,7 +59,7 @@ public class CorpseLoot : MonoBehaviour
                 newLootItem.amount = 1; 
 
                 gameDataManager.currentGameData.OwnedItems.Add(newLootItem);
-                Debug.Log($"Lootnul jsi: {staticItem.itemName} (Uloženo do OwnedItems)");
+                LootUIManager.Instance.ShowLoot(staticItem);
             }
         }
         else

@@ -45,6 +45,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (DialogueManager.isDialogueActive)
+        {
+            movement = Vector2.zero;
+            UpdateAnimator(false); // Vypne běh a updatne animator
+            return; 
+        }
+        
         float horizontal = 0f;
         float vertical = 0f;
 

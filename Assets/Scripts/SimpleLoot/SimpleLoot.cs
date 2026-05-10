@@ -61,7 +61,7 @@ public class SimpleLoot : MonoBehaviour
                 // Zavoláme UI manažera, ať to ukáže v rohu obrazovky
                 if (LootUIManager.Instance != null)
                 {
-                    LootUIManager.Instance.ShowLootNotification(staticItem);
+                    LootUIManager.Instance.ShowLoot(staticItem);
                 }
                 else
                 {
